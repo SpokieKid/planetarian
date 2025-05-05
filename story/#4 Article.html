@@ -1,0 +1,684 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Aaros #4 Article</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1e7add39-0a4a-805d-b259-f7180ab89361" class="page sans"><header><h1 class="page-title">Aaros #4 Article</h1><p class="page-description"></p></header><div class="page-body"><p id="1e7add39-0a4a-8026-b444-cb2fcc8baa88" class=""><em>This post is taking part in the </em><em><strong><a href="https://paragraph.xyz/@kiwi-updates/farcaster-2026-writing-contest">Farcaster 2026 writing contest</a></strong></em><em><strong> </strong></em>organised by <strong><a href="https://news.kiwistand.com/"><span style="border-bottom:0.05em solid">Kiwi News </span></a></strong>&amp; sponsored by <strong><a href="https://purple.construction/about/"><span style="border-bottom:0.05em solid">Purple DAO</span></a></strong><strong><span style="border-bottom:0.05em solid">.</span></strong></p><p id="1e7add39-0a4a-8080-9328-f2bf3e52d971" class=""><em>I would like to thank </em><em><strong><a href="https://warpcast.com/bigsong">DaSong</a></strong></em><em>, </em><em><strong><a href="https://warpcast.com/shirlene-l">Shirlene Liu</a></strong></em><em>, and </em><em><strong><a href="https://warpcast.com/tg326">Tr0y</a></strong></em><em> for their insightful reviews, which were instrumental in grounding my theory and enabling me to craft a more compelling narrative.</em></p><p id="1e7add39-0a4a-80ee-87b3-d767d5e28e75" class="">Special thanks to <strong><a href="https://warpcast.com/jessepollak">@jessepollak</a></strong>, <strong><a href="https://warpcast.com/0xluo.eth">@0xluo</a></strong>, and <strong><a href="https://warpcast.com/pingfeng">@pingfeng(lilping)</a></strong> who has always been inspired my imagination and sparks on these theories and narratives.</p><blockquote id="1e7add39-0a4a-80e8-823a-f16b59075264" class="">“Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation, by children being taught mathematical concepts... A graphic representation of data abstracted from banks of every computer in the human system. Unthinkable complexity. Lines of light ranged in the nonspace of the mind, clusters and constellations of data. Like city lights, receding...” ― William Gibson, Neuromancer</blockquote><p id="1e7add39-0a4a-80cd-ace1-f816dfe17dfe" class="">How can Farcaster grow significantly without losing its soul? If you ask me I would say by creating a new, onchain-native society, evolving into a brand new planetary onchain economy, turning the tables completely.</p><p id="1e7add39-0a4a-80eb-993f-d0fd8e9a1862" class="">I&#x27;ve always believed that the onchain economy, combined with onchain social networks and the broader blockchain ecosystem, is forging a decentralised society. I previously explored this in my essay for the first time in &quot;Onchainomics #2: Bridging Onchainomics with decentralised Social – A Social Platform, or an Emerging Re-globalisation Society?&quot; In that essay, I argued that the Farcaster ecosystem represents a trend towards an emerging re-globalised society.</p><p id="1e7add39-0a4a-8036-a612-f90edbf0ea13" class="">So, how can Farcaster, and broader collaborations like those with the Base ecosystem, integrate and expand while maintaining their inherent decentralised nature?</p><p id="1e7add39-0a4a-80f9-a34f-c905af20a81c" class="">In this article, through brainstorming and a quick A/B comparison between a traditional society and a decentralised society, we&#x27;ll explore their key differences. I used a similar analytical framework in Onchainomics #2 for onchain demand analysis, but don&#x27;t worry – I&#x27;ll strive to use clear and accessible language for a wider audience this time.</p><h1 id="1e7add39-0a4a-804e-bd3c-cec9f9ab2957" class=""><strong>What is a Society?</strong></h1><p id="1e7add39-0a4a-80b9-947f-fe8c301b2375" class="">Instead of relying on textbook definitions, let&#x27;s define society in a more open and self-consistent way. I&#x27;ll use a brainstorming-based, categorical approach:</p><p id="1e7add39-0a4a-8058-b716-c59bace6ac7f" class="">When we discuss society, many topics emerge. If we examine these closely, it&#x27;s surprisingly similar to designing a SimCity-like game. Various categories need to be considered, but on a much broader scale – national, international, and even global.</p><figure id="1e7add39-0a4a-8010-991d-c87999351dad" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F6772ee7d3b2217a712dfcf3af135bc74.png&amp;w=3840&amp;q=75"><img style="width:700px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F6772ee7d3b2217a712dfcf3af135bc74.png&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-802f-aebc-c0a2505be90b" class="">Simcity4 user interface; Source: <strong><a href="https://community.simtropolis.com/files/file/33048-ui-blue-skin/">simtropolis</a></strong></p><p id="1e7add39-0a4a-8021-b58d-fc372ed406de" class="">So, what are the key elements that allow a society to function? A government, laws, law enforcement, social networks, infrastructure, healthcare, medicine, education, postal services, businesses, currency, leisure activities, culture... It&#x27;s impossible to create a truly exhaustive list using this categorical approach, but we now have a rough outline, which we can visualise as a bubble:</p><figure id="1e7add39-0a4a-8063-a29f-eec67eebadd5" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F1f4a9a4a2d3f556c811b6656d3e5622a.png&amp;w=3840&amp;q=75"><img style="width:700px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F1f4a9a4a2d3f556c811b6656d3e5622a.png&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-80c3-9e4d-c39ad3c6306a" class="">non-exhaustive categories that enable a society to function; Source: 183Aaros</p><h1 id="1e7add39-0a4a-807d-9b11-e128fd6c60d5" class=""><strong>Why Decentralised Society?</strong></h1><p id="1e7add39-0a4a-8006-8df8-ff81ab077277" class="">GenZ grew up during a period of intense globalisation. I recall, in my childhood computer classes, the pervasive idea that &quot;the world is a village.&quot; I chatted on Omegle, making friends from Finland and France. I genuinely believed then that the world would one day be united and interconnected, and I was convinced this would happen within my lifetime.</p><p id="1e7add39-0a4a-80f5-8775-ebb731a0992b" class="">However, the world is changing rapidly. The trend of de-globalisation is underway; the world is no longer the one we knew between the 1980s and the 2010s. Whether history is repeating itself or progressing by repeating with slight variations, few can deny that the world&#x27;s pace of change has accelerated since 2018.</p><p id="1e7add39-0a4a-802a-90f7-e46ed7e54ca9" class="">In this era of re-globalisation, shadowed by tariffs and various forms of conflict – trade wars, financial wars, currency wars, and devastating hot wars – our planet needs a new system. A system where jobs, people, ideas, and connections can flow freely, without borders or permission.</p><p id="1e7add39-0a4a-80f9-9dc8-dc3de1c1e743" class="">Consider RedNote as an example: TikTok faces potential bans, and some Americans are <strong><a href="https://www.bbc.com/news/articles/c983lr756xwo">turning to RedNote</a></strong> — a Chinese social app where people share daily pictures, GIFs, and videos of their lives. This has led to a phenomenon dubbed <strong><a href="https://www.bbc.com/news/articles/c2475l7zpqyo">&quot;US &#x27;TikTok refugees&#x27;&quot;</a></strong>. As a result, people are realising that we are not so different.</p><p id="1e7add39-0a4a-8045-b205-f76e6a5fd6f4" class="">People on this planet are yearning and striving for connection.</p><p id="1e7add39-0a4a-8051-8c3b-f8f2d8ad254f" class="">We want that kind of freedom and openness in our lives.</p><h2 id="1e7add39-0a4a-80d3-a46f-e6a917773098" class=""><strong>The Global Hyper-macroeconomics Crisis</strong></h2><figure id="1e7add39-0a4a-809d-b8b6-f3b7426f6d38" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F32c1a30f5e3526b08b4f5745264e1085.png&amp;w=3840&amp;q=75"><img style="width:700px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F32c1a30f5e3526b08b4f5745264e1085.png&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-809d-aec4-c1869a13eb52" class="">Source: 183Aaros, powered by Stable Diffusion</p><p id="1e7add39-0a4a-80da-bea7-c93b023aea6b" class="">There are countless shreds of evidence that can prove we’re in an early stage of something different age and times from before.</p><p id="1e7add39-0a4a-80ef-a0ec-ec5246d624fd" class="">Specifically speaking, the crisis I’m referring to is a hyper-macroeconomics, global, fundamental-level crisis. We’re in the early stages of the version of cybernetics society, the theoretical preparation for this cyberpunk future is all set and ready for launch. From the 1980s the loose tightening of investment banking business and financial opening has dramatically increased the development pace of the internet industry and cybernetic technologies.</p><p id="1e7add39-0a4a-80fd-8f43-df6668a8901b" class="">This stage could be seen as the completion of a world experiment done by the cybernetic, all theories, experiments, technologies and social structures are ready to evolve from a modern industry society to a post-capitalism cyberpunk atomic society.</p><p id="1e7add39-0a4a-80dc-bb27-fdbf02506d89" class="">To clarify, I’m not talking about conspiracy here, this stage of how cybernetics evolved with technological advancement is spontaneous, even mechanical towards the purpose set by itself.</p><p id="1e7add39-0a4a-80dd-8c8b-c43ff684b483" class="">Atomical is in the blood of this post-capitalism cyberpunk society.</p><p id="1e7add39-0a4a-80be-b7ab-d54dcdd53bcd" class="">In another word, decentralised.</p><h1 id="1e7add39-0a4a-80c7-b5fc-f218b8d34c4b" class=""><strong>Farcaster: A Decentralised Social Network</strong></h1><p id="1e7add39-0a4a-802a-afbf-ec9d94da267f" class="">Let’s look at the current status of Farcaster, what does Farcaster already having here?</p><p id="1e7add39-0a4a-80ca-8ada-f6e88a9f2d58" class="">Fundamentally speaking Farcaster is already a portocol that decentralised to build on, with a strong, resillient social network that connecting builders and seed consumers, having a really close feedbacks loop. This is a good start and clean flywheel, as builders and pionner consumers can find interesting things on-frame, onchain.</p><p id="1e7add39-0a4a-802b-b9c8-db0fc898aec5" class="">Another ace of Farcaster is the creator economy, but I’d call it onchain culture machine: with motivated, inspiring and high connected communities such as <strong><a href="https://warpcast.com/~/channel/higher">Higher</a></strong>, creators can easily share their contents and arts right away to Farcaster with just simple few steps, all onchain in a few seconds. Onchain native creators are playing, creating, innovating new experiences and narratives onchain. With the support of creator economy, including Degen, Moxie, Clanker, Bnkr, Anon and more…</p><p id="1e7add39-0a4a-8050-a98c-dfa79bbd5c00" class="">This is a non-stop builder ecosystem.</p><h1 id="1e7add39-0a4a-80d7-a4f3-c92f0f9e60aa" class=""><strong>Wallet + Social is a Bold Move Towards Planetary Onchain Economy</strong></h1><p id="1e7add39-0a4a-8034-a34a-da08a7d06179" class="">On Feb 2025, Jesse, John and Dan announced that the Coinbase Wallet will intergrate Farcaster mini-apps in the wallet. That being said, I believe there would be more intergration, especially real world utilities and AI agent applications in the future, such as <strong><a href="https://x.com/jessepollak/status/1881851708730659275">Jesse ordered a pizza</a></strong> by cooperating with 2 agents - Luna and Agent byte on Base.</p><p id="1e7add39-0a4a-80b7-a386-e40a30ace37e" class="">This is a bold move shows how Coinbase, Base and Farcaster shares a higher ambition, and it&#x27;s clearly their biggest move ever, second only to cbBTC.</p><figure id="1e7add39-0a4a-80e7-9f47-f05912de12e1" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2Fb0cdd6d140f587c9eb8a8d6fa4efc6d8.png&amp;w=3840&amp;q=75"><img style="width:700px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2Fb0cdd6d140f587c9eb8a8d6fa4efc6d8.png&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-80f7-8118-f4097e9ef8e3" class="">Base builder #001 Jesse Pollak, Coinbase Wallet Director of Product John Granata, and Farcaster co-founder Dan Romero; Source: <strong><a href="https://x.com/CoinbaseWallet/status/1886822569334181966">Coinbase Wallet X</a></strong></p><p id="1e7add39-0a4a-8007-92d5-e598875da372" class="">The combination of wallets and social features actually has Web2 precedents. Intriguingly, there was a kind of mirror image development in China&#x27;s Web2 market, where efforts to add social features to wallets and wallet features to social platforms happened at the same time, becoming well-known examples.</p><p id="1e7add39-0a4a-80ad-a105-fdb309d946ac" class="">WeChat, fundamentally a social platform, has seen WeChat Pay flourish due to its massive user base and intuitive payment features, key factors in its widespread adoption. Alipay, a direct competitor, also attempted to integrate social features, but these efforts were unsuccessful. However, Alipay&#x27;s diverse mini-programs have been remarkably successful, providing users with convenient payment options, identity verification, movie ticket purchases, and a range of other services.</p><p id="1e7add39-0a4a-8018-a40e-c0dd50aa0023" class="">Line provides another example, leading the &quot;Super App&quot; trend after 2022 and experiencing rapid growth across Southeast Asia. Numerous examples suggest that &quot;Super Apps&quot; could be the next global trend, particularly for applications aiming to provide comprehensive services.</p><p id="1e7add39-0a4a-80aa-aab0-e7d2b59c6e25" class="">Critically speaking, some might concerned about privacy issues caused by the intergration of the wallet and social app. As I <strong><a href="https://news.kiwistand.com/stories?index=0x67a5ccb124d0679592f38e0a3be41dd452ee48070bf6383908bf67c90af8697ad9ce8858&amp;cacheBuster=67a73547edfbcca8dc0414ac9845605a3440963fc749ae765da207b743f33ee1bdab181e#0x67a73547edfbcca8dc0414ac9845605a3440963fc749ae765da207b743f33ee1bdab181e">commented</a></strong> on Kiwi News regarding &quot;<strong><a href="https://xcancel.com/wslyvh/status/1887522891060949215#m">Wallets don&#x27;t need social features</a></strong>&quot;, I don&#x27;t believe the development of wallets with social features should be halted due to privacy concerns. Web2 payment solutions like PayPal, WeChat, and Alipay have achieved widespread global adoption. I&#x27;m confident that Ethereum, ZK proofs, and other decentralised protocols and technology stacks can surpass Web2 in this area. As Jesse put it this way &quot;It is not DApps, it&#x27;s just apps.&quot; Our goal should be to ensure a seamless and user-friendly, and private experience; we&#x27;re not merely competing with other decentralised applications, but with all applications.</p><h1 id="1e7add39-0a4a-80f4-9cce-db756a6725b3" class=""><strong>So What Make it Different?</strong></h1><p id="1e7add39-0a4a-80a4-a926-e23a5d51828b" class="">What makes Farcaster stands out when it comes to decentralised society? Why it is not neccesary Wechat, Alipay, or Line doing this &#x27;the next global trend&#x27;?</p><p id="1e7add39-0a4a-807d-a63a-eb6a22a02461" class="">As I mentioned above, while Alipay&#x27;s social networking initiatives may have faltered, its mini-program ecosystem has thrived, presenting a compelling parallel to the integration of Farcaster frames within Coinbase Wallet.</p><p id="1e7add39-0a4a-808d-bf0d-e3787268036c" class="">This time it&#x27;s different – we&#x27;re talking about a planetary onchain economy. Keep in mind that &quot;homogeneous distribution&quot;, atomic, decentralised characteristic as I mentioned above, it will make it all difference.</p><p id="1e7add39-0a4a-809c-a65a-fe4094d4efe8" class="">And please bear in mind that narrative is a superpower, just as stories shaped human education in the early Stone Age. It preserves knowledge and heritage for the next generation, ultimately shaping technology and our society. This time, narrative will also spread the word - our onchain knowledge, technologies, and capital will be shaped on Farcaster and the broader ecosystem. And this time, Farcaster would be the storm eye of narrative. With the intergration of Farcaster frame and Coinbase Wallet, combining with the creator economy.</p><h1 id="1e7add39-0a4a-8091-8660-e185caff0adc" class=""><strong>Stay Bullish Alongside with History</strong></h1><p id="1e7add39-0a4a-8064-9ef6-ca37d661d21a" class="">Blockchain is planetary and decentralised, in its blood.</p><p id="1e7add39-0a4a-809c-a547-c3beade982d5" class="">Allow me to explain the concept of the &quot;Planetary&quot; framework - Why is it atomical, onchain, and decentralised?</p><p id="1e7add39-0a4a-8008-87b4-ced22e6df3a5" class="">Think of cryptocurrency as something born for the stars, not just for swapping money across borders. It&#x27;s designed from the ground up to be interplanetary. Before crypto came along, we had &quot;globalisation&quot; taking over from &quot;internationalisation,&quot; but even globalisation felt a bit... landbound. It didn&#x27;t quite capture that sense of reaching for the cosmos.</p><p id="1e7add39-0a4a-80cf-90aa-c021ecb35a53" class="">Planetary phrase is a universal shift.</p><p id="1e7add39-0a4a-8032-a59e-d76ddc904e73" class="">It&#x27;s not solely about cross-nation expansion; it also concerns the even arrangement of how things work, particularly the pace, all within this single planetary economic system.</p><p id="1e7add39-0a4a-802d-965a-d9c769345e66" class="">In the planetary phase, thanks to the economy based onchain, entities of the economy have been equalised and atomised. The economic right has been homogeneously distributed—a uniform distribution of structures at this stage (as a trend, not a result). No matter who you are, where you are, or when you are, even if you&#x27;re an AI agent, a robotic arm, a cat, or whatever; whether you&#x27;re deep in the ocean, on land, or floating in the universe ready for a frame shift drive charging, it&#x27;s all the same: permissionless, fast, and verified.</p><figure id="1e7add39-0a4a-8018-84b9-fd80e76bdf31" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F4866ebb2b403ffee98971a47294d8b09.png&amp;w=3840&amp;q=75"><img style="width:700px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F4866ebb2b403ffee98971a47294d8b09.png&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-8095-9c59-ddf48e5848ec" class="">International vs. Global vs. Planetary Economy; Source: 183Aaros</p><p id="1e7add39-0a4a-80e7-9a77-fb27a213c6c8" class="">Ultimately, what is the endgame for this decentralised society, as we already known it is planetary in its blood?</p><p id="1e7add39-0a4a-807a-b730-ee73ee72209e" class="">Consider a medieval history: peasants were often bound to the land of nobles and knights, unable to leave without their lord&#x27;s permission. However, after the pivotal year of 1453 and throughout the 16th century, significant changes occurred. Mercenaries, merchants, and other free people were moving across Europe and Asia, and a new activity arose - oceanic voyages connecting continents. Gold and silver were brought back to Europe, while new technologies, people, and capital spread across the globe. These developments fundamentally transformed the world.</p><p id="1e7add39-0a4a-803c-8df0-fe30beb4c5d6" class="">Looks similar? If we link it back to the catogorical method to define a society … and still bear the narrative, culture machine stuff in mind ...</p><p id="1e7add39-0a4a-802f-b9da-e260609da7c6" class="">I&#x27;m not sure how people can be bearish on these things: smart wallets, cryptocurrency, smart contracts, AI agents etc., honestly I&#x27;m fully bullish on these new trends, just like ARK Invest mentioned in their <strong><a href="https://www.ark-invest.com/big-ideas-2025">Big Ideas 2025 Report</a></strong>.</p><p id="1e7add39-0a4a-80fd-abe2-f73fe22cac4b" class="">As we enter the solar phase, a decentralised society becomes crucial.</p><figure id="1e7add39-0a4a-8096-abd8-e19f88246d36" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F728d966fcfd213a4eb59e2ad59f53d1e.png&amp;w=3840&amp;q=75"><img style="width:700px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F728d966fcfd213a4eb59e2ad59f53d1e.png&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-80a4-b923-ebb2e2193729" class="">non-exhaustive categories that enable a decentralised society to function; Source: 183Aaros</p><p id="1e7add39-0a4a-80f0-998f-ddb51f231c9b" class="">How can Farcaster achieve significant growth while retaining its core values, and why is the Farcaster + Base combination crucial?</p><p id="1e7add39-0a4a-8048-82e4-fea81ba5535d" class="">While we cannot guarantee that this transformation will occur exclusively on Farcaster and Base, the resilience of onchain social networks and friendships - forged, maintained, and flourishing on-chain - demonstrates a powerful potential.</p><p id="1e7add39-0a4a-8083-af59-e3a640b9e921" class="">After witnessing dramatic cycles of rise and fall, akin to civilizations, I believe we are capable of building a new, planetary, onchain, and decentralised society – one that is entirely onchain native.</p><h3 id="1e7add39-0a4a-80b0-8511-ecf1e6bb217b" class=""><strong>Author Bio</strong></h3><figure id="1e7add39-0a4a-800b-ad30-d8e2bd261264" class="image"><a href="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F0c662f8edf0d88eb178261f76b22d6f1.jpg&amp;w=3840&amp;q=75"><img style="width:640px" src="https://paragraph.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpapyrus_images%2F0c662f8edf0d88eb178261f76b22d6f1.jpg&amp;w=3840&amp;q=75"/></a></figure><p id="1e7add39-0a4a-8021-a873-e85d1cd96d84" class=""><em><strong><a href="http://res.cloudinary.com/dxhpzq6ej/image/upload/v1727040324/production/cm1e37ugn003d21mc8lvs7oia.jpg">Aaron｜183Aaros.base.eth</a></strong></em></p><p id="1e7add39-0a4a-8028-8646-dc87ae0badaf" class=""><strong><a href="https://warpcast.com/183aaros.eth">Farcaster</a></strong><strong> | </strong><strong><a href="https://x.com/aaron183Aaros">X</a></strong><strong> | </strong><strong><a href="https://linktr.ee/183aaros">Linktree</a></strong><strong> | </strong><strong><a href="https://zora.co/manage/1155/base:0x36a16070fe69fe6a8257d9ce77b3ad04b36670a9">Zora (For Colletable Edition)</a></strong></p><p id="1e7add39-0a4a-8058-8b24-e5b50a64824c" class=""><strong><a href="https://warpcast.com/183aaros.eth">183Aaros.eth</a></strong> is a long-term contributor to the onchain economy, an onchain economics researcher and senior analyst focusing on onchain economic activities and their impact on off-chain economies. He&#x27;s also the founder of the LeapOnchain, an association of onchain native Analysts&amp; DAO experts. His recent essays series - Onchainomics #1, #2 and #3 have received 3500+ mints on Zora and won the 2nd and twice 3rd place in multiple <strong><a href="https://news.kiwistand.com/">Kiwi News</a></strong> contest. You can explore more of his works and information on his <strong><a href="https://183aaros.notion.site/">personal homepage</a></strong>.</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

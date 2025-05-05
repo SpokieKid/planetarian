@@ -1,0 +1,80 @@
+.dialog-overlay {
+    /* Remove positioning and centering */
+    /* background-color: rgba(0, 0, 0, 0.7); */ /* Keep if you want dimming, but handle positioning elsewhere */
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    /* z-index: 110; */ 
+    /* backdrop-filter: blur(4px); */
+    /* Instead, make the wrapper handle position */
+}
+
+.dialog-box {
+    position: absolute; /* Position relative to the new wrapper */
+    bottom: 65px; /* Position it above the icon (50px height + 15px gap) */
+    left: 0px; /* Align with the icon */
+    z-index: 110; /* Keep it above other elements */
+    
+    /* Keep existing styles for appearance */
+    background-color: #2a2a3e; 
+    color: #eee;
+    padding: 20px 25px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 350px; /* Maybe make it slightly smaller */
+    width: auto; /* Adjust width based on content */
+    min-width: 250px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
+    /* Add a pointer */
+    /* transform: translateX(-50%); */ /* Adjust centering if needed */
+}
+
+/* Optional: Add a little triangle pointer */
+.dialog-box::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* Position below the box */
+    left: 25px; /* Align roughly with the icon center */
+    /* transform: translateX(-50%); */
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #2a2a3e; /* Match dialog background */
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font-size: 1.4em;
+    color: #a9def9; /* Light blue title */
+}
+
+.dialog-close-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 1.8em;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+}
+
+.dialog-close-btn:hover {
+    color: white;
+}
+
+.dialog-content {
+    line-height: 1.6;
+    max-height: 60vh; /* Allow content scrolling if needed */
+    overflow-y: auto;
+} 

@@ -1,0 +1,110 @@
+.guide-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1600; /* Above game, below potential modals */
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.guide-overlay.visible {
+  opacity: 1;
+}
+
+.guide-content-wrapper {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  background-color: rgba(26, 26, 46, 0.8); /* Dark semi-transparent background like ResourcePanel */
+  padding: 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  width: 90%;
+  backdrop-filter: blur(5px);
+}
+
+.guide-image-container {
+  margin-right: 25px;
+  flex-shrink: 0; /* Prevent image from shrinking */
+}
+
+.guide-assistant-image {
+  width: 100px; /* Adjust size as needed */
+  height: 100px;
+  border-radius: 50%; /* Make it circular */
+  object-fit: cover; /* Fill the circle, crop if needed */
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.guide-text-box {
+  flex-grow: 1;
+  color: #e0e0e0; /* Light text color */
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.guide-text {
+  margin-bottom: 20px;
+  line-height: 1.6;
+  font-size: 1.1em;
+}
+
+.guide-text strong {
+    color: #fca311; /* Highlight color like ResourcePanel title */
+    font-weight: normal; /* Avoid double bolding if base font is bold */
+}
+
+.planet-input {
+    display: block;
+    margin-top: 15px;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+    font-family: inherit;
+    border-radius: 4px;
+    width: 100%; /* Take full width of text box */
+    box-sizing: border-box;
+}
+
+.guide-next-btn {
+  /* Uses .pixel-button style */
+  margin-top: 15px;
+  float: right; /* Position button to the right */
+}
+
+/* Ensure pixel button styles are available (copy if not globally defined) */
+/* If not already present in a global CSS file */
+.pixel-button {
+  background-color: #9d4edd; /* A purple color */
+  border: 2px solid #000;
+  color: white;
+  padding: 10px 20px; /* Adjusted padding */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px; /* Adjusted size */
+  font-family: 'Press Start 2P', monospace;
+  font-weight: bold;
+  cursor: pointer;
+  image-rendering: pixelated;
+  box-shadow: 3px 3px 0px #000; /* Adjusted shadow */
+  border-radius: 0;
+  transition: background-color 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pixel-button:hover {
+  background-color: #c77dff;
+}
+
+.pixel-button:active {
+  background-color: #7b2cbf;
+  box-shadow: 1px 1px 0px #000;
+  transform: translate(2px, 2px); /* Adjusted transform */
+} 

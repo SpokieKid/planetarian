@@ -1,0 +1,98 @@
+.resource-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(26, 26, 46, 0.85); /* Dark blue-purple semi-transparent */
+    color: #e0e0e0;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 300px;
+    z-index: 50;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+.resource-panel h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #fca311; /* Orange title */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mode-badge {
+    font-size: 0.7em;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 10px;
+}
+
+/* Style badges based on mode */
+.mode-international {
+    background-color: #e94560; /* Reddish */
+    color: white;
+}
+.mode-global {
+    background-color: #fca311; /* Orange */
+    color: #16213e; /* Deep blue text */
+}
+.mode-planetary {
+    background-color: #50c878; /* Green */
+    color: black;
+}
+
+.planet-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9em;
+    color: #c0c0e0; /* Lighter text for stats */
+}
+
+.planet-stats span {
+    margin: 0 5px;
+}
+
+p {
+    margin-top: 5px;
+    margin-bottom: 15px; /* More space after growth points */
+    text-align: center;
+    color: #e0e0e0;
+    font-size: 0.95em;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+/* Combined styling for debug buttons */
+.debug-event-btn,
+.debug-turn-btn {
+    padding: 8px 15px;
+    background-color: #4f4f81; /* Consistent button color */
+    color: white;
+    border: 1px solid #6a6aaf;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    flex-grow: 1; /* Make buttons fill space if needed */
+    text-align: center;
+}
+
+.debug-event-btn:hover,
+.debug-turn-btn:hover {
+    background-color: #6a6aaf;
+} 
