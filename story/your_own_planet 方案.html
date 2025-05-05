@@ -1,0 +1,704 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>your_own_planet 方案</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1e3add39-0a4a-80d3-9a69-fa004797e2e2" class="page sans"><header><h1 class="page-title">your_own_planet 方案</h1><p class="page-description"></p></header><div class="page-body"><h1 id="1e3add39-0a4a-80d0-8145-d5fc5fee8ea1" class="">With Aaros: Planetary Pet 星球养成游戏</h1><h2 id="1e3add39-0a4a-8068-95a3-d7348436b663" class="">🌌 项目目标</h2><p id="1e3add39-0a4a-80ee-baa4-fc5bc2708ffc" class="">打造一个完整的前端项目，支持用户养成属于自己的星球。星球出生于不同社会模式（International / Global / Planetary），并在成长过程中经历不同资源变化与环境演化，同时融入我们强调 &quot;Planetary Onchain Society&quot; 的叙事内容。</p><h2 id="1e3add39-0a4a-80f0-9b05-e0481de19010" class="">🔧 技术要求</h2><ul id="1e3add39-0a4a-80ae-bb31-c37f473d143c" class="bulleted-list"><li style="list-style-type:disc">【前端框架】React + Zustand 状态管理</li></ul><ul id="1e3add39-0a4a-8000-b48b-d0a2b4f7265a" class="bulleted-list"><li style="list-style-type:disc">【渲染】Phaser.js 或 Pixi.js（用于星球与环境变化渲染）</li></ul><ul id="1e3add39-0a4a-8049-adb2-f02438efa155" class="bulleted-list"><li style="list-style-type:disc">【交互】轻量 Canvas / WebGL 动效，支持点击、拖拽</li></ul><ul id="1e3add39-0a4a-807f-8ef1-d4ffe5e63896" class="bulleted-list"><li style="list-style-type:disc">【数据管理】本地持久化（LocalStorage），预留接口用于未来链上存档</li></ul><ul id="1e3add39-0a4a-8014-99b3-d73d38678bb4" class="bulleted-list"><li style="list-style-type:disc">【部署】网页端（初期），未来可兼容 Farcaster Frame / Telegram MiniApp</li></ul><h2 id="1e3add39-0a4a-8036-b044-e9fb67425962" class="">🌍 核心功能模块</h2><h3 id="1e3add39-0a4a-8026-8196-d090851d7c9d" class="">1. 星球生成（Planet Creation）</h3><ul id="1e3add39-0a4a-807c-9f8b-d249b7e779be" class="bulleted-list"><li style="list-style-type:disc">用户初次进入时选择出生模式：<ul id="1e3add39-0a4a-80f1-8c00-f734088a3b76" class="bulleted-list"><li style="list-style-type:circle">International</li></ul><ul id="1e3add39-0a4a-80fe-b393-ef2a99f93447" class="bulleted-list"><li style="list-style-type:circle">Global</li></ul><ul id="1e3add39-0a4a-8093-a4bf-e19c2f914a58" class="bulleted-list"><li style="list-style-type:circle">Planetary</li></ul></li></ul><ul id="1e3add39-0a4a-8017-a745-cecbd9e824b9" class="bulleted-list"><li style="list-style-type:disc">每种模式初始星球外观、资源设定不同。</li></ul><ul id="1e3add39-0a4a-807e-9099-f221697f32d6" class="bulleted-list"><li style="list-style-type:disc">自动生成星球名称（可随机或用户自定义）。</li></ul><h3 id="1e3add39-0a4a-8021-9738-c3e823424943" class="">2. 星球养成系统（Planet Evolution）</h3><ul id="1e3add39-0a4a-8032-a28c-d5444b6b69c1" class="bulleted-list"><li style="list-style-type:disc">星球每日/每次交互积累成长点（Growth Points）。</li></ul><ul id="1e3add39-0a4a-80dc-a1ff-dcdc2d847fc7" class="bulleted-list"><li style="list-style-type:disc">不同模式影响成长逻辑：<ul id="1e3add39-0a4a-8072-9ad1-e64296a9edb9" class="bulleted-list"><li style="list-style-type:circle"><strong>International</strong>：受限多，成长慢，需频繁审批、验证（模拟国家壁垒）。</li></ul><ul id="1e3add39-0a4a-8027-a950-f2f5dd0c1c10" class="bulleted-list"><li style="list-style-type:circle"><strong>Global</strong>：中等成长速度，存在费用/资源消耗（模拟全球资本流动）。</li></ul><ul id="1e3add39-0a4a-80cc-97b7-f3d8b2ac8aca" class="bulleted-list"><li style="list-style-type:circle"><strong>Planetary</strong>：无阻碍，自由成长，资源繁荣。</li></ul></li></ul><h3 id="1e3add39-0a4a-80f9-a5a1-e422b54f3ff2" class="">3. 资源系统（Resources）</h3><ul id="1e3add39-0a4a-804a-8807-dac68304bbf2" class="bulleted-list"><li style="list-style-type:disc">资源包括：<ul id="1e3add39-0a4a-80a2-b473-c8f5c8a67dec" class="bulleted-list"><li style="list-style-type:circle">水（Water）</li></ul><ul id="1e3add39-0a4a-807a-94a3-d81080039f01" class="bulleted-list"><li style="list-style-type:circle">光（Light）</li></ul><ul id="1e3add39-0a4a-8008-b980-caf15ab579d6" class="bulleted-list"><li style="list-style-type:circle">气（Air）</li></ul><ul id="1e3add39-0a4a-802f-9389-c327bfea3636" class="bulleted-list"><li style="list-style-type:circle">思想（Ideas）</li></ul></li></ul><ul id="1e3add39-0a4a-80e5-a523-e58c8759bba7" class="bulleted-list"><li style="list-style-type:disc">每日资源获取受社会模式影响：<ul id="1e3add39-0a4a-808a-a3b9-fad4582a69af" class="bulleted-list"><li style="list-style-type:circle">International：资源受限（如有配额或关税）</li></ul><ul id="1e3add39-0a4a-80bc-84fe-c1ec2dab3047" class="bulleted-list"><li style="list-style-type:circle">Global：资源浮动（如需手续费）</li></ul><ul id="1e3add39-0a4a-8010-bf46-ccc308b90bda" class="bulleted-list"><li style="list-style-type:circle">Planetary：资源自由增长（链上验证后可额外奖励）</li></ul></li></ul><h3 id="1e3add39-0a4a-8078-b7e1-df2ee553f9b6" class="">4. 环境变化（Environment Shifts）</h3><ul id="1e3add39-0a4a-8068-91d8-f53d500b03d1" class="bulleted-list"><li style="list-style-type:disc">随着成长，不同模式下星球环境发生变化：<ul id="1e3add39-0a4a-8074-9294-ece0103feebe" class="bulleted-list"><li style="list-style-type:circle"><strong>International</strong>：星球有国界线、审查云、孤岛城市。</li></ul><ul id="1e3add39-0a4a-807b-b44e-df029d465256" class="bulleted-list"><li style="list-style-type:circle"><strong>Global</strong>：跨国枢纽、金融风暴、巨型贸易中心。</li></ul><ul id="1e3add39-0a4a-80d2-a876-c56a66437f73" class="bulleted-list"><li style="list-style-type:circle"><strong>Planetary</strong>：自由丛林、链上城市、无边际光带。</li></ul></li></ul><ul id="1e3add39-0a4a-8091-99e1-d4b4b162cd27" class="bulleted-list"><li style="list-style-type:disc">可通过不同 UI/动画展示。</li></ul><h3 id="1e3add39-0a4a-80e8-ac25-d0731898ef0f" class="">5. 叙事内容嵌入（Narrative Integration）</h3><ul id="1e3add39-0a4a-8021-8e96-cf7fb91d1875" class="bulleted-list"><li style="list-style-type:disc">在特定成长节点触发叙事事件（如：&quot;你的星球因开放治理而迎来繁荣&quot;）。</li></ul><ul id="1e3add39-0a4a-80ba-8d90-f0befde889e5" class="bulleted-list"><li style="list-style-type:disc">叙事文本短小精炼，强调&quot;去中心化自由&quot;、&quot;Planetary 未来&quot;等主题。</li></ul><h3 id="1e3add39-0a4a-8005-9aeb-ec6c65140415" class="">6. 交互与小游戏（Mini-Interactions）</h3><ul id="1e3add39-0a4a-8049-a9bf-d13d773f7e34" class="bulleted-list"><li style="list-style-type:disc">简单交互增加粘性：<ul id="1e3add39-0a4a-8099-ae21-c3b45a6058a4" class="bulleted-list"><li style="list-style-type:circle">给星球添加能量（水、光、思想等）</li></ul><ul id="1e3add39-0a4a-800d-927f-d87e6e136b9f" class="bulleted-list"><li style="list-style-type:circle">升级星球文明（需消耗资源）</li></ul><ul id="1e3add39-0a4a-80b5-a223-d787479c70c7" class="bulleted-list"><li style="list-style-type:circle">选择星球发展的方向（如：文化优先、科技优先）</li></ul></li></ul><h3 id="1e3add39-0a4a-8068-bcaa-c801d55fcc75" class="">7. 分享与社交（Sharing）</h3><ul id="1e3add39-0a4a-8037-914d-d7d0944fe22f" class="bulleted-list"><li style="list-style-type:disc">用户可生成当前星球快照，分享到 Farcaster 或 Telegram</li></ul><ul id="1e3add39-0a4a-804b-b075-d07033747f8a" class="bulleted-list"><li style="list-style-type:disc">未来支持 mint 星球为 NFT（可预留接口）</li></ul><h2 id="1e3add39-0a4a-8094-813b-d396a179c09a" class="">🎓 星球模式具体设定表</h2><table id="1e3add39-0a4a-8012-a807-c2f1480afc69" class="simple-table"><tbody><tr id="1e3add39-0a4a-8046-ad91-caaa138f43ad"><td id="&lt;Oi]" class="">模式</td><td id="m^\}" class="">初始环境</td><td id="`ZD&lt;" class="">资源获取速度</td><td id="=g]U" class="">成长阻碍</td><td id="G]Ts" class="">特殊叙事</td></tr><tr id="1e3add39-0a4a-80e2-8254-dd40496b2a10"><td id="&lt;Oi]" class="">International</td><td id="m^\}" class="">单一大洲，强国界</td><td id="`ZD&lt;" class="">慢</td><td id="=g]U" class="">审查、壁垒</td><td id="G]Ts" class="">星球因孤立而资源短缺</td></tr><tr id="1e3add39-0a4a-8016-9f90-fdcadbb09d5a"><td id="&lt;Oi]" class="">Global</td><td id="m^\}" class="">多枢纽城市，贸易区</td><td id="`ZD&lt;" class="">中等</td><td id="=g]U" class="">费用、风险</td><td id="G]Ts" class="">星球经历金融风暴与繁荣周期</td></tr><tr id="1e3add39-0a4a-8098-8868-c896112d884b"><td id="&lt;Oi]" class="">Planetary</td><td id="m^\}" class="">无界森林，流动都市</td><td id="`ZD&lt;" class="">快速</td><td id="=g]U" class="">几乎无阻碍</td><td id="G]Ts" class="">星球因自由开放迎来科技与文化大爆发</td></tr></tbody></table><h2 id="1e3add39-0a4a-8085-bd01-f95ed6c5fc12" class="">🌟 开发优先级建议（阶段划分）</h2><h3 id="1e3add39-0a4a-80ca-b0f3-c86f7e21a3ea" class="">Phase 1（黑客松目标）</h3><ul id="1e3add39-0a4a-80da-bc06-eb68f73c94c8" class="bulleted-list"><li style="list-style-type:disc">完成星球模式选择 + 初始生成</li></ul><ul id="1e3add39-0a4a-8027-b5e3-f0f40312b0cd" class="bulleted-list"><li style="list-style-type:disc">完成资源变化与简单环境演化（每种模式至少两阶段变化）</li></ul><ul id="1e3add39-0a4a-8005-b5ab-ce2f7781c8cd" class="bulleted-list"><li style="list-style-type:disc">基础交互：添加资源、查看状态</li></ul><ul id="1e3add39-0a4a-800d-9328-ec8cfae4c495" class="bulleted-list"><li style="list-style-type:disc">简单叙事文本触发（如 Planetary 模式成长快的提示）</li></ul><h3 id="1e3add39-0a4a-8002-91f7-c30be9f27c33" class="">Phase 2（后续迭代）</h3><ul id="1e3add39-0a4a-8041-bb0e-d3d7eae64f2b" class="bulleted-list"><li style="list-style-type:disc">更丰富的环境演变动画与艺术素材</li></ul><ul id="1e3add39-0a4a-8020-b04f-e9b52509259b" class="bulleted-list"><li style="list-style-type:disc">更多资源种类与事件（如星际迁徙、文化兴起）</li></ul><ul id="1e3add39-0a4a-80be-a608-d62907dca855" class="bulleted-list"><li style="list-style-type:disc">AI助理（链上治理官、文化引导者）</li></ul><ul id="1e3add39-0a4a-8030-9203-e2d8c9e3d20a" class="bulleted-list"><li style="list-style-type:disc">链上身份绑定（星球钱包）与资产化（NFT化）</li></ul><p id="1e3add39-0a4a-80bc-a711-fa8e0aaf1873" class="">关于星球的动效：</p><h1 id="1e3add39-0a4a-809f-b506-dd9d0709b679" class=""><strong>✨ 星球成长动效设计提案</strong></h1><h3 id="1e3add39-0a4a-8077-b952-e5f78a5c6a1f" class=""><strong>总体要求</strong></h3><ul id="1e3add39-0a4a-80fa-b821-d2d6cac30404" class="bulleted-list"><li style="list-style-type:disc">风格：简洁轻量，突出成长感（避免重型 3D 模型负担）。</li></ul><ul id="1e3add39-0a4a-800f-ac83-ce8bbc6dba4c" class="bulleted-list"><li style="list-style-type:disc">引擎：Phaser.js 或 Pixi.js 渲染。</li></ul><ul id="1e3add39-0a4a-80bc-a015-f54814727b71" class="bulleted-list"><li style="list-style-type:disc">动画风格：缓慢律动（类似 Mountain 风格），增加沉浸感。</li></ul><ul id="1e3add39-0a4a-8082-98b6-e344522da87f" class="bulleted-list"><li style="list-style-type:disc">动效触发：成长节点变化、资源添加、模式转变。</li></ul><hr id="1e3add39-0a4a-80f8-8ed9-c43cae4a202d"/><h2 id="1e3add39-0a4a-80e9-b87e-f9ffd47b1a63" class=""><strong>🪐 动效元素拆分</strong></h2><table id="1e3add39-0a4a-8099-97dd-d5c60a757293" class="simple-table"><tbody><tr id="1e3add39-0a4a-80f0-b53c-ce69850d28e4"><td id="Iz]z" class=""><strong>动效类型</strong></td><td id="GD;h" class=""><strong>描述</strong></td><td id="Nl^F" class=""><strong>技术细节</strong></td></tr><tr id="1e3add39-0a4a-8012-a6ff-cbb4cd91ee8f"><td id="Iz]z" class="">星球基础旋转</td><td id="GD;h" class="">星球缓慢自转（周期 20s-30s）</td><td id="Nl^F" class="">sprite.rotation += 0.001 (Phaser 示例)</td></tr><tr id="1e3add39-0a4a-8022-9307-ff5fd9bb30fe"><td id="Iz]z" class="">资源灌溉动画</td><td id="GD;h" class="">添加水、光、思想等资源时，星球表面出现光晕或粒子流动</td><td id="Nl^F" class="">使用 ParticleEmitter 或 Alpha 渐变过渡</td></tr><tr id="1e3add39-0a4a-809f-856a-f2ed9f77595b"><td id="Iz]z" class="">环境阶段演变</td><td id="GD;h" class="">随着成长，星球表面解锁新的地貌元素（如森林、城市、链上节点）</td><td id="Nl^F" class="">分层 Sprite 替换或动态叠加</td></tr><tr id="1e3add39-0a4a-809e-a2d9-f2055abfb57f"><td id="Iz]z" class="">模式切换动效</td><td id="GD;h" class="">切换 International ➔ Global ➔ Planetary 时，星球颜色、背景星空发生变化</td><td id="Nl^F" class="">场景渐变 + 星球外形变化</td></tr><tr id="1e3add39-0a4a-8071-8c71-dddbaa58a3c8"><td id="Iz]z" class="">叙事事件触发</td><td id="GD;h" class="">某些叙事节点出现时，短暂高亮动画提示</td><td id="Nl^F" class="">加强粒子效果/屏幕轻微闪烁</td></tr><tr id="1e3add39-0a4a-80fa-a767-fc366f450e69"><td id="Iz]z" class="">星球健康反馈</td><td id="GD;h" class="">若资源匮乏，星球表面出现裂痕、乌云；资源充足时星球表面明亮生机</td><td id="Nl^F" class="">贴图替换+渐变动画</td></tr></tbody></table><hr id="1e3add39-0a4a-8035-abd1-c464d6c8bfb0"/><h2 id="1e3add39-0a4a-80e1-ae5a-d8cf4e301891" class=""><strong>📋 具体动效流程示例</strong></h2><h3 id="1e3add39-0a4a-80d6-8089-e7ad7edf5fd1" class=""><strong>例：玩家添加“思想资源”</strong></h3><ul id="1e3add39-0a4a-80de-b07b-d976cc1f32e0" class="bulleted-list"><li style="list-style-type:disc">点击思想按钮 ➔</li></ul><ul id="1e3add39-0a4a-80bd-8137-ede85a7f5c76" class="bulleted-list"><li style="list-style-type:disc">星球表面出现淡紫色粒子流（轻微上升扩散）➔</li></ul><ul id="1e3add39-0a4a-8010-a822-fd68abf9a266" class="bulleted-list"><li style="list-style-type:disc">星球整体 Alpha 值微微增强 ➔</li></ul><ul id="1e3add39-0a4a-803f-b6a8-ea0be1c86320" class="bulleted-list"><li style="list-style-type:disc">思想条上涨 ➔</li></ul><ul id="1e3add39-0a4a-8076-b5e2-cb01d42c1797" class="bulleted-list"><li style="list-style-type:disc">弹出轻提示：“你的星球思想之光正在闪耀 🌟”</li></ul><hr id="1e3add39-0a4a-80cf-8e9f-ee588efcfb58"/><h1 id="1e3add39-0a4a-8048-8684-e7bfdc497742" class=""><strong>🛠 工程师初步目录布局提案</strong></h1><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e3add39-0a4a-8027-ac05-d3b933fe89b7" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">/planetary-pet
+  /public
+    /assets
+      /planets (星球基础素材)
+      /particles (粒子特效)
+      /backgrounds (不同模式背景图)
+  /src
+    /components
+      PlanetCanvas.jsx (星球画布，使用 Phaser.js)
+      ResourcePanel.jsx (资源灌溉界面)
+      StoryEvent.jsx (叙事触发器)
+    /hooks
+      usePlanetState.js (星球状态管理逻辑)
+    /scenes
+      PlanetScene.js (星球渲染主场景)
+    /utils
+      resourceMapping.js (不同模式资源逻辑映射)
+      eventTrigger.js (叙事事件触发逻辑)
+    App.jsx
+    index.js
+  README.md (开发说明)</code></pre><hr id="1e3add39-0a4a-801f-9583-ecff0cd45aa3"/></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

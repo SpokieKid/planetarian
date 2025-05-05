@@ -1,0 +1,34 @@
+.action-icon-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px; /* Match resource panel position */
+    z-index: 100; /* Ensure it's above the canvas but potentially below modals */
+
+    background-color: rgba(79, 79, 129, 0.7); /* Purple, semi-transparent */
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%; /* Make it circular */
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    font-size: 1.8em; /* Adjust emoji/icon size */
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(3px);
+}
+
+.action-icon-button:hover {
+    background-color: rgba(106, 106, 175, 0.9); /* Lighter purple on hover */
+    transform: scale(1.1);
+}
+
+/* Style for image if you use one */
+.action-icon-button img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+} 

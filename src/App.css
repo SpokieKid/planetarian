@@ -1,0 +1,125 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Basic App layout and Start Screen styling */
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Background is handled by Pixi canvas now */
+}
+
+.start-screen {
+  background-color: rgba(16, 16, 24, 0.9); /* Dark background */
+  padding: 40px 50px;
+  border-radius: 15px;
+  color: #eee;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
+  max-width: 500px;
+  z-index: 10;
+}
+
+.start-screen h1 {
+  color: #a9def9; /* Light blue */
+  margin-bottom: 15px;
+}
+
+.start-screen p {
+  color: #ccc;
+  margin-bottom: 25px;
+}
+
+.mode-selection {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.mode-selection button {
+  padding: 12px 25px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 500;
+}
+
+.mode-selection button:nth-child(1) { /* International */
+  background-color: #e94560;
+  color: white;
+}
+
+.mode-selection button:nth-child(2) { /* Global */
+  background-color: #fca311;
+  color: #16213e;
+}
+
+.mode-selection button:nth-child(3) { /* Planetary */
+  background-color: #50c878;
+  color: black;
+}
+
+.mode-selection button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Ensure canvas doesn't interfere when start screen is shown */
+.App:not(:has(canvas)) .planet-canvas-container {
+  display: none;
+}
+
+/* Positioning for the ActionIcon and its Dialog */
+.action-icon-area {
+    position: fixed; /* Or absolute if App has relative positioning */
+    bottom: 0; /* Aligns container bottom with viewport bottom */
+    left: 0; /* Aligns container left with viewport left */
+    /* No width/height needed, just a positioning context */
+    z-index: 90; /* Below the icon/dialog but above canvas */
+}

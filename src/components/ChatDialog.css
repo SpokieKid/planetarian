@@ -1,0 +1,161 @@
+/* Basic styling for the chat dialog - Themed */
+.chat-dialog-container { /* Renamed from overlay, now just a container */
+    position: absolute; /* Position relative to ActionIcon */
+    bottom: 70px; /* Position above the action icon (50px height + 20px gap) */
+    left: 0px; /* Align with the action icon's left edge */
+    z-index: 1000; /* Ensure it's above other content */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Match project font */
+}
+
+.chat-dialog {
+    width: 300px;
+    height: 400px;
+    /* background-color: white; */
+    background-color: #2a2a3e; /* Dark background from DialogBox */
+    color: #e0e0e0; /* Light text from ResourcePanel */
+    /* border: 1px solid #ccc; */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Subtle light border */
+    border-radius: 8px; /* Match ResourcePanel */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4); /* Match ResourcePanel shadow */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    backdrop-filter: blur(5px); /* Add blur like ResourcePanel */
+}
+
+/* Optional: Add pointer like DialogBox */
+.chat-dialog::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* Position below the box */
+    left: 25px; /* Align roughly with the icon center */
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    /* border-top: 10px solid #2a2a3e; */ /* Match dialog background */
+    border-top: 10px solid rgba(42, 42, 62, 0.9); /* Use slightly transparent version if backdrop applied */
+}
+
+
+.chat-dialog-header {
+    /* background-color: #f1f1f1; */
+    background-color: rgba(26, 26, 46, 0.85); /* Match ResourcePanel header/bg */
+    padding: 10px 15px; /* Adjust padding */
+    /* border-bottom: 1px solid #ccc; */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Match border style */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-dialog-header span {
+    font-weight: bold;
+    color: #fca311; /* Orange title like ResourcePanel */
+    font-size: 1.1em;
+}
+
+.chat-dialog-close-btn {
+    background: none;
+    border: none;
+    /* font-size: 1.5em; */
+    font-size: 1.6em; /* Slightly larger like DialogBox */
+    color: #ccc; /* Match DialogBox close button */
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+}
+.chat-dialog-close-btn:hover {
+    color: white; /* Match DialogBox hover */
+}
+
+
+.chat-dialog-messages {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    /* background-color: #e5ddd5; */ /* Remove WhatsApp-like background */
+    background-color: transparent; /* Inherit dark background */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Slightly reduce gap */
+}
+
+.message {
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 80%; /* Allow slightly wider bubbles */
+    word-wrap: break-word;
+    line-height: 1.4;
+    font-size: 0.95em;
+}
+
+.message.user {
+    /* background-color: #dcf8c6; */
+    background-color: rgba(79, 79, 129, 0.7); /* Purple from ActionIcon/ResourceItem */
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+.message.bot {
+    /* background-color: #ffffff; */
+    background-color: rgba(70, 70, 90, 0.8); /* Slightly different dark shade */
+    color: #e0e0e0;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+
+.chat-dialog-input-area {
+    display: flex;
+    padding: 10px;
+    /* border-top: 1px solid #ccc; */
+    border-top: 1px solid rgba(255, 255, 255, 0.15); /* Match border style */
+    /* background-color: #f1f1f1; */
+    background-color: rgba(26, 26, 46, 0.85); /* Match header background */
+}
+
+.chat-dialog-input-area input {
+    flex-grow: 1;
+    padding: 8px 10px;
+    /* border: 1px solid #ccc; */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(0, 0, 0, 0.2); /* Darker input background */
+    color: #e0e0e0; /* Light text */
+    border-radius: 4px;
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
+.chat-dialog-input-area input::placeholder {
+    color: #a0a0c0; /* Lighter placeholder text */
+}
+
+.chat-dialog-input-area button {
+    padding: 8px 15px;
+    /* background-color: #007bff; */
+    background-color: #4f4f81; /* Purple like debug button */
+    color: white;
+    border: 1px solid #6a6aaf; /* Border like debug button */
+    border-radius: 5px; /* Match debug button */
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.chat-dialog-input-area button:hover {
+    /* background-color: #0056b3; */
+    background-color: #6a6aaf; /* Match debug button hover */
+}
+
+/* Animation remains the same */
+.chat-dialog {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+} 

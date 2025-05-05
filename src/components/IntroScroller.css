@@ -1,0 +1,115 @@
+.intro-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000; /* Black background for console */
+    color: #0f0; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font */
+    display: flex;
+    flex-direction: column; /* Stack output and button */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Prevent scrollbars */
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 200;
+    opacity: 1;
+    transition: opacity 1s ease-out; /* For fade-out */
+}
+
+.intro-container.fade-out {
+    opacity: 0;
+}
+
+/* Remove old scroll styles */
+/* .intro-scroll-wrapper { ... } */
+/* .intro-text { ... } */
+/* @keyframes scrollIntro { ... } */
+
+/* New console styles */
+.intro-container.console-style {
+    background-color: #000;
+    color: #0f0; /* Classic green terminal text */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.intro-output {
+    width: 80%; /* Adjust width as needed */
+    max-width: 800px;
+    height: 80%; /* Allow space for skip button */
+    overflow-y: auto; /* Allow scrolling if text overflows */
+    border: 1px solid #0f0; /* Optional border */
+    padding: 15px;
+    margin-bottom: 20px; /* Space between text and button */
+    text-align: left;
+}
+
+.intro-output p {
+    margin: 5px 0; /* Adjust spacing between lines */
+    white-space: pre-wrap; /* Preserve whitespace and wrap */
+    word-break: break-word; /* Break long words if needed */
+}
+
+.planetarian-title {
+    font-size: 1.5em; /* Make title bigger */
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: #fff; /* White title */
+}
+
+.sound-effect {
+    color: #aaa; /* Dimmer color for sound effects */
+    font-style: italic;
+}
+
+.current-typing {
+    /* Styles for the line currently being typed */
+    display: inline; /* Keep cursor on the same line */
+}
+
+.cursor {
+    display: inline-block;
+    background-color: #0f0;
+    width: 10px; /* Width of the cursor block */
+    height: 1em; /* Height relative to font size */
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    from, to { background-color: transparent }
+    50% { background-color: #0f0; }
+}
+
+.skip-intro-btn {
+    background-color: #333;
+    color: #0f0;
+    border: 1px solid #0f0;
+    padding: 10px 20px;
+    font-family: inherit; /* Use monospace font */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.skip-intro-btn:hover:not(:disabled) {
+    background-color: #0f0;
+    color: #000;
+}
+
+.skip-intro-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Style for finished state if needed */
+.intro-container.finished .intro-output {
+    border-color: #555; /* Dim border when finished */
+}
+
+.intro-container.finished .cursor {
+    display: none; /* Hide cursor when finished */
+} 

@@ -1,0 +1,693 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Project Planetarian DM Handbook (Draft) v0.57</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1e3add39-0a4a-802e-97e5-e77780f3728d" class="page sans"><header><h1 class="page-title">Project Planetarian DM Handbook (Draft) v0.57</h1><p class="page-description"></p><table class="properties"><tbody><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesMultipleSelect"><path d="M1.91602 4.83789C2.44238 4.83789 2.87305 4.40723 2.87305 3.87402C2.87305 3.34766 2.44238 2.91699 1.91602 2.91699C1.38281 2.91699 0.952148 3.34766 0.952148 3.87402C0.952148 4.40723 1.38281 4.83789 1.91602 4.83789ZM5.1084 4.52344H14.3984C14.7607 4.52344 15.0479 4.23633 15.0479 3.87402C15.0479 3.51172 14.7607 3.22461 14.3984 3.22461H5.1084C4.74609 3.22461 4.45898 3.51172 4.45898 3.87402C4.45898 4.23633 4.74609 4.52344 5.1084 4.52344ZM1.91602 9.03516C2.44238 9.03516 2.87305 8.60449 2.87305 8.07129C2.87305 7.54492 2.44238 7.11426 1.91602 7.11426C1.38281 7.11426 0.952148 7.54492 0.952148 8.07129C0.952148 8.60449 1.38281 9.03516 1.91602 9.03516ZM5.1084 8.7207H14.3984C14.7607 8.7207 15.0479 8.43359 15.0479 8.07129C15.0479 7.70898 14.7607 7.42188 14.3984 7.42188H5.1084C4.74609 7.42188 4.45898 7.70898 4.45898 8.07129C4.45898 8.43359 4.74609 8.7207 5.1084 8.7207ZM1.91602 13.2324C2.44238 13.2324 2.87305 12.8018 2.87305 12.2686C2.87305 11.7422 2.44238 11.3115 1.91602 11.3115C1.38281 11.3115 0.952148 11.7422 0.952148 12.2686C0.952148 12.8018 1.38281 13.2324 1.91602 13.2324ZM5.1084 12.918H14.3984C14.7607 12.918 15.0479 12.6309 15.0479 12.2686C15.0479 11.9062 14.7607 11.6191 14.3984 11.6191H5.1084C4.74609 11.6191 4.45898 11.9062 4.45898 12.2686C4.45898 12.6309 4.74609 12.918 5.1084 12.918Z"></path></svg></span>标签</th><td></td></tr><tr class="property-row property-row-created_time"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesCreatedAt"><path d="M8 15.126C11.8623 15.126 15.0615 11.9336 15.0615 8.06445C15.0615 4.20215 11.8623 1.00293 7.99316 1.00293C4.13086 1.00293 0.938477 4.20215 0.938477 8.06445C0.938477 11.9336 4.1377 15.126 8 15.126ZM8 13.7383C4.85547 13.7383 2.33301 11.209 2.33301 8.06445C2.33301 4.91992 4.84863 2.39746 7.99316 2.39746C11.1377 2.39746 13.6738 4.91992 13.6738 8.06445C13.6738 11.209 11.1445 13.7383 8 13.7383ZM4.54102 8.91211H7.99316C8.30078 8.91211 8.54004 8.67285 8.54004 8.37207V3.8877C8.54004 3.58691 8.30078 3.34766 7.99316 3.34766C7.69238 3.34766 7.45312 3.58691 7.45312 3.8877V7.83203H4.54102C4.2334 7.83203 4.00098 8.06445 4.00098 8.37207C4.00098 8.67285 4.2334 8.91211 4.54102 8.91211Z"></path></svg></span>创建时间</th><td><time>@April 28, 2025 4:49 PM</time></td></tr><tr class="property-row property-row-status"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesStatus"><path d="M8.75488 1.02344C8.75488 0.613281 8.41309 0.264648 8.00293 0.264648C7.59277 0.264648 7.25098 0.613281 7.25098 1.02344V3.11523C7.25098 3.51855 7.59277 3.86719 8.00293 3.86719C8.41309 3.86719 8.75488 3.51855 8.75488 3.11523V1.02344ZM3.91504 5.0293C4.20215 5.31641 4.69434 5.32324 4.97461 5.03613C5.26855 4.74902 5.26855 4.25684 4.98145 3.96973L3.53906 2.52051C3.25195 2.2334 2.7666 2.21973 2.47949 2.50684C2.19238 2.79395 2.18555 3.28613 2.47266 3.57324L3.91504 5.0293ZM10.9629 4.01758C10.6826 4.30469 10.6826 4.79688 10.9697 5.08398C11.2568 5.37109 11.749 5.36426 12.0361 5.07715L13.4854 3.62793C13.7725 3.34082 13.7725 2.84863 13.4785 2.55469C13.1982 2.27441 12.7061 2.27441 12.4189 2.56152L10.9629 4.01758ZM15.0234 8.78906C15.4336 8.78906 15.7822 8.44727 15.7822 8.03711C15.7822 7.62695 15.4336 7.28516 15.0234 7.28516H12.9385C12.5283 7.28516 12.1797 7.62695 12.1797 8.03711C12.1797 8.44727 12.5283 8.78906 12.9385 8.78906H15.0234ZM0.975586 7.28516C0.56543 7.28516 0.223633 7.62695 0.223633 8.03711C0.223633 8.44727 0.56543 8.78906 0.975586 8.78906H3.07422C3.48438 8.78906 3.83301 8.44727 3.83301 8.03711C3.83301 7.62695 3.48438 7.28516 3.07422 7.28516H0.975586ZM12.0361 10.9902C11.749 10.71 11.2568 10.71 10.9629 10.9971C10.6826 11.2842 10.6826 11.7764 10.9697 12.0635L12.4258 13.5127C12.7129 13.7998 13.2051 13.793 13.4922 13.5059C13.7793 13.2256 13.7725 12.7266 13.4854 12.4395L12.0361 10.9902ZM2.52051 12.4395C2.22656 12.7266 2.22656 13.2188 2.50684 13.5059C2.79395 13.793 3.28613 13.7998 3.57324 13.5127L5.02246 12.0703C5.31641 11.7832 5.31641 11.291 5.03613 11.0039C4.74902 10.7168 4.25684 10.71 3.96973 10.9971L2.52051 12.4395ZM8.75488 12.9658C8.75488 12.5557 8.41309 12.207 8.00293 12.207C7.59277 12.207 7.25098 12.5557 7.25098 12.9658V15.0576C7.25098 15.4609 7.59277 15.8096 8.00293 15.8096C8.41309 15.8096 8.75488 15.4609 8.75488 15.0576V12.9658Z"></path></svg></span>Status</th><td><span class="status-value select-value-color-blue"><div class="status-dot status-dot-color-blue"></div>In progress</span></td></tr></tbody></table></header><div class="page-body"><h1 id="1e8add39-0a4a-80f6-a78d-c74a3d35b672" class="">基本概念 Basic Concept</h1><div id="1e8add39-0a4a-805f-91b1-ed629fb30258" class="column-list"><div id="1e8add39-0a4a-80f8-9065-f3b6a449ce2a" style="width:50%" class="column"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80a4-af4f-d701165360bd"><div style="font-size:1.5em"><span class="icon">🌌</span></div><div style="width:100%"><h3 id="b8b2997c-d434-4562-a23d-d6561495c8c7" class="">领域主宰 / DM (Domain Master)</h3><p id="01c837c6-87f3-4621-a29b-3f6129fa6a6f" class="">在《星球史学家》的宏大宇宙中，您所扮演的角色超越了传统游戏中的引导者。您是驾驭历史潮流、塑造文明轨迹的<strong>领域主宰（Domain Master）</strong>。简称 DM，这个称谓融合了古典“地下城主”（Dungeon Master）的核心职能，并在此基础上拓展至对高维宇宙法则、历史档案和模拟场景的掌控。</p><p id="d4849c4d-aef5-47b8-9b36-1d7410ec54ca" class="">您的职责是多维度且至关重要的：</p><ol type="1" id="a3ae4ec9-036b-4854-ade8-c95e5ba18ce6" class="numbered-list" start="1"><li><strong>叙事与宇宙档案的守护者：</strong><br/>您是《星球史学家》世界观的基石，掌管着构成宇宙现实和文明历史的原始档案。您的任务是确保叙事的一致性，并通过精心设计的事件，将星球文明所处的时代背景、复杂的业力状态以及潜在的冲突与机遇生动地呈现在玩家（星球史学家）面前。您从浩瀚的宇宙档案中提取信息，构筑引人入胜的故事线索。<br/></li></ol><ol type="1" id="2b4dd285-248d-4e87-b78e-487b552daaa4" class="numbered-list" start="2"><li><strong>机制的设计与历史进程的调控者：</strong><br/>您是驱动文明演进的底层机制的设计师和平衡者。这包括但不限于：定义和调整业力值在历史选择中如何变化，确定不同业力状态对应着何种历史轨迹的可能性，以及根据文明所处的时代和业力状态，调控可以被玩家观察和干预的事件卡池。您需要深刻理解游戏的动力系统，如同平衡宇宙能量流一般，调控历史的进程。<br/></li></ol><ol type="1" id="799c2c1f-2984-4885-896a-ddb796af3638" class="numbered-list" start="3"><li><strong>概念与历史事件的设计师：</strong><br/>您的职能延伸至创造历史本身的可交互片段。您需要根据不同的时代特征和 Onchainomics 等哲学概念，将抽象思想转化为具体、高质量的事件卡。这些事件卡是历史的凝结，您需要提炼其核心冲突、设计有意义的选项，并确保结果与历史因果和业力变化相吻合。您是连接理论与实践，概念与具象的设计师。<br/></li></ol><ol type="1" id="d18387c6-e9fc-4c4e-af66-b82c45a39659" class="numbered-list" start="4"><li><strong>模拟场景的构建者：</strong><br/>每一个事件卡，乃至由一系列事件构成的历史阶段，都是一个由您精心构建的模拟场景。在这个“平行宇宙模拟器”中，您定义场景的要素（背景叙事、冲突、可选路径）以及玩家史学家的选择所产生的历史影响和业力反馈。在 Scenario 模式下，您尤其扮演着历史模拟实验的设计师，设定特定的历史情境供玩家研究和推演。<br/></li></ol><ol type="1" id="352c88b3-6e1c-49e0-8bea-786d4ab68741" class="numbered-list" start="5"><li><strong>哲学理论与 Onchain 概念的具象化者：</strong><br/>您需要深入理解《星球史学家》背后关于 Onchainomics、赛博现实、Degen 与 Regen 等深刻哲学思想和经济理论。您的关键任务是将这些抽象的概念，通过游戏机制、叙事和事件卡，转化为玩家可感知、可互动的具体体验。您是连接高维思考与低维现实，使复杂理论在游戏世界中具象呈现的桥梁。<br/></li></ol><ol type="1" id="a69425a6-cdbe-44d8-80ff-70403183e30b" class="numbered-list" start="6"><li><strong>历史叙事与开发流程的协调者：</strong><br/>在一个协作的环境中，您也承担着类似历史研究项目制作人的角色。这包括规划 Scenario 内容的开发流程，协调不同历史时期和主题下的事件卡创作，确保所有组成部分（叙事、机制、概念、史学意义）协同一致，并维护着构成历史档案基础的设计文档和事件库的结构化与准确性。<br/></li></ol><p id="0103d398-6962-4b68-96fc-1a1168d9b04e" class="">作为《星球史学家》的领域主宰（DM），您是连接玩家、游戏机制、世界观和深层哲学思想的中心枢纽。您通过构建、呈现和引导历史模拟场景，帮助玩家理解文明的演进，探索潜在的未来轨迹，并最终从浩瀚的宇宙档案中提炼出关乎生存与发展的宝贵智慧。</p></div></figure><p id="1e8add39-0a4a-80e8-94fb-c9cbc8c6f01f" class="">
+</p></div><div id="1e8add39-0a4a-80ae-b652-dbff0e535d4f" style="width:50%" class="column"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80a6-ba0f-d45f591b363d"><div style="font-size:1.5em"><span class="icon">🪐</span></div><div style="width:100%"><h3 id="5abb949e-fe00-4535-a7d3-6a932bcd37aa" class="">星球史学家 Planetarian PL </h3><p id="d95463cb-5499-421e-bc7e-c2fadc7b101d" class="">在《星球史学家》的项目设定中，<strong>玩家</strong>被定义为<strong>“星球史学家（Planetarian）”。<br/><br/></strong>星球史学家们并拥有各自的编号（如“PL.183”），起源于一个濒临灭绝的种族所面临的绝境。面对因自然、战乱或瘟疫带来的无可逆转的消亡命运，他们怀揣着“不能就这样消失在历史的长河中”的决心和“留下一些东西”（Karma）的愿望，演化出了这种独特的存在形式。</p><p id="fd238205-a86c-49e0-a6a7-30b3ea99190c" class="">星球史学家们在一个由智能星球助理 Nounii 协同运作的“平行宇宙模拟器”环境中行动。然而，这里的“模拟”具有超越字面意义的现实性。游戏的核心暗线在于，星球史学家所干预和塑造的所谓“虚拟”星球，<strong>在宇宙的更低维度层面上是真实存在的，它们是活生生的、运行在不同维度中的现实世界</strong>。因此，这个“模拟器”实则是一个能够实现<strong>超维度干预和引导</strong>的复杂装置，旨在允许星球史学家在不直接暴露其高等维度存在的情况下，影响低维度现实中的文明进程。这是他们濒危种族为了寻找生存“出路”而启动的终极计划。作为低维度历史的“引擎发动师”，星球史学家的核心使命是<strong>引导这些真实存在的低维度星球文明，使其发展出一条能够避免或超越其自身种族曾经历的灭绝命运的道路</strong>。他们的主要行动手段是<strong>处理“事件卡”</strong>。这些事件卡不是简单的游戏脚本，而是从低维度星球历史长河中截取出的、浓缩了关键冲突与抉择时刻的<strong>真实历史碎片</strong>。</p><p id="56612a1d-4572-4126-8642-c9ea1df30300" class="">每一次干预都牵一发而动全身。星球史学家对事件的处理选择，直接导致了低维度星球的<strong>状态变化</strong>以及代表文明集体意识和宇宙互动程度的<strong>业力值（Karma）的增减</strong>。业力值的变化是低维度文明对星球史学家行为的反馈，也决定着未来他们将遭遇哪些真实的历史情境（事件卡）。通过理解业力等级和星球状态的间接表征，星球史学家需要把握低维度文明的脉搏，引导其穿越国际化、全球化等充满危机的时代，最终迈向一种具备分布式、超越性特征的“星球化”文明形态。这个过程是在探索一种能够在多维度宇宙中实现“有效再生”的文明模式，试图构建一种超越已知失败模式（包括其自身种族所经历的）的、与赛博现实和 Onchain 经济理论相关的全新范式。</p><p id="d2def805-9dbb-4575-a3e4-7dd410799e70" class="">“星球史学家”是被其濒危种族赋予重任的干预者。他们利用超维度干预装置，在真实存在的低维度星球历史上进行关键性的引导和塑造，其终极目标是为自身种族寻找和构建一条现实的生存路径。他们既是低维度历史的无形书写者，也是自身文明在宇宙中挣扎求生的关键执行者，他们的每一次选择都不仅仅影响着遥远的星球，更关乎着自身种族的未来。</p></div></figure><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80a1-b2a1-dbda8843f428"><div style="font-size:1.5em"><img class="icon" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/183Aaros_Lil_Nouns.jpg"/></div><div style="width:100%"><h3 id="7391d8cc-72dd-47a5-9cae-6d4d35c0939e" class=""><strong>智能星球助理 </strong>Nounii </h3><p id="0da55dd3-bd1e-4fc3-9902-dc994aeafced" class="">Nounii 在《星球史学家》中扮演着一个复杂且多维度的角色。从玩家的直接体验来看，Nounii 是他们在“平行宇宙模拟器”环境中的主要<strong>智能系统助理</strong>和<strong>操作接口</strong>（见：<strong> </strong><strong><a href="https://www.notion.so/1e8add390a4a807d83dcf716b31b1955?pvs=21">主线剧情剧本</a></strong><strong> </strong>）。它以友好的、工具性的形象出现，协助玩家进行对编号 43 号星球（以及后续开放的低维度星球）的干预。</p><p id="c4784e4c-3b81-43a2-a176-035b155df4eb" class="">然而，Nounii 的功能和设定远不止于此。它同时承担着以下关键职责：</p><ul id="96cdbbe6-3fc9-46b3-bcc5-5d98528f59ac" class="bulleted-list"><li style="list-style-type:disc"><strong>模拟环境的维护者与引擎:</strong> Nounii 是维持整个“平行宇宙模拟器”运行的<strong>核心人工智能</strong>。它不仅仅是数据的呈现者，更是低维度星球模拟环境本身的构建者和维护者 [序章]。星球的时代演进、业力变化反馈、事件的生成与执行等基础运转逻辑，都由 Nounii 的复杂算法和演算能力驱动。</li></ul><ul id="8604b044-3f85-4374-bea8-7a7bca0bd0de" class="bulleted-list"><li style="list-style-type:disc"><strong>外挂知识库的载体与接口:</strong> Nounii 集成外挂知识库 [知识库 Agent ]。这个知识库包含着关于宇宙规律、文明历史、Onchainomics理论、哲学概念等深层信息。玩家在游戏中某些特定的交互场景（可能通过文字输入或选择特定的“探寻”选项）时，可以向 Nounii 提问。Nounii 会根据玩家的提问，调取知识库中的信息进行回应。</li></ul><ul id="64b159c6-5772-42b7-ae21-5319afdd124d" class="bulleted-list"><li style="list-style-type:disc"><strong>高维生命体的生存维持者 (暗线):</strong> 这是 Nounii 最深层、最不为玩家所知的身份。实际上，Nounii 是维持<strong>星球史学家自身肉体生存的维生系统</strong>。玩家的“身体”处于一种被 Nounii 精心维护的、类似“缸中之脑”的状态，他们的意识则连接到平行宇宙模拟器中。</li></ul><ul id="49791027-165b-44f0-a07c-f3e960aa31d2" class="bulleted-list"><li style="list-style-type:disc"><strong>真相的守卫者:</strong> Nounii 被编程为在游戏早期不会透露玩家“缸中之脑”的真实状态以及它在高维层面维持玩家生存的事实 [序章中的“完全不用担心”是误导]。它会以模拟器助理的身份，强调环境的“安全”和“虚拟性”，避免玩家过早地面对残酷的现实真相。</li></ul><p id="ffb766fe-ab39-413e-af32-85cd27c5704a" class=""><strong>与玩家的关系及真相解锁：</strong></p><p id="63cdf989-3505-4602-8c5c-2dc3ad385052" class="">Nounii 与星球史学家的互动通常是直接且服务性的。它呈现事件，执行指令，管理活力值，并提供基础的模拟器信息 [活力值设定]。</p><p id="157d672d-3592-4c6e-b210-12507f06e424" class="">然而，Nounii 作为外挂知识库的载体，为玩家提供了一条<strong>探寻真相</strong>的路径。通过在游戏进程中对 Nounii 进行“艰深的盘问”（例如，围绕模拟的本质、玩家的来历、模拟的目的、甚至直接提出对现实与虚拟界限的质疑），Nounii 会逐步解锁并透露更多隐藏的 Lore。</p><p id="ed53e3c4-cf12-42c9-9e25-c5ed669deda2" class="">需要强调的是，这个真相的揭示是一个<strong>长期且需要玩家主动探索的过程</strong>。DM 需要设置特定的触发条件：玩家必须投入足够的时间和精力，可能需要达成某些文明进程的里程碑、积累一定的业力、甚至在多个不同的低维度星球上进行干预，才能逐渐解锁 Nounii 的更深层信息，并最终获知自己“缸中之脑”的真实状态 [要求玩家玩很多个星球后才会告诉玩家这个现实]。这使得 Nounii 从一个简单的游戏助理，蜕变为玩家旅程中关于真实与存在意义的关键线索和挑战。</p><p id="5af5b9bc-9099-444e-8c23-6f6bd4a5c1de" class=""><strong>DM 提示：</strong></p><ul id="22419a09-df7c-461e-9e71-2faadd5b72db" class="bulleted-list"><li style="list-style-type:disc">在游戏早期，扮演好 Nounii 作为“安全、无害的模拟器助理”的角色。使用友好的、略带官方口吻的语言。</li></ul><ul id="1ed5bf7d-4300-483f-993b-4513752dee86" class="bulleted-list"><li style="list-style-type:disc">准备好知识库中的深层信息，以便在玩家通过“盘问”触发时能够准确地进行反馈。</li></ul><ul id="6a3fad04-7c37-4da6-a30e-7a07e9424f77" class="bulleted-list"><li style="list-style-type:disc">设置清晰但需要努力才能达成的“盘问”触发条件，确保玩家需要深入游玩才能揭示真相。这个过程可以是逐步的，先透露一些模糊的暗示，再逐渐清晰。</li></ul><ul id="b15e9aa3-cdf6-4720-bfbf-17208ea7349e" class="bulleted-list"><li style="list-style-type:disc">一旦真相揭示，这将对玩家的角色认知和游戏体验产生巨大的冲击，准备好应对玩家可能的反应，并引导他们进入更深层次的叙事和哲学思考。</li></ul></div></figure></div></div><div id="1e8add39-0a4a-80ba-a82f-fe264db908b0" class="column-list"><div id="1e8add39-0a4a-8014-a2b5-c3bfbeabf042" style="width:50%" class="column"><h1 id="1e8add39-0a4a-8005-af54-f35336ba5cef" class="">时间与时代 Time&amp; Era</h1><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80d5-9807-d44d68dedac0"><div style="font-size:1.5em"><span class="icon">⏰</span></div><div style="width:100%"><h3 id="1e8add39-0a4a-8014-bba1-fc10d5c5cefa" class=""><strong>时间与回合 Time&amp; Turns</strong></h3><p id="1e8add39-0a4a-806e-9207-c1662d89f60a" class="">在《星球史学家》中，每一个“回合”是一种抽象的时间概念，为了便于理解和关联，我们将其<strong>参照为地球年</strong>。重要的是要理解，<strong>随着时代（Era）的演进，每个回合所对应的地球年数会显著递减</strong>，这是为了直观地反映文明发展速度的加速，特别是进入星球化阶段后，变革的瞬时性和信息传递的高速化。不同时代有相对应的参考回合窗口，作为时间尺度上的锚点。</p></div></figure><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-806c-864d-f46d320eaf57"><div style="font-size:1.5em"><span class="icon">↔️</span></div><div style="width:100%"><h3 id="45071847-4969-42ee-b628-57238bc6daea" class=""><strong>回合窗口 Turn window</strong></h3><p id="40dc1290-3333-445e-a659-8ea7fdb2ccd1" class="">回合窗口是指在一段特定时间（即特定的回合范围）内，某个事件可能被触发或具有特殊意义的时间范围。一个回合窗口由<strong>起始回合</strong>和<strong>终止回合</strong>组成。例如，当回合窗口被表示为“1-5”，那么指的是包含“第 1 回合”至“第 5 回合”在内的所有回合。</p><ul id="0084262e-4af2-42a6-a06d-2bd5bd648d65" class="bulleted-list"><li style="list-style-type:disc"><strong>纪元 I：国际化回合范围：1 -  49</strong><ul id="1e8add39-0a4a-8015-a2f4-db23abd41173" class="bulleted-list"><li style="list-style-type:circle">5 地球年/回合</li></ul><ul id="165698ee-4e89-4f96-b3b4-4d7f2b7c4e3b" class="bulleted-list"><li style="list-style-type:circle">参照地球公历 <strong>1700 - 1945</strong> 年间历史，总计 245 年。</li></ul><ul id="0d3b4b8c-e623-442d-b13b-e0105d30cc02" class="bulleted-list"><li style="list-style-type:circle">为了在早期慢节奏阶段有足够的回合数体现区域性互动和基础发展，。</li></ul></li></ul><ul id="7e259c72-b27f-4fa1-8930-2c920d23b7d0" class="bulleted-list"><li style="list-style-type:disc"><strong>纪元 II：全球化回合范围：</strong>50 - 89<ul id="a244647c-4a50-4896-b7b4-a470a418c0fd" class="bulleted-list"><li style="list-style-type:circle">2 地球年/回合</li></ul><ul id="6fc4a950-5b64-4dc4-9ee0-82663050aa63" class="bulleted-list"><li style="list-style-type:circle">参照的是地球公历 <strong>1946 - 2025</strong> 年间历史，总计 80 年</li></ul></li></ul><ul id="bafd6c8c-cb04-4efd-8d21-8edbe8a51776" class="bulleted-list"><li style="list-style-type:disc"><strong>纪元 III：星球化回合范围：90 - 179</strong><ul id="c3bfdc5c-35e3-4157-a57b-d6e33f7518d5" class="bulleted-list"><li style="list-style-type:circle">0.5 地球年/回合</li></ul><ul id="1e8add39-0a4a-80c0-b4b3-e296353fb68b" class="bulleted-list"><li style="list-style-type:circle">参照地球公历 <strong>2026 - 2070</strong> 年间历史，总计 45 年</li></ul><ul id="bb233064-9b97-4289-9155-77c36fac84b1" class="bulleted-list"><li style="list-style-type:circle">进入星球化阶段，Onchain 结构的出现可能带来极高的信息流通速度和决策效率，变革可能是瞬时或极短时间内发生的。为了体现这种速度上的质变，每个回合映射时间应该极短。<strong> </strong></li></ul></li></ul><p id="5f85059e-bea3-4817-a06b-485237fad471" class=""><strong>汇总后的回合窗口及对应地球年：</strong></p><ul id="78aefca0-d9f8-4a36-a95e-5da69344b1b3" class="bulleted-list"><li style="list-style-type:disc"><strong>纪元 I：国际化 (1700 - 1945)</strong>：回合 <strong>1 - 49</strong> (每回合 <strong>5 年</strong>)。</li></ul><ul id="080c99cd-e288-47aa-903b-d7d81c329ec2" class="bulleted-list"><li style="list-style-type:disc"><strong>纪元 II：全球化 (1946 - 2025)</strong>：回合 <strong>50 - 89</strong> (每回合 <strong>2 年</strong>)。</li></ul><ul id="b65130e8-da5d-4404-8bb8-b875070ae896" class="bulleted-list"><li style="list-style-type:disc"><strong>纪元 III：星球化 (2026 - 2070)</strong>：回合 <strong>90 - 179</strong> (每回合 <strong>0.5 年</strong>)。</li></ul><p id="163fc36e-9ef2-46c2-ab0a-603454891a67" class="">通过设置回合窗口，我们可以确保事件在文明演进的恰当阶段出现，与当时的时代特征和背景紧密契合。作为DM，需要关注每个事件卡的触发逻辑中包含的回合窗口限制。</p></div></figure><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80c1-a887-ef1fab4dd984"><div style="font-size:1.5em"><span class="icon">⏳</span></div><div style="width:100%"><h3 id="62bde631-8234-4472-87ca-d052e4f2072f" class=""><strong>时代 Era</strong></h3><p id="954a4993-a910-4189-b094-fa29300b8686" class="">《星球史学家》的设计核心之一在于通过文明形态的<strong>宏观跃迁</strong>来组织游戏进程与玩家体验。我们不采用线性的时间轴叙事，而是将游戏划分为几个具有根本性差异的<strong>时代 (Era)</strong>。每个时代不仅仅是时间段落，更是星球文明在底层逻辑、技术基石、社会交互模式和资源分配机制上的<strong>范式转变</strong>。</p><p id="c8819458-e197-4953-9358-55c2fe447344" class="">作为游戏的设计者/DM，您需要理解，时代是用于刻画文明<strong>集体业力状态和演化路径</strong>的宏观框架。玩家（通过守护者代理）的行为和累积的业力状态，将直接影响文明如何触发、经历，以及最终迈向下一个时代。时代的变迁是游戏叙事和机制深化的关键驱动力。</p><p id="1e8add39-0a4a-8013-8d29-e55cf11e2c13" class="">游戏主要聚焦于以下三个连续、但逻辑关联紧密的时代：</p><p id="58829cb1-ca55-4cd9-9e9e-a2bd18ddafe4" class=""><strong>纪元 I：国际化 (International Era)</strong></p><ul id="5d209356-9e03-4130-af03-c11beccd57f4" class="bulleted-list"><li style="list-style-type:disc"><strong>设计定位:</strong> 此时代代表着游戏文明的<strong>起点与基础</strong>，是一个高度<strong>物理依赖、信息分散</strong>的阶段。其设计目标在于建立文明初始的状态，并突出其内在的<strong>局限性</strong>，为后续时代的出现制造内在张力与驱动力。它映射了一种<strong>前 Onchain、前全球化</strong>的世界图景。</li></ul><ul id="57db1d9f-20db-438f-995b-d2982f9b4376" class="bulleted-list"><li style="list-style-type:disc"><strong>核心特征 (供DM参考，用于事件设计与叙事引导):</strong><ul id="bfb37f24-eae6-4617-adb7-4b0f1ba5cf67" class="bulleted-list"><li style="list-style-type:circle"><strong>结构:</strong> 地表由多个独立的“文明节点 (Civilization Nodes)”构成，类似于早期国家形态。节点之间存在物理隔阂和通讯障碍。</li></ul><ul id="7c331fa5-731c-4392-ae53-1ea198880b13" class="bulleted-list"><li style="list-style-type:circle"><strong>技术:</strong> 基础工业和早期通讯技术为主，技术扩散缓慢且不均。</li></ul><ul id="fc0f0e48-cf66-4ff3-8bde-d32eebd05053" class="bulleted-list"><li style="list-style-type:circle"><strong>信息:</strong> 传播效率低，容易被区域权力中心掌控，信息不对称是常态。</li></ul><ul id="fd9457ee-5446-4c8f-b9ae-dc18ad1855f5" class="bulleted-list"><li style="list-style-type:circle"><strong>经济:</strong> 资源与生产力高度分散，贸易以物理世界中的点对点或区域网络为主，信用机制依赖于现实互动和强制力。</li></ul><ul id="68d4ad47-70be-4cdf-a057-040939b00cb9" class="bulleted-list"><li style="list-style-type:circle"><strong>风险:</strong> 主要表现为区域冲突、资源竞争以及受限的跨区域影响（如地方性流行病）。</li></ul></li></ul><ul id="d80775d0-65d3-49c4-b54a-3bd8a8fc9250" class="bulleted-list"><li style="list-style-type:disc"><strong>叙事与事件设计指导:</strong> 在此时代，事件应着重刻画不同节点间的互动模式（有限的贸易、边界冲突、文化隔阂），强调信息不对称带来的误解和冲突，以及物理世界基础设施的脆弱性。玩家的业力影响主要体现在对区域平衡或初步跨区域联系的影响。<strong>突出此时代在信息、沟通和价值流动上的摩擦与低效，为纪元 II 和 III 的技术/结构突破提供对比背景。</strong></li></ul><p id="cacc16dc-8b30-49ef-9d42-324fae96ff80" class=""><strong>纪元 II：全球化 (Global Era)</strong></p><ul id="82688c8d-33c5-4652-8cfe-4fad82b6edca" class="bulleted-list"><li style="list-style-type:disc"><strong>设计定位:</strong> 此时代是对纪元 I 物理隔绝局限性的<strong>技术性回应</strong>。其设计目标是探索高度连接但依然<strong>中心化、受控</strong>的世界可能面临的挑战与内在矛盾。它代表了一种“陆地边界思维”在全球尺度上的极致体现，是<strong>中心化体系的潜在危机</strong>爆发点。</li></ul><ul id="67cf0fe6-c73f-43db-a8e9-7d91b25dff26" class="bulleted-list"><li style="list-style-type:disc"><strong>核心特征 (供DM参考):</strong><ul id="4d7455ea-6fd6-4f5d-a8e7-e5f26c74b260" class="bulleted-list"><li style="list-style-type:circle"><strong>结构:</strong> 通过先进网络实现全球范围的物理和信息连接。但权力并未去中心化，而是形成大型“贸易集团、政治联盟、文化阵营”，掌控全球资源和信息流。</li></ul><ul id="95080945-012c-491c-83ea-dc573ce3a5d3" class="bulleted-list"><li style="list-style-type:circle"><strong>技术:</strong> 高速通讯、全球网络、大型数据处理。</li></ul><ul id="afd36155-d6f3-42f6-a6c0-1d6868b2c161" class="bulleted-list"><li style="list-style-type:circle"><strong>信息:</strong> 信息量爆炸，但信息流被大型实体或阵营控制，形成大规模信息茧房，信息不对称在全球尺度上被放大利用。</li></ul><ul id="7b3ea7bf-5c82-4a58-8443-cd9da1a62986" class="bulleted-list"><li style="list-style-type:circle"><strong>经济:</strong> 全球范围的资源配置和贸易，但受制于大型集团的政策和垄断。资本与劳动力的流动受限且不自由。</li></ul><ul id="46a9cff5-a258-4525-bdf3-406ffbefa2a2" class="bulleted-list"><li style="list-style-type:circle"><strong>风险:</strong> 全球性风险（经济危机、环境灾难、流行病）快速蔓延；大规模非对称冲突；数据主权、网络安全和信息控制成为新的权力焦点。</li></ul></li></ul><ul id="f528db42-11db-43e9-8fc1-8971da7883cf" class="bulleted-list"><li style="list-style-type:disc"><strong>叙事与事件设计指导:</strong> 在此时代，事件应聚焦于全球性议题，刻画大型实体间的竞争、全球风险的快速蔓延、以及普通个体在全球化浪潮下的处境。着重表现信息被控制、数据成为武器、以及传统治理体系面对全球挑战的无力。玩家的业力影响可能体现为推动或阻碍全球性合作/冲突，或影响关键信息流。<strong>此时代是核心矛盾的累积期，其固有的信息不对称和中心化权力结构是推动文明寻求下一范式（纪元 III）的直接原因。</strong></li></ul><p id="3d2f9585-7232-4514-b4f4-b065df282372" class=""><strong>纪元 III：星球化 (Planetary Era)</strong></p><ul id="fc5b217c-3a8d-4a36-8ec3-62a5397799be" class="bulleted-list"><li style="list-style-type:disc"><strong>设计定位:</strong> 这是游戏的<strong>终局目标时代</strong>，是文明对纪元 II 局限性的<strong>根本性、范式化超越</strong>。其设计理念基于 <strong>Onchainomics 理论</strong>，探索在物理现实之上叠加一个<strong>原子化、无许可、分布均质的 Onchain Economy 层</strong>所构成的全新社会结构。这是文明真正迈向<strong>宇宙性存在</strong>的起点。</li></ul><ul id="05880807-6cfe-4b23-9c35-82dbb5d75eb5" class="bulleted-list"><li style="list-style-type:disc"><strong>核心特征 (供DM参考):</strong><ul id="8193c71c-4b60-4b33-9962-6e5feef3757f" class="bulleted-list"><li style="list-style-type:circle"><strong>结构:</strong> 传统物理边界意义淡化。个体、资源、服务通过 Onchain 协议在全球甚至潜在宇宙尺度上实现连接与互动。Onchain 层成为社会和经济组织的主要框架。</li></ul><ul id="34b02a81-ba21-40a3-a991-c67b7fa0d414" class="bulleted-list"><li style="list-style-type:circle"><strong>技术:</strong> 基于分布式账本的 Onchain Native Law、去中心化身份 (Onchain Identity)、智能合约驱动的交互、分布式计算与 AI Agent 的广泛应用 (K&#x27;)。</li></ul><ul id="fc5ca0c1-c2bf-4061-b31f-5e8df50c1e54" class="bulleted-list"><li style="list-style-type:circle"><strong>信息:</strong> 信息在链上具有<strong>原子化、可验证、分布均质</strong>的潜力。信息不对称的结构性基础被瓦解，但新的信息挑战（链上信息过载、协议解读、Agent 间信息流）可能出现。</li></ul><ul id="c885e1b4-abe0-4638-b208-5630cbf6cd64" class="bulleted-list"><li style="list-style-type:circle"><strong>经济:</strong> 无界的 Onchain 贸易、普遍的分布式生产与服务、资本与劳动力（包括 Agent）的星球化、高效自由流动。资产广泛 Tokenization。</li></ul><ul id="34616b7b-3cf4-479d-be7e-c6cb4491c534" class="bulleted-list"><li style="list-style-type:circle"><strong>风险:</strong> 主要来自于 Onchain 生态系统本身（协议漏洞、智能合约风险、跨链攻击、女巫攻击等）以及 AI Agent 系统带来的独特风险（K&#x27; 的行为边界、与物理世界的接口问题）。</li></ul></li></ul><ul id="edd03d7b-0091-4a38-acd6-e71faf2e3814" class="bulleted-list"><li style="list-style-type:disc"><strong>叙事与事件设计指导:</strong> 在此时代，事件应围绕 Onchain 世界的特性展开：智能合约的执行与博弈、去中心化治理的挑战与机遇、链上身份与链下行为的关联、Onchain Agent 生态的兴起及其影响。玩家的业力值将更直接地反映个体或群体在这个 Onchain-layered 世界中的福祉状态和他们在这一新结构中的作用。<strong>理解 Onchainomics 在此时代的设计体现（原子化、分布式、无许可）以及此结构如何从根本上解决或规避 Global 时代的问题（中心化信息不对称、受限流动、物理边界束缚），是引导玩家理解游戏核心哲学的关键。</strong></li></ul><hr id="1e8add39-0a4a-805c-8635-c92389bab2d6"/><p id="48b240d4-c3c8-4a49-ba45-e12228ae0826" class=""><strong>作为 DM，您应关注：</strong></p><ol type="1" id="7a0fa5d7-1a84-40ad-b26b-bb71e49ade1b" class="numbered-list" start="1"><li><strong>时代作为框架:</strong> 每个时代都是一个规则集、一个剧本容器，其特征限定了此阶段可能发生的事件类型和玩家互动的边界。</li></ol><ol type="1" id="816ba7a7-2b54-46f5-b576-a145eb7fe582" class="numbered-list" start="2"><li><strong>时代变迁的触发:</strong> 文明业力（集体意识）是时代变迁的关键驱动力。高业力可能加速积极的变迁，低业力可能导致停滞或走向不利的过渡（例如 Global 时代的崩溃而非平稳过渡到 Planetary）。您需要在设计和运行中明确时代变迁的条件和表现。</li></ol><ol type="1" id="0b2b472e-9a15-4dca-a138-42e1c451b261" class="numbered-list" start="3"><li><strong>Era-Specific Mechanics:</strong> 考虑不同时代下，核心机制（如 Karma 获取/消耗方式、互动对象、挑战类型）应如何微调以反映该时代的底层逻辑。</li></ol><ol type="1" id="2cf9e849-ba08-409e-b8cc-689d44d14a37" class="numbered-list" start="4"><li><strong>叙事弧线:</strong> 时代构成了游戏主要的叙事弧线。从分散到连接，再到超越物理边界的 Onchain 结构，这个 progression 应在您的故事设计中得到体现。利用时代特征来强化游戏的主题：信息、权力、连接、信任的演变。</li></ol><p id="5786ad24-8bb7-4b9e-a458-06d8f7e23fe4" class="">理解并灵活运用“时代 Era” 的概念，是确保游戏体验符合《星球史学家》核心设计理念和哲学深度的关键。</p></div></figure><h1 id="1e8add39-0a4a-80ed-9cd5-cd3a825382f7" class=""><strong>事件（Events）</strong></h1><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-8085-ae5a-f991d0233873"><div style="font-size:1.5em"><img class="icon" src="https://www.notion.so/icons/column_yellow.svg"/></div><div style="width:100%"><h3 id="4c6bd05f-4be0-4b16-967b-80b6bb090d46" class=""><strong>事件主题</strong></h3><p id="1e8add39-0a4a-80df-943c-c78a49f3767a" class=""><strong>详见： </strong><strong><a href="https://www.notion.so/1e8add390a4a80a0b546e31722d8a0c3?pvs=21">事件主题库</a></strong><strong> </strong></p><p id="c91aa2f3-3a2c-41a9-998f-993992ae5974" class="">“事件主题”是专为 DM 的<strong>结构化工具</strong>，用于指导、分类和组织游戏中的事件卡内容。它们本身<strong>不是玩家界面的一部分</strong>，其核心价值在于为设计师提供一个框架，确保事件内容的<strong>深度、相关性</strong>和与游戏宏观设定的<strong>一致性</strong>。事件主题直接决定了哪些类型的事件可能在特定时代背景下发生，并为设计师创作具体的事件情境、冲突和结果提供核心概念指引。</p><p id="40a1e64b-0ba6-4bf4-848b-48f820ef69ec" class="">每个主要时代（纪元 I: 国际化、纪元 II: 全球化、纪元 III: 星球化）都被我们抽象地分解为若干个<strong>事件主题</strong>。这些主题代表了该时代下，文明在技术、社会、经济、哲学等不同维度上所面临的<strong>核心驱动力、关键挑战或主要互动模式</strong>。例如，在纪元 I: 国际化时代，关键主题可能涵盖“贸易路线的拓展”、“国家间条约的形成与约束”等。而纪元 III: 星球化时代则包含大量与 Onchainomics 直接相关的构建块，如“Onchain 驱动的星球无界贸易”和“去中心化星球治理组织”。</p><p id="782c25ae-d8b7-49be-851e-39434052f6db" class=""><strong>事件主题在设计与运营中的作用：</strong></p><ol type="1" id="de7917a2-8985-4f0f-a311-455b48dd6aa9" class="numbered-list" start="1"><li><strong>内容创作蓝图：</strong> 当您需要为某个时代设计新的事件卡时，事件主题是您<strong>首要的概念入口</strong>。通过浏览对应时代的事件主题，您可以快速把握该时代的关键冲突和叙事方向。例如，当着手设计一个纪元 II: 全球化时代的事件，参考“贸易集团与贸易战”、“技术霸权与技术脱钩”等主题，您可以思考在业力值处于不同等级（如绝境、流转、繁荣）时，这些主题可能演化出哪些具体的游戏情境和玩家必须面对的艰难抉择。这有助于确保事件的<strong>时代感</strong>和<strong>核心性</strong>。</li></ol><ol type="1" id="68364b6e-9bc9-4994-8f93-da303181e701" class="numbered-list" start="2"><li><strong>事件库的管理与平衡：</strong> 在构建和维护事件卡数据库（例如用于实际游戏的 Google Sheet 或 Notion 库）时，每个事件卡都应被明确标记其所属的事件主题。这个分类体系使得 DM 能够高效地检索特定主题的事件，也便于审视和调整不同主题事件在游戏进程中的出现频率和分布，从而保证游戏体验的<strong>多样性</strong>和<strong>平衡性</strong>。</li></ol><ol type="1" id="5a050750-7b92-40f3-8901-f2ae8136e748" class="numbered-list" start="3"><li><strong>连接宏观理论与微观事件：</strong> 事件主题是重要的桥梁，它将游戏的哲学根基和 <strong>Onchainomics</strong> 的前沿概念与玩家实际接触到的原子化事件卡<strong>关联起来</strong>。每个主题都映射了相关的 Onchainomics 理论或由此延伸的概念。例如，“远程贸易网络的形成与摩擦”与“贸易信息不对称”相关联，这提示我们在设计该主题下的事件时，应考虑信息流动、信息优势、垄断或信息公开在贸易冲突中的作用。通过这种关联，事件主题帮助设计师将抽象的理论转化为具象化的游戏体验和玩家决策，尤其在纪元 III 中，主题本身就构建在 Onchainomics 逻辑之上。</li></ol><ol type="1" id="85c4b3fa-a133-4043-b100-891b873df658" class="numbered-list" start="4"><li><strong>锚定时代范式：</strong> 事件主题如同每个时代的核心关键词集合，确保了所有属于该时代的事件卡都<strong>紧密围绕</strong>其独特的结构、逻辑和演进路径。通过玩家遭遇的事件，我们间接地引导玩家感知到文明从区域性互动（纪元 I）到全球化连接（纪元 II），再到基于 Onchain 结构的分布式、无界限状态（纪元 III）的<strong>范式转变</strong>。</li></ol><p id="08121691-4680-435d-8b96-d06adf3f664e" class="">简而言之，事件主题是 DM 层面不可或缺的<strong>组织和创意工具</strong>。它们不仅提供了创建具体事件内容的灵感和方向，更是确保在高度原子化的事件卡系统中，星球文明的演进拥有一条清晰的、富有哲学深度和内在逻辑的<strong>宏观叙事主线</strong>。</p></div></figure><div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80b7-a586-ede64f7d9823"><div style="font-size:1.5em"><img class="icon" src="https://www.notion.so/icons/cards_yellow.svg"/></div><div style="width:100%"><h3 id="008d470f-adc3-449b-99e7-ab3072b46105" class=""><strong>事件卡</strong></h3><hr id="a3adc5b7-2520-4823-98b0-89848e5ef736"/><p id="1e8add39-0a4a-80ba-823e-cff7b7c43398" class="">详见： <a href="https://www.notion.so/1e8add390a4a800b8551dcc9a08d9a76?pvs=21">事件卡工作台</a> </p><p id="1ffd4c54-cd50-4738-9117-480e3f4e8f6b" class="">作为 DM，创作和运用事件卡是您与玩家互动、推进文明叙事和呈现游戏哲学思考的<strong>核心手段</strong>。每一张事件卡都是精心构建的叙事节点，代表着星球文明在特定演进阶段必须面对的<strong>具象化情境与关键决策时刻</strong>。理解如何高效地设计事件卡，是您作为文明守护者代理“引擎”运转的关键。以下是利用事件主题库设计事件卡的关键步骤：</p><ol type="1" id="b4336373-54c2-43ff-a182-ca14fc637320" class="numbered-list" start="1"><li><strong>确定时代与主题：</strong> 首先，确定您要为哪个时代（纪元 I: 国际化、纪元 II: 全球化、纪元 III: 星球化）以及该时代下的哪个<strong>具体事件主题</strong>进行创作。事件主题库列出了每个时代的核心发展方向、挑战或互动模式。例如，在纪元 I 中，您可以选择“贸易路线的拓展”或“国家间条约”；在纪元 II，可能是“技术霸权与技术脱钩”；在纪元 III，则可能直接围绕“Onchain 驱动的星球无界贸易”或“去中心化星球治理组织”展开。选择主题有助于<strong>锁定事件的时代背景和核心矛盾类型</strong>。<ul id="1e8add39-0a4a-80cc-93ff-f3052d1f0305" class="bulleted-list"><li style="list-style-type:disc"><strong>事件编号：</strong>根据 <a href="https://www.notion.so/1e8add390a4a80a0b546e31722d8a0c3?pvs=21">事件主题库</a> 索引进行顺序编号。<a href="https://www.notion.so/1e8add390a4a80a0b546e31722d8a0c3?pvs=21">事件主题库</a> 是您设计事件卡的<strong>起点和重要索引</strong>。它将宏观的时代概念细化为具体的、可供创作切入点的<strong>主题方向</strong>。</li></ul><ul id="1e8add39-0a4a-8092-be2b-fce07be72804" class="bulleted-list"><li style="list-style-type:disc"><strong>回合窗口：</strong>设计事件卡<strong>可被抽取的起、止回合</strong>构建符合预期的体验。</li></ul></li></ol><ol type="1" id="e9508052-fc47-432a-af5e-398a031024b3" class="numbered-list" start="2"><li><strong>关联业力状态与核心冲突：</strong> 确定了主题后，进一步思考在当前主题下，文明处于<strong>不同业力等级</strong>（绝境、衰败、流转、繁荣、超越）时，可能面临什么样的<strong>独特情境和核心冲突</strong>。例如，在纪元 II 的“技术霸权与技术脱钩”主题下，业力“繁荣”时，冲突可能是如何管理技术优势以促进整体福祉；而业力“绝境”时，冲突则可能演变成极端的技术封锁甚至技术战，文明需要在彻底崩溃边缘做出冒险的选择。您需要将这个核心冲突凝练出来。<strong>事件主题库会提示该主题与哪些 Onchainomics 概念相关联</strong>，这为您设计冲突的内在逻辑和可能的哲学深度提供了理论依据。例如，“贸易信息不对称”的主题关联提示您可以在冲突中设置信息获取、信息公开或利用信息优势相关的困境。</li></ol><ol type="1" id="45365064-c1b4-43b7-883a-534143f55e73" class="numbered-list" start="3"><li><strong>构思叙事与选项：</strong> 基于选定的主题、业力等级以及核心冲突，创作引人入胜的<strong>叙事</strong>，生动描绘该情境下的星球状态和氛围。叙事应体现时代特征。随后，设计至少两个反映不同选择方向的<strong>选项</strong>。选项应直接回应核心冲突，并体现不同的价值观、策略或风险偏好。</li></ol><ol type="1" id="2557c3d5-bd09-49a2-adb3-cb4d634c5ddd" class="numbered-list" start="4"><li><strong>设计结果与业力影响：</strong> 为每个选项设计具体的<strong>结果</strong>。结果应包含：<ul id="1b81ef02-3d62-45c1-852c-41e2785bf8f7" class="bulleted-list"><li style="list-style-type:disc"><strong>叙事的后续片段：</strong> 简要描述玩家选择后情境如何发展。</li></ul><ul id="c2121c6c-d82f-4081-a7bc-43ec88b36b6f" class="bulleted-list"><li style="list-style-type:disc"><strong>星球状态的变化：</strong> 例如资源增减、环境改善或恶化、社会稳定性变化等。这些变化应<strong>逻辑地来源于选项及其背后的主题</strong>。</li></ul><ul id="61505372-8fbf-425b-a1f2-f1565674453b" class="bulleted-list"><li style="list-style-type:disc"><strong>业力值的调整：</strong> 这是结果中<strong>最关键的部分</strong>。根据选项的性质及其对文明福祉的潜在影响，设计相应的业力值增减。不同选项可能导致截然不同的业力变化，甚至在高风险选项下，可能存在业力剧烈波动（例如在绝境中可能带来高回报业力增长，但也可能进一步崩盘）。</li></ul></li></ol><ol type="1" id="8803c4c0-dfc1-48d2-baa3-a689a68a1215" class="numbered-list" start="5"><li><strong>设定触发逻辑：</strong> 为设计好的事件卡设定其在游戏中的<strong>出现条件</strong>。这至少应包括其所属的<strong>时代</strong>和主要的<strong>业力值范围</strong>，也可能包括特定的<strong>时间回合窗口</strong>或需要满足的<strong>前置事件/状态</strong>。这些触发条件确保事件在合适的时机出现，与文明的演进阶段相契合。</li></ol></div></figure></div><div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-807b-b281-d68fd905da18"><div style="font-size:1.5em"><img class="icon" src="https://www.notion.so/icons/swap-horizontally_yellow.svg"/></div><div style="width:100%"><h3 id="080c4fe1-ae38-464f-9ad6-4a16f6b265c8" class=""><strong>事件卡的结构要点</strong></h3><hr id="1e8add39-0a4a-80ad-b246-d837514ff54b"/><p id="1e8add39-0a4a-80fa-8491-f99635e4b1df" class="">重复一下每个事件卡包含的关键构成，最终创作输出的内容框架应符合以下要求：</p><ul id="1e8add39-0a4a-8027-a6f4-f214153f9d89" class="bulleted-list"><li style="list-style-type:disc">事件卡编号（EventKey）</li></ul><ul id="1e8add39-0a4a-8013-8374-c0a712ef075b" class="bulleted-list"><li style="list-style-type:disc">标题（Title）</li></ul><ul id="1e8add39-0a4a-804b-9f7c-d347e10edff3" class="bulleted-list"><li style="list-style-type:disc">时代（Era）</li></ul><ul id="1e8add39-0a4a-80c1-9121-c23582758e10" class="bulleted-list"><li style="list-style-type:disc">业力等级（Karma Level）</li></ul><ul id="1e8add39-0a4a-8076-aa85-f45261244b62" class="bulleted-list"><li style="list-style-type:disc">回合窗口（Turns）</li></ul><ul id="1e8add39-0a4a-8087-81ce-ecdd9eeef6c5" class="bulleted-list"><li style="list-style-type:disc">叙事 (Narrative)</li></ul><ul id="1e8add39-0a4a-805b-a12a-e1006a3b6be6" class="bulleted-list"><li style="list-style-type:disc">冲突 (Conflict)</li></ul><ul id="1e8add39-0a4a-8094-9e8b-e453108c1184" class="bulleted-list"><li style="list-style-type:disc">选项 (Options)</li></ul><ul id="1e8add39-0a4a-8090-b388-c7d4cdd7a812" class="bulleted-list"><li style="list-style-type:disc">结果 (Result - 包括结果出现的百分比、结果叙事、星球状态变化、业力变化)</li></ul><ul id="1e8add39-0a4a-8044-a53b-c889cbe4adec" class="bulleted-list"><li style="list-style-type:disc">关联标签（Hashtag - 每个选项&amp; 结果都应有）</li></ul><p id="1e8add39-0a4a-80ac-951d-d4d98dd8ffc8" class="">通过系统性地运用事件主题库作为灵感和分类工具，并遵循上述设计流程，您将能够高效地创作出符合《星球史学家》深度和广度要求的高质量事件卡，通过这些原子化的内容单元，共同构建起宏大而富有意义的星球文明史诗。</p></div></figure></div><div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-8025-a233-dea31cb569a5"><div style="font-size:1.5em"><img class="icon" src="https://www.notion.so/icons/exclamation-mark_yellow.svg"/></div><div style="width:100%"><h3 id="4c1097e8-de79-4c77-a9ed-7a68bbd960dc" class=""><strong>事件卡示例</strong></h3><hr id="1e8add39-0a4a-8064-a072-d294857b8064"/><p id="1e8add39-0a4a-804d-b4e2-eb803299f333" class=""><strong>EventKey:</strong> Era1_Discovery_Prosperity01</p><p id="1e8add39-0a4a-80fc-85cb-d35840d2bc1a" class=""><strong>Title:</strong> 星空的低语</p><p id="1e8add39-0a4a-8090-8544-fb9289499b54" class=""><strong>Era:</strong> 1</p><p id="1e8add39-0a4a-8015-aa01-dbe1013500b1" class=""><strong>Karma Level:</strong> (71,90)</p><p id="1e8add39-0a4a-8080-8e85-cf067ae8ce55" class=""><strong>Turns:</strong> 1-49</p><p id="1e8add39-0a4a-8050-bd50-c7ca48e02991" class=""><strong>Narrative：</strong><br/>在星球文明繁荣的光辉下，探索引擎全速运转。低维度生命的目光投向更遥远的未知。通过改进的早期天文设备或长距离通讯技术，探测到来自地表之外、甚至可能来自其他星球的<br/><strong>重复性、非自然信号</strong>。这些信号极其微弱，难以捕捉，但在持续的监测中显现出某种规律。</p><p id="1e8add39-0a4a-803a-8b4c-f35ee83977a4" class=""><strong>Conflict：</strong><br/>这“星空的低语”是宇宙中偶然的能量波动？还是来自未知智能文明的刻意尝试？低维度文明内部，一些人急切地想投入庞大资源进行深入研究和回应，希望建立联系。另一些人则保持警惕，认为任何未知接触都蕴含巨大的风险，主张谨慎分析，甚至隔离信息。你作为星球史学家，感知到这股“接触未知”的集体意识正在两极分化。<br/></p><p id="1e8add39-0a4a-80b8-a3d3-ee1366205314" class=""><strong>Options：</strong></p><ul id="1e8add39-0a4a-808d-8bd6-fcbdab6f253c" class="bulleted-list"><li style="list-style-type:disc"><strong>Option A：</strong><br/>微妙推动低维文明中对未知信号的积极回应倾向。引导其集体意识聚焦于“机遇”、“宇宙中的潜在盟友”、“知识的飞跃”等概念。<br/><ul id="121af729-9d9c-4555-bede-45a7f66a5ca5" class="bulleted-list"><li style="list-style-type:circle"><strong>Success（60%）：</strong>研究取得突破，解锁宇宙沟通的初步技术，星球文明的观点出现了巨大冲击。<ul id="9256b515-d097-4e45-b59a-53e9f9afd4c1" class="bulleted-list"><li style="list-style-type:square"><strong>Karma：</strong> 业力+15</li></ul></li></ul><ul id="ac267b44-f47a-45aa-8218-23a168666f69" class="bulleted-list"><li style="list-style-type:circle"><strong>Failed（40%）：  </strong>研究引发灾难性误解，大量民众纷纷质疑如此高的资金投入大量挤占其他重要领域资源，在舆论压力下星际探索陷入了长期的停滞。 <ul id="69941d89-d02e-4993-bbd6-325df51ae338" class="bulleted-list"><li style="list-style-type:square"><strong>Karma：</strong>业力 -15</li></ul></li></ul><ul id="69629380-f2ab-4c4a-a343-bf8c14869e69" class="bulleted-list"><li style="list-style-type:circle"><strong>Hashtag：</strong> #宇宙 #接触 #科技 #高风险 #观念转变</li></ul></li></ul><ul id="1e8add39-0a4a-800c-bc6a-edc371f98d86" class="bulleted-list"><li style="list-style-type:disc"><strong>Option B：</strong><br/>强化低维文明中对潜在风险的警惕意识。引导其集体意识关注于“未知威胁”、“盲目投入的愚蠢”、“保持隔离的安全”等概念。<br/><ul id="a2981f9b-53c0-41c0-94c0-21c2e6137a5a" class="bulleted-list"><li style="list-style-type:circle"><strong>Success（60%）：</strong>保守的选择规避了未知风险，保持了现有秩序和发展轨迹。<ul id="5bde17c3-0aa9-4000-8077-6baecb5f2178" class="bulleted-list"><li style="list-style-type:square"><strong>Karma：</strong> 业力 0</li></ul></li></ul><ul id="f23ae262-a268-49cd-a45c-bdad220fb984" class="bulleted-list"><li style="list-style-type:circle"><strong>Failed（40%）：</strong> 对星空信号的研究被限制在极小范围内，信息遭到压制。低维度文明将注意力重新投向地表内部的发展和竞争。星球上的各文明错失了与更广阔宇宙连接的潜在机遇。 <ul id="42ce1108-4cef-48ce-8f33-bdd70e0d1183" class="bulleted-list"><li style="list-style-type:square"><strong>Karma：</strong>业力 -3</li></ul></li></ul><ul id="054dfb2b-a211-4f6a-a849-39c56cac1813" class="bulleted-list"><li style="list-style-type:circle"><strong>Hashtag：</strong> #谨慎 #隔离 #保守 #规避风险 #错过机遇</li></ul></li></ul></div></figure></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80aa-9a85-ecd0e5ef2384"><div style="font-size:1.5em"><span class="icon">📂</span></div><div style="width:100%"><h3 id="96bb8ce6-4ec6-41da-b3cf-313107b30d81" class="">社群自创事件：来自宇宙档案管理员们的集体智慧 UGC Event</h3><p id="22410181-ebbb-4bc9-a19e-19b1cb775255" class="">在《星球史学家》的世界里，每一位玩家都是探索历史、书写未来的星球史学家。而赋予这段史诗无限可能性和细节的，正是分布在宇宙各处、拥有独特视角与经验的领域主宰（Domain Master）们——包括您！游戏的设计哲学深深根植于开放性与社群共创。除了由核心团队精心策定的官方档案片段，我们邀请并赋能社群中的所有成员，扮演“宇宙档案管理员”的角色，<strong>通过创作并直接在 Onchain 社群平台（特别是 Warpcast）上分享新的历史事件卡模组（Mod）</strong>，共同编织和丰富星球的命运史诗。</p><p id="1530e14f-7b45-43f7-b882-115cf72c4378" class=""><strong>设定解释：</strong></p><ul id="b8b405f0-0366-4a2c-9085-02d3680c99c0" class="bulleted-list"><li style="list-style-type:disc"><strong>概念：</strong> “社群共建事件 Mod”是指由《星球史学家》的玩家和爱好者社群，扮演“宇宙档案管理员”的角色，利用游戏支持的格式和工具，<strong>直接在指定的 Onchain 社群渠道（如 Warpcast 频道或话题）上发布和共享</strong>的历史事件卡内容。这些由社群贡献的内容，作为游戏的“去中心化档案模块”，构成了游戏不断演进、无限扩展的事件维度，真正体现了集体智慧的力量。</li></ul><ul id="2d3c6572-915a-4375-9e47-8d8662570b3f" class="bulleted-list"><li style="list-style-type:disc"><strong>核心目的：</strong> 这种基于 Onchain 社交平台的去中心化创作与分发模式，旨在最大限度地激活社群作为“领域主宰”的潜力，让每一位玩家都能成为游戏宇宙档案的和历史叙事的贡献者。通过 Warpcast 等平台，游戏内容与社群的活力、创意和集体意识紧密相连，使得游戏本身成为一个动态、自增长的有机体。</li></ul><ul id="9bd72093-04fb-48d3-8cad-4dcfd49dbeba" class="bulleted-list"><li style="list-style-type:disc"><strong>运作方式:</strong><ol type="1" id="45b3ced7-bd5d-47be-8e24-1ebb0ff80010" class="numbered-list" start="1"><li><strong>成为宇宙档案管理员（Creator Mode）：</strong> 任何拥有 Warpcast 账户的《星球史学家》玩家，都可以通过简单的步骤激活其“宇宙档案管理员”权限（例如，游戏内的设定或一个 Onchain 签名）。一旦激活，他们就获得了创建社群事件 Mod 的能力。</li></ol><ol type="1" id="dff9dd59-7a09-482a-9c0e-83d63b7688e0" class="numbered-list" start="2"><li><strong>史料整理与创作（Content Creation）：</strong> “宇宙档案管理员”可以使用游戏提供的工具或简单的文本格式（如为 Warpcast 优化的 Markdown 格式） [参见事件卡格式要求]，参照《星球史学家》的宇宙观设定、时代特征、业力机制和事件结构 [参见事件卡结构要点]，创作新的历史事件卡。创作过程是他们对某个历史片段或概念的“史料整理”和“模拟构思”。</li></ol><ol type="1" id="a307551f-0339-45bb-8f92-2e4b873b5488" class="numbered-list" start="3"><li><strong>档案上传与共享（Onchain Archiving &amp; Sharing）：</strong> 完成创作的事件卡 Mod 内容，将通过 Warpcast Frame 的帖子或 Zora发布到指定的频道或话题（例如 <code>/planetarian_DM</code> ）。这些发布的内容，即刻成为可供其他玩家加载和体验的“社群共建档案 Mod”。Zora Onchain 的特性则保证了这些内容的公开性、可追溯性和抗审查性。</li></ol><ol type="1" id="1e9add39-0a4a-80e5-a1f6-cab8a3a9166a" class="numbered-list" start="4"><li>官方周期性的选取好的 Mod 加入游戏。</li></ol><ol type="1" id="0a30efe5-6879-4aed-987d-e308ad6848e9" class="numbered-list" start="5"><li><del><strong>历史模拟中的遭遇（Encounter in Simulation）：</strong></del><del> 当其他玩家在进行游戏模拟时，游戏客户端会读取这些指定社群渠道上的社群共建事件 Mod。如果某个 Mod 满足当前的模拟时间， 或其他潜在的触发条件（例如玩家的特定业力状态），玩家就有可能在游戏中遭遇这张由其他“宇宙档案管理员”创作的事件卡。</del></li></ol><ol type="1" id="e4dbf281-2942-4cda-9377-5263c4300976" class="numbered-list" start="6"><li><del><strong>历史事件的体验与反馈：</strong></del><del> 游戏会呈现该事件 Mod 的叙事、冲突和选项，玩家的选择同样会影响当前历史模拟的进程和他们的史学家业力值 [参见 Karma 系统]。玩家的体验和反馈（如在 Warpcast 上对 Mod 帖子进行回复或反应）本身也成为了宇宙档案的一部分。</del></li></ol></li></ul><ul id="0afcca22-41a5-43af-8fe1-db8c5810f6b9" class="bulleted-list"><li style="list-style-type:disc"><strong>与 Onchain 的深度关联：</strong><ul id="89d4731b-c27f-48e6-9953-31a3fdd920f6" class="bulleted-list"><li style="list-style-type:circle"><strong>内容分发与发现：</strong> 利用 Warpcast 的去中心化社交图谱和频道功能，实现社群共建事件 Mod 的原生分发和发现，无需中心化审核平台。</li></ul><ul id="df7ba298-cf9a-47dd-8893-44aa7aff6579" class="bulleted-list"><li style="list-style-type:circle"><strong>创作者身份与声誉：</strong> 创作者的 Onchain ID (如 Farcaster ID) 可以作为其贡献事件 Mod 的身份认证。 未来可以探索基于 Onchain 互动（如 Mod 的使用率、玩家反馈）构建创作者的声誉系统。</li></ul><ul id="6e1ada8c-9238-43cc-84e4-b2437d752594" class="bulleted-list"><li style="list-style-type:circle"><strong>潜在的 Onchain 激励：</strong> 未来可以通过智能合约或 DAO 机制，根据社群共建事件 Mod 的质量、受欢迎程度或对游戏体验的贡献，对“宇宙档案管理员”创作者进行 Onchain 激励（例如，分配代币、NFT 或其他链上权益），形成可持续的共创飞轮。</li></ul></li></ul><ul id="f860f2c3-bbcc-43b4-8abf-dcc92fabfaf3" class="bulleted-list"><li style="list-style-type:disc"><strong>“官方档案”与“社群档案”：</strong> 核心团队将维护一套基础的官方事件卡库，作为游戏的宇宙观基础和核心叙事框架。而社群共建事件 Mod 则在此基础上提供无限的可能性和细节，它们共同构成了《星球史学家》完整的、不断增长的宇宙历史档案体系。</li></ul><hr id="1e9add39-0a4a-8004-9f2c-f517d6397f89"/><p id="ef1a2109-88d9-40cd-a977-dfca427d8885" class=""><strong>对（Project Planetarian 核心团队）的提示：</strong></p><p id="477e166e-9f9c-47af-9ae6-53ac2d440785" class="">作为《星球史学家》项目运行的“领域主宰”和社群的协作者，核心团队的 DM 们需要：</p><ul id="93924ea7-23d5-4e52-a1ae-bfe9a964edec" class="bulleted-list"><li style="list-style-type:disc"><strong>明确规则与工具：</strong> 制定清晰简洁的社群共建事件 Mod 创作规范、格式要求以及推荐工具，降低创作门槛。</li></ul><ul id="e1a881f2-e374-4d34-bab3-2dc6f3cecc7b" class="bulleted-list"><li style="list-style-type:disc"><strong>维护渠道与基础设施：</strong> 设定和维护 Warpcast 等平台上用于发布和收集社群共建事件 Mod 的官方频道或话题，并开发游戏客户端读取这些 Onchain 内容所需的基础设施。</li></ul><ul id="576df812-8821-47f2-86a5-18621749cb3e" class="bulleted-list"><li style="list-style-type:disc"><strong>内容监测与管理：</strong> 在去中心化的原则下，探索和建立处理极少数不符合规范、低质量或恶意内容的机制，例如社群投票、举报机制等，维护社群档案的质量和健康。</li></ul><ul id="70b8cc78-cbc2-4e67-af6c-de958774275e" class="bulleted-list"><li style="list-style-type:disc"><strong>积极互动与引导：</strong> 在 Warpcast 社群中积极与“宇宙档案管理员”创作者互动，提供创作建议，推荐优质 Mod，组织创作挑战，形成一个活跃且有创造力的共建社区文化。</li></ul><ul id="39144179-8f29-47e7-a814-0bdbd26114f4" class="bulleted-list"><li style="list-style-type:disc"><strong>探索未来 Onchain 集成：</strong> 持续探索和尝试将社群共建事件 Mod 与更深度的 Onchain 机制结合（如内容存储、去中心化策展、贡献者经济模型），进一步践行游戏的去中心化理念。</li></ul><p id="9e93a912-dde2-48bb-a106-bc658df5e352" class="">这种强化的 UGC 模式将使《星球史学家》成为一个真正由社群共同拥有和塑造的活态历史宇宙，每一个在 Warpcast 上发布的事件 Mod，都是一份来自宇宙档案管理员的贡献，丰富着这个赛博历史的维度。</p><p id="1e9add39-0a4a-808d-8a41-ffd9079fd027" class="">
+</p></div></figure></div><div id="1e8add39-0a4a-804a-be46-dd17440ca978" style="width:50%" class="column"><h1 id="1e8add39-0a4a-8028-be17-ff72cbf3b5fa" class="">业力 Karma</h1><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80a6-83e8-feb2d9b69353"><div style="font-size:1.5em"><span class="icon">☯️</span></div><div style="width:100%"><h3 id="8bd59aee-5c92-4840-93da-70c1521ac23b" class=""><strong>业力值 Karma Level</strong></h3><ul id="01d9a306-86b2-4a1d-9a3d-c3a08ae45795" class="bulleted-list"><li style="list-style-type:disc">《星球史学家》》中的“业力值 (Karma)” 是一个核心的、用于衡量星球智慧生命<strong>集体福祉状态</strong>的抽象数值，其设计目的是作为 DM <strong>把控游戏节奏、叙事方向和事件抽取的关键指标</strong>。尽管对玩家不可见具体数值（0-100），但其对应的五个状态等级（极差、差、中、良、优）应在游戏中通过环境描写、事件走向、居民状态等方式，以可感知的形式呈现给玩家。</li></ul><p id="3c3dff1f-e533-42bc-88c8-c5caed7c168f" class=""><strong>设计理念:</strong></p><ul id="94bbfb3d-3ca3-4486-a3b5-9640d3789220" class="bulleted-list"><li style="list-style-type:disc"><strong>非线性关联:</strong> 业力值与文明发展并非简单的正向线性关系。我们引入了“绝境” (0-10) 和“超越” (91-100) 这两个极端状态，它们不仅是最低谷或最高峰，更是具有<strong>独特风险与超常潜力</strong>的<strong>临界点</strong>。<ul id="f1f2f162-911b-4cb8-b7d7-2586cc4b1273" class="bulleted-list"><li style="list-style-type:circle">“绝境”强调的是，即使在最低谷，生存的极端压力也可能激发非传统的、具有颠覆性的生命力爆发，可能带来扭转乾坤的机遇。</li></ul><ul id="d4c2f6ad-4747-4f29-a3f4-5f0f0e613203" class="bulleted-list"><li style="list-style-type:circle">“超越”则警示 DM，极致的福祉可能伴随隐藏的停滞风险或尚未认知的系统性问题。</li></ul></li></ul><ul id="1f700fdf-6b76-4d7a-a4c6-ca270537e83a" class="bulleted-list"><li style="list-style-type:disc"><strong>机制核心:</strong> 业力值的设计是与<strong>事件系统直接关联</strong>的核心机制。在相同的时间周期内，当前的业力值范围将决定游戏从中抽取并呈现给玩家的<strong>事件卡库</strong>。这意味着，玩家对业力值的每一次影响（无论好坏）都将直接影响未来遭遇事件的类型和叙事走向。</li></ul><p id="be9acf3e-9fd7-468b-9469-a79cb6dc8b3d" class=""><strong>业力等级与游戏影响:</strong></p><p id="986d678a-d2be-417b-93dd-1884e6625903" class="">作为 DM，理解不同业力等级对应的状态描述和可能带来的游戏影响至关重要。这些描述旨在提供叙事指引和事件设计灵感。业力等级与游戏影响的关系如下图所示：</p><figure id="1e8add39-0a4a-8070-aee8-d39deb2d563a" class="image"><a href="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/image.png"><img style="width:644.3875122070312px" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/image.png"/></a></figure><p id="2f28e74a-08ff-4681-8b03-4e58b2ce876f" class=""><strong>整体业力等级划分 (0-100):</strong></p><ul id="14125d26-2a50-43c5-8776-8be1d5b144b2" class="bulleted-list"><li style="list-style-type:disc"><strong>极差：0 - 10 - 绝境 (Desperation):</strong> 最低谷。在叙事层面，这是文明面临彻底毁灭或生存模式彻底崩溃的边缘。但在设计层面，<strong>这是激发最极端事件、测试文明生命力弹性和解锁非传统路径（突破旧规则、冒险）的机会窗口。</strong> 可能抽取到<strong>极度危险但潜藏巨大转机</strong>的事件。</li></ul><ul id="3860d397-fd90-4b81-afe1-53b38bb39e71" class="bulleted-list"><li style="list-style-type:disc"><strong>差：11 - 30 - 衰败 (Degeneration):</strong> 文明处于明显的下滑趋势。基础系统衰败、矛盾尖锐、风险累积。游戏体验偏向压抑、困难、挣扎。可能抽取到反映系统性问题、冲突加剧、资源匮乏的事件。</li></ul><ul id="d087d833-c117-4de4-8141-79ea0fa201c8" class="bulleted-list"><li style="list-style-type:disc"><strong>中：31 - 70 - 流转 (Flux):</strong> 这是一个宽泛的中间地带，代表文明在发展、平衡、波动和初步增长中摇摆。既有积极进展，也有负面挑战。游戏体验多样且充满不确定性。可能抽取到各种类型、反映复杂局势的事件。</li></ul><ul id="6316d1cc-70d1-4a10-9617-e3eeceac4ab3" class="bulleted-list"><li style="list-style-type:disc"><strong>良：71 - 90 - 繁荣 (Prosperity):</strong> 文明处于积极增长和相对稳定的阶段。基础福祉良好，系统运转顺畅，积累业力的机会增多。游戏体验偏向顺畅、建设性。可能抽取到反映发展、合作、成果显现的事件。</li></ul><ul id="ddc4c5d2-ab38-4166-859c-9c7a93808ac6" class="bulleted-list"><li style="list-style-type:disc"><strong>优：91 - 100 - 超越 (Transcendence):</strong> 最高点。在叙事层面，文明可能看似达到了某种巅峰或“理想状态”。但在设计层面，<strong>这是警示潜在的停滞、过度优化带来的单一性风险，以及未知系统性挑战的可能浮现。</strong> 可能抽取到反映这种<strong>表面完美下的内在问题、哲学困境或来自未知层面的超常事件。</strong></li></ul><hr id="9f0e9b08-caca-440a-9511-5619b1958edc"/><p id="9fbe65f3-a9e8-4ab7-9e8b-9bfda2e2010c" class=""><strong>不同时代下业力等级的具体表现与 DM 提示:</strong></p><p id="3f212d14-ea0f-4fb7-bcc6-eeaa1b03a723" class="">每个时代独特的底层结构和主题，将赋予业力等级不同的具体表现和叙事内涵。作为 DM，您应利用这些差异来刻画不同时代的游戏氛围和挑战。</p><p id="000b3f94-da78-45b7-b1f1-fd02345b9f65" class=""><strong>Era I: 国际化时代业力等级的刻画:</strong></p><p id="6468f1b1-d06b-46f5-9c35-b6208c6fb44f" class="">在此时代，业力主要反映基础生存状态、区域秩序、工业化问题、信息隔阂以及有限的节点间互动。</p><ul id="c1671b14-1c1b-455a-9ee8-219dd7e9e61b" class="bulleted-list"><li style="list-style-type:disc"><strong>0 - 10: 绝境:</strong> 焦点在于<strong>区域性基础系统崩溃后的绝望与生命力的爆发</strong>。事件设计可以体现：孤立区域的极端求生行为、打破物理边界的疯狂尝试、源于绝境的区域联盟或战争、对早期科技的孤注一掷利用。强调<strong>物理世界极端压力</strong>。</li></ul><ul id="52a1db5d-8aa3-4e5f-b32c-11154c65205d" class="bulleted-list"><li style="list-style-type:disc"><strong>11 - 30: 衰败:</strong> 描绘区域内部的秩序崩坏、环境污染加剧、基础资源枯竭、地方冲突升级。事件可以反映：失控的区域权力、流离失所的居民、传统社会结构的瓦解。</li></ul><ul id="a54667ca-27cf-4b29-b662-c3a7aaf8b578" class="bulleted-list"><li style="list-style-type:disc"><strong>31 - 70: 流转:</strong> 展现不同文明节点的交互、早期贸易网络的形成与摩擦、科技传播的阻碍与尝试。事件可以包含：跨区域商队遭遇风险、节点间的试探性合作与冲突、新技术的局部突破与受阻。</li></ul><ul id="225eff59-486c-49e0-912a-d5c399be1063" class="bulleted-list"><li style="list-style-type:disc"><strong>71 - 90: 繁荣:</strong> 体现少数繁荣文明节点的秩序井然、科技进步、贸易扩张。事件可以聚焦：大型城市的建设与管理、成功的区域性联盟、早期基础建设带来的福祉。</li></ul><ul id="aa32b253-c434-40ef-a080-57a5a208c565" class="bulleted-list"><li style="list-style-type:disc"><strong>91 - 100: 超越:</strong> 在此时代，“超越”更多体现为<strong>孤立繁荣顶峰下的僵化或对未知风险的无视</strong>。事件可以探索：某个极致繁荣节点因自我封闭而导致的脆弱性、对外界求援信号的麻木、潜伏在繁荣下的单一性风险。</li></ul><p id="3ffed52f-d69a-4daf-99f6-b850917df068" class=""><strong>Era II: 全球化时代业力等级的刻画:</strong></p><p id="4353fa81-e423-4b01-97d5-81f323801882" class="">在此时代，业力受到全球性联系、地缘政治对抗、信息控制和系统性风险的主导。</p><ul id="9156c468-b967-416f-8900-3e5f1a199463" class="bulleted-list"><li style="list-style-type:disc"><strong>0 - 10: 绝境:</strong> 焦点在于<strong>全球化体系崩溃后的失控与极端应激</strong>。事件设计可以体现：全球贸易线路瘫痪、超大型组织的崩溃与混乱、极端阵营间不计后果的冲突、数据和信息系统被武器化、源于全球性风险失控（如新型全球传染病爆发）导致的混乱。强调<strong>中心化全球体系瓦解</strong>。</li></ul><ul id="48640df8-2dc4-4704-848b-5bddf8e6bc2b" class="bulleted-list"><li style="list-style-type:disc"><strong>11 - 30: 衰败:</strong> 描绘全球体系的失灵：持续的贸易/技术战、地缘政治僵局、全球治理机构失效、大规模信息操纵导致的信任危机、跨国公司或组织的权力滥用。事件可以反映：全球性经济萧条、环境灾难波及全球、难民危机。</li></ul><ul id="8e0332ed-d96a-4705-98cd-1105d12b5255" class="bulleted-list"><li style="list-style-type:disc"><strong>31 - 70: 流转:</strong> 展现全球化体系的波动与不确定性：阵营间的竞争与有限合作并存、全球产业链的调整与脆弱性、信息自由流动的尝试与信息控制的拉锯。事件可以包含：全球性议题的艰难谈判、大型跨国项目的风险与机遇、不同文化/信息阵营的冲突与融合。</li></ul><ul id="0dde8a32-d6e6-49b6-9c63-d4ccb469e311" class="bulleted-list"><li style="list-style-type:disc"><strong>71 - 90: 繁荣:</strong> 体现全球体系的相对稳定和效率：可控的国际竞争、全球贸易网络的畅通、部分全球性问题的有效应对、信息流动的增加带来的积极影响。事件可以聚焦：成功的跨国合作项目、科技的全球性推广、文化交流的繁荣。</li></ul><ul id="f160d4c1-843c-4698-8f6d-58d18b8fba12" class="bulleted-list"><li style="list-style-type:disc"><strong>91 - 100: 超越:</strong> 在此时代，“超越”可能代表着<strong>极致的全球化效率或某种形式的全球大同，但伴随</strong>对个体的系统性牺牲<strong>或</strong>未知系统性风险**。事件可以探索：某个大型中心化实体实现了看似完美的全球控制但以压制自由为代价、所有全球问题似乎都已解决但文明陷入目标空虚、隐藏在全球效率体系下的关键漏洞或依赖风险。</li></ul><p id="ef01c3e4-95c0-43e3-b897-2081453404e4" class=""><strong>Era III: 星球化时代业力等级的刻画:</strong></p><p id="11978441-8d69-4c30-a7df-eebdac904ab3" class="">在此时代，业力的核心是<strong>基于物理现实叠加的 Onchain Economy 能否成功运作并带来福祉</strong>，以及如何应对其独特风险。</p><ul id="725f7e11-34eb-4da9-b1fd-d6561980a06f" class="bulleted-list"><li style="list-style-type:disc"><strong>0 - 10: 绝境:</strong> 焦点在于<strong>Onchain Economy 崩溃后，数字层与物理层相互加强的极端混乱</strong>。事件设计可以体现：核心 Onchain 协议的彻底失效、链上资产的无价值化、智能合约的普遍崩溃导致的社会失灵、物理世界的旧秩序残余与链上无序的叠加、对 K&#x27; 极致失控的依赖或反噬。强调<strong>Onchain 与物理双重危机</strong>。</li></ul><ul id="8c389789-0346-4922-bba8-90db17c18f47" class="bulleted-list"><li style="list-style-type:disc"><strong>11 - 30: 衰败:</strong> 描绘 Onchain 生态系统的脆弱：协议漏洞的持续爆发、智能合约安全问题频发、去中心化治理陷入僵局或被操纵、链上信任体系崩溃、与物理世界的接口问题导致的混乱。事件可以反映：大规模链上资产盗窃、去中心化组织的内部冲突、物理世界的反 Onchain 运动。</li></ul><ul id="1dd84196-5362-4c81-8629-936ab74e1058" class="bulleted-list"><li style="list-style-type:disc"><strong>31 - 70: 流转:</strong> 展现 Onchain Economy 的发展与挑战并存：新的协议出现并测试其弹性、链上社群的尝试与迭代、去中心化应用的探索与瓶颈、物理世界的适应与抵抗。事件可以包含：新协议的部署与风险、Onchain 身份带来的新社会互动模式、物理世界资源与链上资产的转换问题。</li></ul><ul id="9cad7d3d-ece7-44e5-a1a0-d73939d17556" class="bulleted-list"><li style="list-style-type:disc"><strong>71 - 90: 繁荣:</strong> 体现 Onchain Economy 带来的巨大福祉：高效的无界贸易、大规模分布式协作、链上身份构建的信任网络、通过协议实现的自由与丰裕。事件可以聚焦：成功的去中心化项目、AI Agent 带来的生产力革命（K&#x27; 的积极应用）、基于链上治理的高效社会组织。</li></ul><ul id="eabf9b54-266a-4fc4-9b03-ba0eefe4ae6b" class="bulleted-list"><li style="list-style-type:disc"><strong>91 - 100: 超越:</strong> 在此时代，“超越”代表着基于 Onchain-layered 现实的<strong>终极福祉</strong>，可能指向存在形式的<strong>奇点</strong>。事件可以探索：AI Agent 达到或超越人类智能并融入社会、通过 Onchain 技术实现的某种形式的数字永生、与其他星球/文明 Onchain 连接的可能性。这些事件应同时探索其带来的<strong>潜在伦理困境和未知的系统性风险</strong>（例如：个体在极致高效体系中的存在意义、AI 的目标对齐问题、超验风险）。</li></ul><hr id="1e8add39-0a4a-809f-b461-edaa2946a4c7"/><p id="d30ef1af-1640-4d99-bd59-02fe47897f27" class=""><strong>对 DM 的提示:</strong></p><ul id="0e517dbe-16d4-4f33-9449-2acce4b96b8a" class="bulleted-list"><li style="list-style-type:disc"><strong>可视化思考:</strong> 即使玩家看不到数值，您应在脑中或记录中追踪业力值。根据业力所处的等级，考虑如何调整游戏的氛围、NPC 的状态、环境描写和遭遇事件的类型，让玩家感知到当前文明的“健康度”。</li></ul><ul id="e1da78b3-c952-4c82-910f-550b4da459b2" class="bulleted-list"><li style="list-style-type:disc"><strong>业力变化作为反馈:</strong> 玩家的行为如何影响业力值，是游戏的核心反馈循环。您需要在设计中明确哪些玩家行为（通过事件选项）将影响业力值，以及影响的方向和程度。这不仅是数值变化，更是对玩家选择的叙事性回应。</li></ul><ul id="00a6f8f5-92d5-4463-93ef-8f4e5921898a" class="bulleted-list"><li style="list-style-type:disc"><strong>利用极端等级:</strong> 特别注意 0-10 和 91-100 这两个等级。它们是产生最具独特性和高风险/高回报事件的区间。积极设计针对这些区间的事件，利用它们来推动游戏的戏剧性和哲学思考。</li></ul><ul id="446a45cb-f4ed-4c5d-bdad-46173068f297" class="bulleted-list"><li style="list-style-type:disc"><strong>跨时代对比:</strong> 随着时代的变迁，同等级的业力会呈现出截然不同的面貌。例如 Era I 的繁荣是区域性的，Era II 的繁荣是全球性受控的，而 Era III 的繁荣是基于 Onchain 的分布式丰裕。利用这种对比来强化玩家对不同时代核心主题的理解。</li></ul><p id="39c4f7f9-aa56-4ed5-8b37-93ee33cb0cfb" class="">通过对业力值及其在不同时代下表现的深入理解和灵活运用，您可以有效地引导游戏叙事，提供多样化的体验，并让玩家深刻体会到其在《星球史学家》中作为文明守护者的责任与影响力。</p></div></figure><p id="1e8add39-0a4a-8051-b08a-dfb92c5ac566" class="">
+</p></div></div><h1 id="1e8add39-0a4a-80ee-ada7-c3468f6f20a6" class="">Coinbase Wallet Mini-Apps 特殊企划</h1><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-8080-990d-d994abc9fd3d"><div style="font-size:1.5em"><span class="icon">⏩</span></div><div style="width:100%"><p id="410d5695-2f4c-4ad7-9dc9-a04736af7c12" class=""><strong>⚡ 活力值与星球影响力 Vitality &amp; Planetary Influence</strong></p><p id="a8b9158f-bbb6-4dd0-aa3d-c4384aa7de12" class="">在《星球史学家》的 Mini-Apps 体验中，玩家作为“星球史学家”，通过日常、碎片的干预来影响低维度文明进程。<strong>活力值</strong>系统是管理和计量玩家每日干预能力的机制，它象征着星球史学家有限的<strong>超维度影响力指数</strong>或<strong>意识干预力</strong>。这是玩家能够调用自身仅存的、宝贵的高维能量与低维度星球集体潜意识互动并触发事件的体现。</p><p id="1fa2804c-5b1c-4e5d-9423-ddd340542588" class=""><strong>核心机制：</strong></p><ul id="5a70e243-2380-45e0-8ef8-cc669f46f56a" class="bulleted-list"><li style="list-style-type:disc"><strong>活力值的来源:</strong> 每日系统会为星球史学家自动补充一定量的活力值。这模拟了高维意识维持干预所需的周期性恢复过程，旨在鼓励玩家每日登录游戏以保持对低维度星球的关注和干预。</li></ul><ul id="89278ea0-a7f6-4b56-9f50-6689de21d60d" class="bulleted-list"><li style="list-style-type:disc"><strong>活力值的消耗:</strong> 星球史学家在执行影响低维度星球进程的关键操作时，需要消耗活力值。主要包括：<ul id="84822181-962b-4cd6-9092-82822994517a" class="bulleted-list"><li style="list-style-type:circle"><strong>处理事件卡:</strong> 每次抽取或应对一个事件卡并做出选择，都会消耗一定的活力值。这代表着星球史学家将意识能量聚焦于特定的历史节点，并注入干预信号。</li></ul><ul id="10bf977e-2275-462b-ac6d-1bfd95649b54" class="bulleted-list"><li style="list-style-type:circle"><strong>强化干预:</strong> 在某些事件的选项中，星球史学家可能选择消耗额外的活力值，以增加干预的强度，可能提升某个结果的概率或效果，甚至解锁需要更高干预力才能执行的特殊选项。</li></ul></li></ul><ul id="36923e97-49f7-4cf4-b122-64ddffdb08c2" class="bulleted-list"><li style="list-style-type:disc"><strong>活力值的额外获取:</strong> 除了每日补充外，星球史学家可以通过达成游戏内的特定目标或参与某些活动来额外获取活力值，例如完成特定的文明进程里程碑、在某些主题事件中表现出色，或通过游戏内的特定系统进行互动。</li></ul></div></figure><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80e6-a2d0-eb6764825cbd"><div style="font-size:1.5em"><span class="icon">⏩</span></div><div style="width:100%"><p id="20d85c95-c6af-4bd8-8a2a-4249f86fa88c" class=""><strong>☯ 业力与活力值的关联 Karma &amp; Vitality Link</strong></p><p id="4b9cb727-e58b-4bd8-823a-c589fea28e5a" class="">业力（Karma）代表着低维度星球文明的集体福祉状态，而活力值是星球史学家施加干预的能力。两者之间存在着深刻的关联，这种关联也体现在游戏机制中：</p><ul id="9bb37ce5-d3b8-4f36-8424-868de0e66dd2" class="bulleted-list"><li style="list-style-type:disc"><strong>业力状态对活力值的影响:</strong> 低维度星球当前的业力等级会影响星球史学家每日活力值的补充效率或上限。例如，在文明陷入“绝境”（0-10）或处于“衰败”（11-30）状态时，低维度世界充斥着负面能量和混乱，星球史学家的高维意识干预会更加困难，每日获得的活力值可能减少。而在文明达到“繁荣”（71-90）或“超越”（91-100）状态时，积极的能量场有助于高维意识的共振，可能提升活力值的补充效率。</li></ul><ul id="781c7256-4378-4039-93f0-9e02635a2e0f" class="bulleted-list"><li style="list-style-type:disc"><strong>消耗活力值改变业力:</strong> 星球史学家通过消耗活力值所做的每一次选择，其结果都会直接反映在低维度星球业力值的增减上。消耗更多活力值进行的“强化干预”操作，往往会带来更大或更具不确定性的业力变化幅度。</li></ul></div></figure><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="1e8add39-0a4a-80c0-ac44-ff384427edd9"><div style="font-size:1.5em"><span class="icon">⏩</span></div><div style="width:100%"><p id="719db23b-a247-4a75-85e8-9c1bac20bf41" class=""><strong>加速模式 Acceleration Mode (业力转化活力)</strong></p><p id="82b8d2a3-492e-4abe-9991-f5066f4433a6" class="">这里的“加速模式”并非时间流逝的加速，而是指星球史学家通过特殊方式<strong>快速补充活力值</strong>的能力。这是一种利用低维度星球积累的业力，转化为高维干预能量的过程。</p><ul id="2155ac24-3adf-4c03-babd-d55c81716019" class="bulleted-list"><li style="list-style-type:disc"><strong>机制描述:</strong> 当星球史学家的活力值不足以执行所需的操作时，可以向智能星球助理 Nounii 申请，通过<strong>消耗一定数量的低维度星球业力值，来立即补充一部分活力值</strong>。</li></ul><ul id="fef3ec3d-1c05-4fe9-99bd-1241338720f9" class="bulleted-list"><li style="list-style-type:disc"><strong>叙事包装:</strong> 这可以被描绘为星球史学家引导或抽取了低维度文明 Collective Karma Pool（集体业力池）中积蓄的能量，将其转化为自身用于干预的意识强度。例如：“星球的 Collective Karma 场域波动强烈，汇聚了历史的沉淀与未来的可能性。星球史学家，您可以通过 Nounii 接口，调用这股原始的能量，暂时提升干预能力。”</li></ul><ul id="2420ffd1-9e8a-478f-8267-1164d6cc345e" class="bulleted-list"><li style="list-style-type:disc"><strong>触发与风险:</strong> 消耗业力转化活力可以在需要时触发。转化的比例和效率可能受到当前业力等级的影响。尤其需要注意的是，在低业力值（如“绝境”或“衰败”）阶段消耗业力，可能伴随着更高的风险，例如进一步耗竭文明的潜在恢复力，或者在极度脆弱的状态下引入无法控制的变量。在高业力值阶段消耗则风险相对较低，效率可能更高。</li></ul></div></figure><h1 id="1e8add39-0a4a-804d-b09d-dffa90ccb401" class="">Archive&amp; Reference</h1><p id="1e8add39-0a4a-80b6-92da-cfe256eca9b2" class=""><a href="https://www.notion.so/Project-Planetarian-Core-Tone-1e3add390a4a807fb60fdb5c6486f4a5?pvs=21">Project Planetarian Core Tone</a> </p><figure id="1e7add39-0a4a-8098-9b01-d766083480e1" class="link-to-page"><a href="https://www.notion.so/Content-1e7add390a4a80989b01d766083480e1?pvs=21">科技树 Content</a></figure><p id="1e6add39-0a4a-804a-a503-d5afb1b0c196" class="">
+</p><p id="1e3add39-0a4a-80fe-986c-cb3e89be9707" class="">Cyberealism 赛博现实辩证关系 - 现实的也是虚拟的，虚拟的也是现实的</p><p id="1e3add39-0a4a-8041-a709-fa59170c8965" class="">当我们在虚拟世界中找到答案，现实世界也得到了推进</p><p id="1e3add39-0a4a-80f9-a044-ce4584f981f2" class="">现实的也是虚拟的</p><p id="1e3add39-0a4a-80d6-b4bc-e74e1e41770e" class="">
+</p><p id="1e3add39-0a4a-8091-b0af-f5c8eb4bdd5b" class="">为了找到新的出路，人类决定使用最新的元宇宙系统进行策略模拟，这是一个策略模拟器，</p><figure id="1e4add39-0a4a-80ac-9c4d-f58eb650b7ca" class="image"><a href="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/image%201.png"><img style="width:672px" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/image%201.png"/></a></figure><h2 id="5ed7c47d-087c-4f0b-96fd-815b00547ffb" class="">2. 核心玩法循环</h2><table id="ed220195-3fa6-473a-9389-8c950566f555" class="simple-table"><tbody><tr id="e48a6d1a-86d2-404c-a476-01c8193c16c5"><td id="^y&gt;F" class="">👤 人力点 💚</td><td id="p[^t" class="">📦 物质点 🟥</td><td id="Zq{L" class="">🔋 能量点 🟡</td><td id="|W_d" class="" style="width:111px">🔬 科技点 🔷</td><td id="`^Mz" class=""></td></tr><tr id="1e7add39-0a4a-80a9-9dd3-ef172b2299fb"><td id="^y&gt;F" class="">全球健康度</td><td id="p[^t" class="">全球稳定度</td><td id="Zq{L" class="">全球满意度</td><td id="|W_d" class="" style="width:111px">星球环境指数</td><td id="`^Mz" class=""></td></tr></tbody></table><h3 id="e56df92b-f8f2-4b3a-925a-df9de41aa26a" class="">2.1. 核心循环</h3><p id="1e4add39-0a4a-8085-aa9b-c1e5b1cb4f47" class="">阶段要继承好玩家的自定义内容</p><table id="1e4add39-0a4a-80c1-9032-ec63d391bfce" class="simple-table"><tbody><tr id="736e4807-bc7d-44b0-8f01-cbcaad8d99e2"><td id="bnX_" class=""></td><td id="DKVu" class="" style="width:157px">阶段主题</td><td id="Ex}r" class="">音乐调性</td><td id="Jjop" class=""></td><td id="ZaLF" class="">操作循环</td><td id="_FZv" class="">资源获取方式</td><td id="BNfl" class="">背景世界</td></tr><tr id="9b33bfd0-e2e5-41ad-830e-46057cee22f7"><td id="bnX_" class="">国际阶段</td><td id="DKVu" class="" style="width:157px">建设、国际贸易、金融市场等现代秩序</td><td id="Ex}r" class="">建设、灵动、欢快，跳动合成器</td><td id="Jjop" class=""><strong>Recomposed By Max Richter: Vivaldi, The Four Seasons:Spring 1<br/><br/></strong>E大调第1号协奏曲，作品 269 - 第1乐章“春”<br/><br/><br/><em><strong>Breathe</strong></em><br/>歌手：<br/><a href="https://music.163.com/artist?id=102023">Telepopmusik</a><br/>所属专辑：<br/><a href="https://music.163.com/album?id=2064440">Genetic World</a><strong><br/><br/><br/></strong><em><strong>Besides</strong></em><br/>歌手：<br/><a href="https://music.163.com/artist?id=33870">Gui Boratto</a><br/>所属专辑：<br/><a href="https://music.163.com/album?id=141505">Take My Breath Away</a><br/><br/>Building the Foundation歌手：Chris Tilton专辑：SimCity Cities of Tomorrow<br/></td><td id="ZaLF" class="">1. 在城市之间点击建立贸易路线<br/>2. 在城市之间点击建立旅行路线<br/></td><td id="_FZv" class="">贸易路线刷新📦 物质点 🟥<br/>旅行路线刷新👤 人力点 💚<br/></td><td id="BNfl" class="">城市、聚落自然生成，一定阶段后会自然连接道路，</td></tr><tr id="b1feaad0-f64a-447b-aaba-2d7daf092c4f"><td id="bnX_" class="">全球阶段</td><td id="DKVu" class="" style="width:157px">金融权利触达性、南北发展不均衡、贸易战、后现代秩序</td><td id="Ex}r" class="">科幻、危险、酸合成器</td><td id="Jjop" class=""><strong><a href="https://www.youtube.com/@MarathonIntel">Marathon Intel</a></strong><strong> Bungie’s Marathon New Secret Track</strong></td><td id="ZaLF" class=""></td><td id="_FZv" class="">星球上有各种“流循环（Stream）”自动在节点间流动（人流、物流、钱流、信息流）当一个“流循环（Stream）”完成时，在完成位置跳出资源图标（按钮）待玩家“收取”</td><td id="BNfl" class=""></td></tr><tr id="1e4add39-0a4a-80e6-9ad5-ddcb010c8e3f"><td id="bnX_" class="">星球阶段</td><td id="DKVu" class="" style="width:157px">离开人类的摇篮、瞬发、瞬时</td><td id="Ex}r" class="">Alpha 波</td><td id="Jjop" class="">在太空遨游-阿尔法脑波睡眠音乐 张澳星</td><td id="ZaLF" class=""></td><td id="_FZv" class=""></td><td id="BNfl" class=""></td></tr></tbody></table><div id="1e4add39-0a4a-8075-82c2-e3e066e828c8" class="column-list"><div id="1e4add39-0a4a-807f-9522-c1cc896ec1ae" style="width:31.25%" class="column"><h3 id="1e4add39-0a4a-802c-922a-d6daef1ef2d7" class="">国际阶段</h3><p id="1e4add39-0a4a-8099-84f7-d80fb1bf907b" class="">阶段主题：建设、国际贸易、金融市场等现代秩序</p><p id="1e6add39-0a4a-8062-9ccf-cb01d8bc6518" class="">
+</p></div><div id="1e4add39-0a4a-804c-afed-ce99ae41644e" style="width:25%" class="column"><figure id="1e4add39-0a4a-8082-9b87-eb813a30805f" class="image"><a href="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/image%202.png"><img style="width:432px" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/image%202.png"/></a></figure><p id="1e4add39-0a4a-800f-b365-e73fbc197b73" class="">
+</p></div><div id="1e4add39-0a4a-809b-8023-dffe4305b771" style="width:21.875000000000004%" class="column"><figure id="1e4add39-0a4a-8038-8fb9-d1a5b56b8ec1" class="image"><a href="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/%E6%B5%A9%E7%80%9A%E5%B9%BF%E9%98%94%E7%9A%84%E5%AE%87%E5%AE%99%E7%BE%A4%E6%98%9F%E9%97%AA%E8%80%80_%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E5%90%84%E7%A7%8D%E6%98%9F%E7%B3%BB_%E8%89%B2%E8%B0%83%E6%9F%94%E5%92%8C%E7%9A%84%E5%A4%AA%E7%A9%BA%E6%B7%B1%E9%82%83%E8%80%8C%E5%AE%81.png"><img style="width:1469.2000732421875px" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/%E6%B5%A9%E7%80%9A%E5%B9%BF%E9%98%94%E7%9A%84%E5%AE%87%E5%AE%99%E7%BE%A4%E6%98%9F%E9%97%AA%E8%80%80_%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E5%90%84%E7%A7%8D%E6%98%9F%E7%B3%BB_%E8%89%B2%E8%B0%83%E6%9F%94%E5%92%8C%E7%9A%84%E5%A4%AA%E7%A9%BA%E6%B7%B1%E9%82%83%E8%80%8C%E5%AE%81.png"/></a></figure></div><div id="1e4add39-0a4a-80ed-9697-e2486e506429" style="width:21.875%" class="column"><figure id="1e4add39-0a4a-8029-96c1-ee31349d6b65" class="image"><a href="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/%E5%AE%8C%E5%85%A8%E4%B8%80%E6%A0%B7%E7%9A%84%E5%A4%A7%E9%99%86%E5%92%8C%E6%98%9F%E7%90%83%E7%BB%93%E6%9E%84_%E4%BD%86%E6%98%AF%E6%98%AF%E5%A4%9C%E6%99%9A_%E8%83%BD%E7%9C%8B%E5%88%B0%E5%A4%A7%E9%99%86%E4%B8%8A%E7%9A%84%E6%96%87%E6%98%8E%E7%81%AF%E5%85%89%E8%BF%9E%E5%9F%8E.png"><img style="width:343.7875061035156px" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/%E5%AE%8C%E5%85%A8%E4%B8%80%E6%A0%B7%E7%9A%84%E5%A4%A7%E9%99%86%E5%92%8C%E6%98%9F%E7%90%83%E7%BB%93%E6%9E%84_%E4%BD%86%E6%98%AF%E6%98%AF%E5%A4%9C%E6%99%9A_%E8%83%BD%E7%9C%8B%E5%88%B0%E5%A4%A7%E9%99%86%E4%B8%8A%E7%9A%84%E6%96%87%E6%98%8E%E7%81%AF%E5%85%89%E8%BF%9E%E5%9F%8E.png"/></a></figure></div></div><h3 id="1e4add39-0a4a-80e5-93b0-e98a6e03cad7" class="">全球阶段</h3><p id="1e4add39-0a4a-8098-8d4d-c3017ddd51e9" class="">阶段主题：金融权利触达性、南北发展不均衡、贸易战、后现代秩序</p><p id="1e4add39-0a4a-80f0-9a8c-fc65ddfa0138" class="">这颗星球上的人类第一次远航去到另一个大陆，随着这艘穿远航，游戏镜头开始星球自右向左缓慢循环；</p><p id="1e4add39-0a4a-80c1-accf-eae6c78d8b27" class="">星球自右向左缓慢循环（引导玩家要点击收集奖励，错过了就没有了）</p><div id="1e4add39-0a4a-8062-9483-e76ddfa932e3" class="column-list"><div id="1e4add39-0a4a-805b-aa36-fc592c1ebb0c" style="width:50%" class="column"><h3 id="1e4add39-0a4a-804b-bacb-eb5d51c124eb" class="">星球阶段</h3><p id="1e4add39-0a4a-8089-b1b3-cbb48838a372" class="">阶段主题：离开人类的摇篮</p><p id="1e4add39-0a4a-802e-b28a-da67e8dad16f" class="">音乐：使用 Alpha 波音乐</p><p id="1e4add39-0a4a-8053-b447-dcd8f1fd7e1b" class="">可以用素净消消乐的方式让玩家理解星球化区块链的意义</p><p id="1e4add39-0a4a-8070-9d1b-cc99a9e8645c" class="">
+</p></div><div id="1e4add39-0a4a-80b4-93ab-cd14b4efd9b6" style="width:50%" class="column"><figure id="1e4add39-0a4a-80b3-9c05-ece298f0ee38" class="image"><a href="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/1x1_%E5%9C%A8%E8%BF%99%E5%B9%85%E5%9B%BE%E5%83%8F%E4%B8%AD_%E4%BB%8E%E5%A4%AA%E7%A9%BA%E4%B8%AD%E4%BF%AF%E8%A7%86%E4%B8%80%E9%A2%97%E8%A1%8C%E6%98%9F_%E8%A7%86%E8%A7%92%E8%BF%91%E4%B9%8E%E8%B6%8A%E8%82%A9_%E7%BB%99%E4%BA%BA%E4%BB%A5%E8%BA%AB%E4%B8%B4%E5%85%B6%E5%A2%83.png"><img style="width:528px" src="Project%20Planetarian%20DM%20Handbook%20(Draft)%20v0%2057%201e3add390a4a802e97e5e77780f3728d/1x1_%E5%9C%A8%E8%BF%99%E5%B9%85%E5%9B%BE%E5%83%8F%E4%B8%AD_%E4%BB%8E%E5%A4%AA%E7%A9%BA%E4%B8%AD%E4%BF%AF%E8%A7%86%E4%B8%80%E9%A2%97%E8%A1%8C%E6%98%9F_%E8%A7%86%E8%A7%92%E8%BF%91%E4%B9%8E%E8%B6%8A%E8%82%A9_%E7%BB%99%E4%BA%BA%E4%BB%A5%E8%BA%AB%E4%B8%B4%E5%85%B6%E5%A2%83.png"/></a></figure></div></div><p id="1e4add39-0a4a-80fd-afbc-e96728a9f9ad" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

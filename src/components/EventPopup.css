@@ -1,0 +1,154 @@
+.story-event-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    padding: 15px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.story-event-card {
+    background-color: #2c2c54;
+    color: #e0e0f0;
+    padding: 20px 25px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: auto;
+}
+
+.story-event-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #fca311;
+    text-align: center;
+    font-size: 1.4em;
+}
+
+.story-event-card p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* Optional: Style card border based on event bias */
+.story-event-positive {
+    border-left: 4px solid #50c878;
+}
+.story-event-negative {
+    border-left: 4px solid #e94560;
+}
+.story-event-neutral {
+    border-left: 4px solid #fca311;
+}
+
+/* Styling for Narrative and Conflict sections */
+.story-event-narrative,
+.story-event-conflict {
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    border-left: 3px solid #6a6aaf;
+}
+
+.story-event-narrative h3,
+.story-event-conflict h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #a9def9;
+    font-size: 1.0em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+}
+
+.story-event-narrative p,
+.story-event-conflict p {
+    margin-bottom: 0;
+    line-height: 1.5;
+    font-size: 0.9em;
+}
+
+/* Options section */
+.story-event-options {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.story-event-options h3 {
+    margin-bottom: 12px;
+    color: #fca311;
+    font-size: 1.1em;
+}
+
+.story-event-options button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background-color: #4f4f81;
+    color: white;
+    border: 1px solid #6a6aaf;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.story-event-options button:last-child {
+    margin-bottom: 0;
+}
+
+.story-event-options button:hover {
+    background-color: #6a6aaf;
+}
+
+/* Media Query for larger screens (optional adjustments if needed) */
+@media (min-width: 640px) {
+    .story-event-card {
+        padding: 25px 35px;
+    }
+    .story-event-card h2 {
+        font-size: 1.6em;
+        margin-bottom: 20px;
+    }
+    .story-event-narrative,
+    .story-event-conflict {
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+    .story-event-narrative h3,
+    .story-event-conflict h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+    }
+    .story-event-narrative p,
+    .story-event-conflict p {
+        font-size: 0.95em;
+        line-height: 1.6;
+    }
+    .story-event-options {
+        margin-top: 25px;
+    }
+    .story-event-options h3 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+    .story-event-options button {
+        padding: 12px 20px;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+} 
