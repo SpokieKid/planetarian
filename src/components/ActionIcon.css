@@ -28,7 +28,8 @@
 
 /* Style for image if you use one */
 .action-icon-button img {
-    width: 60%;
-    height: 60%;
-    object-fit: contain;
+    width: 100%; /* Fill the container width */
+    height: 100%; /* Fill the container height */
+    object-fit: cover; /* Cover the area, crop if needed, maintain aspect ratio */
+    border-radius: 50%; /* Make the image itself circular */
 } 

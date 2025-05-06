@@ -31,7 +31,6 @@ const PlanetCanvas = () => {
                     <Planet />
                     <OrbitingObjects count={8} /> {/* Add orbiting objects */} 
                     <BackgroundShips count={5} /> {/* Add background ships */} 
-                    <CollectibleSuns count={10} planetRadius={1.0} /> {/* Add collectible suns */}
                     <Preload all /> {/* Preload assets */} 
                 </Suspense>
                 

@@ -4,48 +4,42 @@ import './IntroScroller.css';
 // Intro text broken into paragraphs
 const introParagraphs = [
     "他们说，我们是异类",
-    "是不安分者，是异想天开，是不可能",
-    "是\"想都不用想\"",
-    "是 meaningless",
-    "是 nonsense",
+    "是不安分者，是异想天开，没有意义",
     "我说，我们是觉醒的有机物",
     "是思辨，是智慧，是灵性，是归宿",
     "是树，是风，是树摇摆的运动方向",
-    "是观察者",
-    "是记录者",
-    "是动荡不安",
-    "是宇宙进程",
+    "是观察者，记录者，动荡不安，宇宙进程",
     "是世界缔造者",
     "是",
     "…",
-    "Planetarian",
-    " ", // Spacer
-    "(电供应上升的音效)",
-    "(操作系统启动的声音)",
-    "这是实验的第 43 次重启",
-    "每一次，我们的星球都已走向毁灭",
+    "星球史学家",
     "自然的惩罚，战乱，瘟疫",
-    "每次毁灭都以我们的种群为代价",
-    "(喀噔、喀噔的切换卡带一样的声音)",
-    "(按下按钮声)",
-    "不可以 … 我们不能就这样消失在历史的长河中",
-    "(电供应上升的音效)",
+    "每一次，我们的星球都走向毁灭",
+    " ", // Spacer
+    " ", // Spacer
+    " ", // Spacer
+    "我们不能就这样消失在历史的长河中",
+    " ", // Spacer
     "我们要留下一些东西 …",
-    "(操作系统启动的声音)",
+    " ", // Spacer
+    "任何东西 … "
 ];
 
 // Constants for timing
-const TYPING_SPEED_MS = 50; // Speed of typing characters
+const TYPING_SPEED_MS = 80; // Faster typing speed (e.g., 80ms)
 const PARAGRAPH_DELAY_MS = 700; // Delay between paragraphs
-const FINISH_DELAY_MS = 1000; // Delay after finishing before calling onFinished
+const FINISH_DELAY_MS = 2000; // Extend delay after finishing to 2 seconds
+const TRANSITION_INDEX = 9; // CORRECT Index of "星球史学家"
+const TRANSITION_DELAY_MS = 500; // How long the "clear screen" takes
 
-const IntroScroller = ({ onFinished }) => {
+const IntroScroller = ({ onFinished, onTypingFinished }) => {
     const [currentParaIndex, setCurrentParaIndex] = useState(0);
-    const [currentCharIndex, setCurrentCharIndex] = useState(0);
-    const [displayedLines, setDisplayedLines] = useState([]); // Stores fully displayed lines
-    const [currentLine, setCurrentLine] = useState(''); // Stores the currently typing line
+    const [displayedLines, setDisplayedLines] = useState([]);
     const [isFinished, setIsFinished] = useState(false);
-    const intervalRef = useRef(null); // Ref to store interval ID
+    const [isTransitioning, setIsTransitioning] = useState(false); // State for transition effect
+    const intervalRef = useRef(null);
+    const typingAudioRef = useRef(null);
+    const outputRef = useRef(null);
 
     // Function to clear the interval
     const clearTypingInterval = () => {
@@ -55,98 +49,167 @@ const IntroScroller = ({ onFinished }) => {
         }
     };
 
+    // Effect for typing logic (Refactored)
     useEffect(() => {
-        clearTypingInterval(); // Clear any existing interval on re-render
+        if (isTransitioning) return;
+        clearTypingInterval();
 
         if (currentParaIndex >= introParagraphs.length) {
             setIsFinished(true);
+            onTypingFinished?.(); // Call immediately when typing finishes
+            // Delay only the final onFinished call
             setTimeout(() => {
-                onFinished?.(); // Use optional chaining
+                onFinished?.(); 
             }, FINISH_DELAY_MS);
-            return; // Stop typing
-        }
-
-        const currentParagraph = introParagraphs[currentParaIndex];
-
-        // Handle sound effects or empty lines immediately
-        if (currentParagraph.startsWith("(") || currentParagraph.trim() === "" || currentParagraph === "Planetarian") {
-             setDisplayedLines(prev => [...prev, { text: currentParagraph, type: currentParagraph.startsWith("(") ? 'sound' : (currentParagraph === "Planetarian" ? 'title' : 'normal') }]);
-            setTimeout(() => {
-                setCurrentParaIndex(prevIndex => prevIndex + 1);
-                setCurrentCharIndex(0);
-                setCurrentLine('');
-            }, PARAGRAPH_DELAY_MS / 2); // Shorter delay for these lines
             return;
         }
 
+        const currentParagraph = introParagraphs[currentParaIndex];
+        let charIndex = 0; 
+        let lineAdded = false; // Flag to track if the current line placeholder has been added
+
+        // Handle non-typable lines immediately
+        if (currentParagraph.startsWith("(") || currentParagraph.trim() === "" || currentParagraph === "Planetarian") {
+            const lineType = currentParagraph.startsWith("(") ? 'sound' : (currentParagraph === "Planetarian" ? 'title' : 'normal');
+            setDisplayedLines(prev => [...prev, { text: currentParagraph, type: lineType }]);
+            setTimeout(() => setCurrentParaIndex(prev => prev + 1), PARAGRAPH_DELAY_MS / 2);
+            return;
+        }
 
         intervalRef.current = setInterval(() => {
-            setCurrentCharIndex(prevCharIndex => {
-                const nextCharIndex = prevCharIndex + 1;
-                if (nextCharIndex > currentParagraph.length) {
-                    // Paragraph finished typing
-                    clearTypingInterval();
-                    setDisplayedLines(prev => [...prev, { text: currentParagraph, type: 'normal' }]); // Add finished line
-                    setCurrentLine(''); // Clear current typing line
-
-                    // Move to the next paragraph after a delay
-                    setTimeout(() => {
-                        setCurrentParaIndex(prevParaIndex => prevParaIndex + 1);
-                        setCurrentCharIndex(0); // Reset char index for new paragraph
-                    }, PARAGRAPH_DELAY_MS);
-
-                    return 0; // Reset for the next cycle (though interval is cleared)
+            charIndex++;
+            if (charIndex <= currentParagraph.length) {
+                // Add the line placeholder ONCE when the first character is typed
+                if (!lineAdded) {
+                    setDisplayedLines(prev => [...prev, { text: '', type: 'normal' }]);
+                    lineAdded = true;
+                    // Use a minimal timeout to allow state update before proceeding
+                    // This might still be racy, alternative needed if issues persist.
+                    setTimeout(() => { 
+                        // Update the (now existing) last line
+                        setDisplayedLines(prev => {
+                            const newLines = [...prev];
+                            if (newLines.length > 0) {
+                                newLines[newLines.length - 1].text = currentParagraph.substring(0, charIndex);
+                            }
+                            return newLines;
+                        });
+                         // Play typing sound
+                         if (typingAudioRef.current) {
+                            typingAudioRef.current.currentTime = 0;
+                            typingAudioRef.current.play().catch(error => console.warn("Typing sound failed:", error));
+                        }
+                    }, 10); // Small delay
                 } else {
-                    // Update the currently typing line
-                    setCurrentLine(currentParagraph.substring(0, nextCharIndex));
-                    return nextCharIndex;
+                     // Update the last line in displayedLines (subsequent characters)
+                     setDisplayedLines(prev => {
+                        const newLines = [...prev];
+                        if (newLines.length > 0) {
+                            newLines[newLines.length - 1].text = currentParagraph.substring(0, charIndex);
+                        }
+                        return newLines;
+                    });
+                     // Play typing sound
+                     if (typingAudioRef.current) {
+                        typingAudioRef.current.currentTime = 0;
+                        typingAudioRef.current.play().catch(error => console.warn("Typing sound failed:", error));
+                    }
                 }
-            });
+
+            } else {
+                // Paragraph finished typing
+                clearTypingInterval();
+                console.log(`[Typing Effect] Paragraph finished. Index: ${currentParaIndex}, Transition Index: ${TRANSITION_INDEX}`);
+                if (currentParaIndex === TRANSITION_INDEX) {
+                    console.log('[Typing Effect] Entering transition logic...');
+                    setIsTransitioning(true);
+                    setTimeout(() => {
+                        console.log('[Typing Effect] Transition timeout: Clearing lines and moving index.');
+                        setDisplayedLines([]);
+                        setCurrentParaIndex(prev => prev + 1);
+                        setIsTransitioning(false);
+                    }, TRANSITION_DELAY_MS);
+                } else {
+                     console.log('[Typing Effect] Normal paragraph end. Scheduling next paragraph.');
+                    setTimeout(() => setCurrentParaIndex(prev => prev + 1), PARAGRAPH_DELAY_MS);
+                }
+            }
         }, TYPING_SPEED_MS);
 
-        // Cleanup function to clear interval on component unmount or dependency change
+        // Cleanup
         return () => clearTypingInterval();
 
-    }, [currentParaIndex, onFinished]); // Re-run effect when paragraph index changes or onFinished callback changes
+    }, [currentParaIndex, onFinished, onTypingFinished, isTransitioning]);
+
+    // Effect for auto-scrolling
+    useEffect(() => {
+        if (outputRef.current && !isTransitioning) {
+            const container = outputRef.current;
+            const lastElement = container.querySelector('p:last-child');
+
+            if (lastElement) {
+                // Use scrollIntoView to bring the last element into view,
+                // attempting to center it vertically.
+                lastElement.scrollIntoView({
+                    behavior: 'smooth', // Optional: smooth scrolling
+                    block: 'center'    // Attempt to vertically center
+                });
+                 // console.log('Scrolling last element into view (center)');
+            } else {
+                 // Fallback remains the same
+                 container.scrollTop = container.scrollHeight;
+            }
+        }
+    }, [displayedLines, isTransitioning]);
 
     const handleSkip = () => {
-        clearTypingInterval(); // Stop any typing
+        clearTypingInterval();
         setIsFinished(true);
-         // Display all lines immediately for skip
+        // Display all lines immediately
         const allLines = introParagraphs.map(text => ({
             text,
             type: text.startsWith("(") ? 'sound' : (text === "Planetarian" ? 'title' : 'normal')
         }));
         setDisplayedLines(allLines);
-        setCurrentLine(''); // Ensure no line is actively typing
-        onFinished?.(); // Call immediately
+        onTypingFinished?.();
+        onFinished?.();
     };
 
     return (
-        <div className={`intro-container console-style ${isFinished ? 'finished' : ''}`}>
-            <div className="intro-output">
-                 {/* Render fully displayed lines */}
-                {displayedLines.map((line, index) => {
+        <div className={`intro-container console-style ${isFinished ? 'finished' : ''} ${isTransitioning ? 'transitioning' : ''}`}>
+            <audio ref={typingAudioRef} src="/assets/audio/typing_sound.mp3" preload="auto"></audio>
+
+            <div className="intro-output" ref={outputRef}>
+                 {/* Render displayed lines */} 
+                 {displayedLines.map((line, index) => {
+                     const isLastLine = index === displayedLines.length - 1;
+                     const isTyping = !isFinished && !isTransitioning && currentParaIndex < introParagraphs.length && isLastLine && line.text.length < introParagraphs[currentParaIndex].length;
+
+                     // Log isTyping for the last line
+                     if (isLastLine) {
+                       // console.log(`[Render] isTyping for last line (index ${index}): ${isTyping}`);
+                     }
+
                      if (line.type === "title") {
                          return <p key={index} className="planetarian-title">{line.text}</p>;
                      } else if (line.type === "sound") {
                          return <p key={index} className="sound-effect"><em>{line.text}</em></p>;
                      } else {
-                         return <p key={index}>{line.text}</p>;
+                         return (
+                            <p key={index}>
+                                {line.text}
+                                {isTyping && <span className="cursor"></span>} {/* Show cursor only on the line being actively typed */}
+                            </p>
+                         );
                      }
                  })}
-                 {/* Render the line currently being typed */}
-                 {!isFinished && currentLine && (
-                    <p className="current-typing">
-                        {currentLine}
-                        <span className="cursor"></span> {/* Blinking cursor */}
-                    </p>
-                )}
             </div>
-             {/* Use handleSkip for the button */}
-            <button className="skip-intro-btn" onClick={handleSkip} disabled={isFinished}>
-                 {isFinished ? 'Finished' : 'Skip Intro'}
-            </button>
+            {/* Conditionally render the skip button */} 
+            {!isFinished && (
+                <button className="skip-intro-btn pixel-button" onClick={handleSkip}>
+                     Skip Intro
+                </button>
+            )}
         </div>
     );
 };

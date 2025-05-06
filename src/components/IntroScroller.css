@@ -4,7 +4,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #000; /* Black background for console */
+    background-color: rgba(0, 0, 0, 0.9); /* Slightly transparent black */
     color: #0f0; /* Green text */
     font-family: 'Courier New', Courier, monospace; /* Monospace font */
     display: flex;
@@ -14,13 +14,14 @@
     overflow: hidden; /* Prevent scrollbars */
     padding: 20px;
     box-sizing: border-box;
-    z-index: 200;
+    z-index: 1500;
     opacity: 1;
-    transition: opacity 1s ease-out; /* For fade-out */
+    transition: opacity 0.5s ease-out; /* For fade-out */
 }
 
-.intro-container.fade-out {
+.intro-container.finished {
     opacity: 0;
+    pointer-events: none;
 }
 
 /* Remove old scroll styles */
@@ -36,14 +37,24 @@
 }
 
 .intro-output {
-    width: 80%; /* Adjust width as needed */
-    max-width: 800px;
-    height: 80%; /* Allow space for skip button */
-    overflow-y: auto; /* Allow scrolling if text overflows */
-    border: 1px solid #0f0; /* Optional border */
-    padding: 15px;
-    margin-bottom: 20px; /* Space between text and button */
-    text-align: left;
+    width: 80%; /* Limit width */
+    max-width: 700px;
+    height: 70%; /* Let it take up significant height */
+    max-height: 70vh; /* Ensure it doesn't exceed viewport too much */
+    overflow-y: auto; /* Enable vertical scroll if needed */
+    border: 1px solid #0f0; /* Green border */
+    padding: 20px; /* Keep internal padding */
+    margin-bottom: 20px; /* Space before skip button */
+    /* Add padding to push initial content towards center */
+    padding-top: 25vh; /* Adjust as needed */
+    padding-bottom: 20px;
+    box-sizing: border-box;
+    /* Hide scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+}
+.intro-output::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 .intro-output p {
@@ -57,7 +68,7 @@
     font-weight: bold;
     text-align: center;
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 1em;
     color: #fff; /* White title */
 }
 
@@ -66,43 +77,46 @@
     font-style: italic;
 }
 
+.sound-effect em {
+    color: #888; /* Different color for sound cues */
+    font-style: italic;
+}
+
 .current-typing {
     /* Styles for the line currently being typed */
     display: inline; /* Keep cursor on the same line */
 }
 
-.cursor {
+.current-typing .cursor {
     display: inline-block;
-    background-color: #0f0;
-    width: 10px; /* Width of the cursor block */
-    height: 1em; /* Height relative to font size */
+    background-color: #ff0000; /* TEMP: Bright red for visibility */
+    width: 10px;            
+    height: 1.2em;          
     margin-left: 2px;
-    animation: blink 1s step-end infinite;
+    vertical-align: bottom; /* Align with text baseline */
+    /* animation: blink 1s step-end infinite; */ /* Temporarily disable animation */
 }
 
-@keyframes blink {
-    from, to { background-color: transparent }
-    50% { background-color: #0f0; }
+.cursor { /* Simplified selector */
+    display: inline-block;
+    background-color: #0f0; /* Cursor color */
+    width: 10px;            
+    height: 1.2em;          
+    margin-left: 2px;
+    vertical-align: bottom; /* Align with text baseline */
+    animation: blink 1s step-end infinite; /* Restore animation */
 }
+
+@keyframes blink { /* Restore animation */
+    from, to { background-color: transparent }
+    50% { background-color: #0f0; } /* Cursor color */
+}
+
+/* @keyframes blink { ... } */ /* Temporarily disable animation */
 
 .skip-intro-btn {
-    background-color: #333;
-    color: #0f0;
-    border: 1px solid #0f0;
-    padding: 10px 20px;
-    font-family: inherit; /* Use monospace font */
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.skip-intro-btn:hover:not(:disabled) {
-    background-color: #0f0;
-    color: #000;
-}
-
-.skip-intro-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+    /* Reuse pixel button style from VideoStartScreen.css */
+    /* Make sure .pixel-button styles are available or copy them */
 }
 
 /* Style for finished state if needed */

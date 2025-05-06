@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import PlanetCanvas from './components/PlanetCanvas';
 import ResourcePanel from './components/ResourcePanel';
@@ -7,6 +7,8 @@ import StoryLog from './components/StoryLog';
 import ActionIcon from './components/ActionIcon';
 import DialogBox from './components/DialogBox';
 import IntroScroller from './components/IntroScroller';
+import VideoStartScreen from './components/VideoStartScreen';
+import GuideOverlay from './components/GuideOverlay';
 import usePlanetStore from './hooks/usePlanetState';
 import { PLANET_MODES } from './utils/resourceMapping';
 import { EVENTS_TO_FINISH } from './constants/events';
@@ -71,38 +73,47 @@ function App() {
   } = usePrivy();
   // --- End Privy Hook --- 
 
-  const [gameStarted, setGameStarted] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  const [showVideoScreen, setShowVideoScreen] = useState(true);
+  const [introTypingFinished, setIntroTypingFinished] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
-  // --- Updated useEffect Hook to Load User State using Supabase --- 
+  // Log critical state on render
+  console.log('[App Render] State:', { ready, authenticated, showGuide, showIntro, showVideoScreen, isGameFinished });
+
+  // --- Updated useEffect Hook to Load User State & Handle Post-Login Guide Close --- 
   useEffect(() => {
+      console.log('[Auth Effect] Running. States:', { ready, authenticated, showGuide }); // Log entry
       if (ready && authenticated && user?.wallet?.address) {
           const userAddress = user.wallet.address;
           console.log("User authenticated, calling loadPlanetState for:", userAddress);
           setWalletAddress(userAddress);
-          
-          // Directly call the async loadPlanetState action
           loadPlanetState(userAddress);
           
+          // If user becomes authenticated WHILE the guide is showing, close the guide.
+          if (showGuide) {
+              console.log('[Auth Effect] User authenticated AND guide showing. Closing guide...'); // Log decision
+              setShowGuide(false);
+          }
+          
       } else if (ready && !authenticated) {
-          // Optional: Handle logout case - clear wallet address?
-          // setWalletAddress(null); 
-          // Consider if you need to reset other game state on logout
+          console.log('[Auth Effect] User not authenticated or not ready.');
       }
-  }, [ready, authenticated, user?.wallet?.address, setWalletAddress, loadPlanetState]); // Keep dependencies
+  // Add showGuide to dependency array to correctly handle the closing logic
+  }, [ready, authenticated, user?.wallet?.address, setWalletAddress, loadPlanetState, showGuide]);
   // --- End Updated useEffect Hook --- 
 
   // Game loop
   useEffect(() => {
-    if (!gameStarted || isGameFinished) return;
+    if (!showVideoScreen && showIntro && introTypingFinished) {
+      const intervalId = setInterval(() => {
+        tick(); // Call the Zustand tick action
+      }, 1000); // Update roughly every second
 
-    const intervalId = setInterval(() => {
-      tick(); // Call the Zustand tick action
-    }, 1000); // Update roughly every second
-
-    return () => clearInterval(intervalId); // Cleanup on unmount or game stop
-  }, [tick, gameStarted, isGameFinished]);
+      return () => clearInterval(intervalId); // Cleanup on unmount or game stop
+    }
+  }, [tick, showVideoScreen, showIntro, introTypingFinished]);
 
   // Check for game end condition
   useEffect(() => {
@@ -152,12 +163,81 @@ function App() {
   }, []); // Empty dependency array ensures this runs only ONCE on mount
   // --- End useEffect Hook ---
 
-  const handleStartGame = (chosenMode) => {
-    initializePlanet(chosenMode);
-    setGameStarted(true);
-    setIsDialogOpen(false);
+  // --- Add Audio Refs ---
+  const introAudioRef = useRef(null);
+  const gameAudioRef = useRef(null);
+
+  // --- Modify Audio Control Effect ---
+  useEffect(() => {
+    const introAudio = introAudioRef.current;
+    const gameAudio = gameAudioRef.current;
+    if (!introAudio || !gameAudio) return;
+    const playAudio = (audioElement) => {
+      if (audioElement && audioElement.paused) {
+         audioElement.play().catch(error => {
+           // It's fine if play fails here initially due to lack of interaction,
+           // subsequent runs triggered by state changes after interaction should succeed.
+           console.warn(`Audio play failed for ${audioElement.src}:`, error);
+         });
+      }
+    };
+    const pauseAudio = (audioElement) => {
+      if (audioElement && !audioElement.paused) {
+        audioElement.pause();
+      }
+    };
+
+    // Play intro music when typing is finished AND we are still technically in the intro phase
+    if (!showVideoScreen && introTypingFinished && showIntro) { 
+      playAudio(introAudio);
+      pauseAudio(gameAudio);
+    } 
+    // Play game music only when intro is fully done AND guide is closed
+    else if (!showVideoScreen && !showIntro && !showGuide && !isGameFinished) {
+      playAudio(gameAudio);
+      pauseAudio(introAudio);
+    } 
+    // Pause both in other states
+    else { 
+      pauseAudio(introAudio);
+      pauseAudio(gameAudio);
+    }
+
+    return () => {
+      pauseAudio(introAudio);
+      pauseAudio(gameAudio);
+    };
+  // Dependencies reflect states controlling music
+  }, [showVideoScreen, showIntro, introTypingFinished, showGuide, isGameFinished, ready]); 
+
+  // --- Handler for Start Button Click (remains simple) ---
+  const handleVideoScreenFinish = () => {
+    setShowVideoScreen(false);
   };
 
+  // --- Handler for when IntroScroller finishes TYPING ---
+  const handleIntroTypingFinished = () => {
+    setIntroTypingFinished(true);
+    setShowGuide(true); // Show guide immediately when typing finishes
+    console.log("Intro typing finished, showing guide and attempting to play music.");
+  };
+
+  // --- Handler for when IntroScroller sequence fully ends (after delay) ---
+  const handleIntroFinished = () => {
+      setShowIntro(false); // Hide IntroScroller component
+      setIntroTypingFinished(false); // Reset typing finished flag
+      console.log("Intro sequence (incl. delay) finished.");
+      // Guide is already shown by handleIntroTypingFinished
+  };
+
+  // --- Re-introduce handleGuideClose --- 
+  const handleGuideClose = () => {
+    setShowGuide(false);
+    console.log("Guide closed manually or because user was already logged in.");
+  };
+  // --- End handleGuideClose ---
+
+  // --- Add Dialog Handlers back ---
   const handleOpenDialog = () => {
       setIsDialogOpen(true);
   };
@@ -165,73 +245,78 @@ function App() {
   const handleCloseDialog = () => {
       setIsDialogOpen(false);
   };
-
-  const handleIntroFinished = () => {
-      setShowIntro(false);
-      console.log("Intro finished");
-  };
-
-  // Start Screen Component
-  const StartScreen = () => (
-    <div className="start-screen">
-      <h1>Welcome to Planetary Pet</h1>
-      <p>Choose your starting society:</p>
-      <div className="mode-selection">
-        <button onClick={() => handleStartGame(PLANET_MODES.INTERNATIONAL)}>International</button>
-        <button onClick={() => handleStartGame(PLANET_MODES.GLOBAL)}>Global</button>
-        <button onClick={() => handleStartGame(PLANET_MODES.PLANETARY)}>Planetary</button>
-      </div>
-       {/* Add descriptions for each mode later */}
-    </div>
-  );
+  // --- End Dialog Handlers ---
 
   // TODO: Create EndingCard component
   const EndingScreen = () => (
-     <div className="ending-screen"> {/* Use styles similar to start-screen */}
+     <div className="ending-screen"> 
         <h1>Game Over!</h1>
         <p>Your planet evolution is complete.</p>
-        {/* Add summary generation later */}
-        <button onClick={() => { setShowIntro(true); setGameStarted(false); }}>Play Again?</button>
+        <button className="pixel-button" onClick={() => { 
+            setShowVideoScreen(true); 
+            setShowIntro(true); 
+        }}>Play Again?</button>
      </div>
   );
 
   return (
     <div className="App">
-      {/* --- Add Privy Auth Buttons & Loading State --- */}
+      {/* --- Add Hidden Audio Elements --- */}
+      <audio ref={introAudioRef} src="/assets/audio/intro_music.mp3" loop preload="auto" />
+      <audio ref={gameAudioRef} src="/assets/audio/game_music.mp3" loop preload="auto" />
+
+      {/* Log state specifically before Auth rendering */}
+      {/* {console.log('[App Render] Auth Check:', { ready, authenticated, showGuide })} */}
       {!ready && <div className="loading-indicator">Loading Privy...</div>} 
-      {ready && (
+      
+      {/* Show Logout button etc. ONLY when ready, authenticated, AND guide is NOT showing */}
+      {ready && authenticated && !showGuide && (
         <div className="auth-controls">
-          {authenticated ? (
-            <>
-              <span>Connected: {user?.wallet?.address}</span>
-              <button onClick={logout}>Logout</button>
-            </>
-          ) : (
-            <button onClick={login}>Connect Wallet</button>
-          )}
+           <span>Connected: {user?.wallet?.address}</span>
+           <button onClick={logout}>Logout</button>
         </div>
       )}
-      {/* --- End Privy Auth Buttons & Loading State --- */}
-
-       {/* Show Intro first if showIntro is true */} 
-       {showIntro ? (
-           <IntroScroller onFinished={handleIntroFinished} />
-       ) : !gameStarted ? (
-        <StartScreen />
-      ) : isGameFinished ? (
-          <EndingScreen />
-      ) : (
-        <>
-          <PlanetCanvas />
-          <ResourcePanel />
-          <StoryLog /> {/* Add StoryLog to the UI */} 
-          <EventPopup /> 
-        </>
+      
+      {/* Show Login button ONLY when ready, NOT authenticated, AND guide is NOT showing */}
+      {ready && !authenticated && !showGuide && (
+        <div className="auth-controls">
+           <button onClick={login}>Connect Wallet</button>
+        </div>
       )}
 
-      {/* --- Wrapper for ActionIcon and its Dialog --- */} 
-      {/* Render only when intro is done and game is running */}
-      {!showIntro && gameStarted && !isGameFinished && (
+      {/* --- Updated Rendering Logic --- */}
+      {showVideoScreen ? (
+           <VideoStartScreen onStartClick={handleVideoScreenFinish} />
+       ) : showIntro ? (
+           // IntroScroller stays rendered until its onFinished delay completes
+           <IntroScroller 
+              onFinished={handleIntroFinished} 
+              onTypingFinished={handleIntroTypingFinished}
+           />
+       ) : isGameFinished ? (
+           <EndingScreen />
+       ) : (
+           // Show main game view if not in video/intro/ending 
+           // Guide will overlay this if showGuide is true
+           <>
+              <PlanetCanvas />
+              <ResourcePanel />
+              <StoryLog /> 
+              <EventPopup /> 
+           </>
+       )}
+
+      {/* --- Conditionally Render Guide Overlay --- */}
+      {/* Guide shows as soon as typing finishes */}
+      {showGuide && 
+        <GuideOverlay 
+          login={login} 
+          authenticated={authenticated} 
+          onClose={handleGuideClose} 
+        />}
+
+      {/* ActionIcon area - Render only when game is active (no video, intro, guide, finished) */}
+      {!showVideoScreen && !showIntro && !showGuide && !isGameFinished && (
          <div className="action-icon-area"> 
             <ActionIcon onClick={handleOpenDialog} />
             <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title="Planet Info">

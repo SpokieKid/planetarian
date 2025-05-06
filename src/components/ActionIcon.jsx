@@ -16,7 +16,7 @@ const ActionIcon = () => {
         <div style={{ position: 'relative' }}>
             <button className="action-icon-button" onClick={toggleChat}>
                  {/* Replace emoji with image */}
-                 <img src="/noun-2.png" alt="Action Icon" />
+                 <img src="/assets/agent/Nouns DAO.png" alt="Action Icon" />
             </button>
             {isChatOpen && <ChatDialog onClose={toggleChat} />}
         </div>
