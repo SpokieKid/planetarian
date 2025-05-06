@@ -13,10 +13,13 @@
 }
 
 .intro-video {
-  /* Adjust size - cover the screen */
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Cover the screen, maintain aspect ratio */
+  /* Display video at its original size, centered by parent */
+  /* width: 70vmin; */ /* Remove fixed width */
+  /* height: 70vmin; */ /* Remove fixed height */
+  /* object-fit: cover; */ /* No longer needed when using natural size */
+  max-width: 100%; /* Ensure video doesn't overflow screen horizontally */
+  max-height: 100%; /* Ensure video doesn't overflow screen vertically */
+  /* Centering is handled by the parent .video-start-screen flex container */
 }
 
 .start-button {

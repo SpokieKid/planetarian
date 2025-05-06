@@ -58,6 +58,11 @@ function App() {
   const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
   const isGameFinished = usePlanetStore(state => state.isGameFinished);
   const finishGame = usePlanetStore(state => state.finishGame);
+  const resetPlanetState = usePlanetStore(state => state.resetPlanetState);
+  const triggerNextEvent = usePlanetStore(state => state.triggerNextEvent);
+  const activeEvent = usePlanetStore(state => state.activeEvent);
+  const isEventPopupMinimized = usePlanetStore(state => state.isEventPopupMinimized);
+  const isEventPopupOpen = usePlanetStore(state => state.isEventPopupOpen);
   // --- Add Zustand actions for backend interaction --- 
   const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
   const loadPlanetState = usePlanetStore(state => state.loadPlanetState);
@@ -80,7 +85,8 @@ function App() {
   const [showGuide, setShowGuide] = useState(false);
 
   // Log critical state on render
-  console.log('[App Render] State:', { ready, authenticated, showGuide, showIntro, showVideoScreen, isGameFinished });
+  // console.log('[App Render] State:', { ready, authenticated, showGuide, showIntro, showVideoScreen, isGameFinished });
+  // console.log('[App Render] Current Privy Ready State:', ready, 'Authenticated:', authenticated, 'ShowGuide:', showGuide); // Keep for debugging if needed
 
   // --- Updated useEffect Hook to Load User State & Handle Post-Login Guide Close --- 
   useEffect(() => {
@@ -106,14 +112,22 @@ function App() {
 
   // Game loop
   useEffect(() => {
-    if (!showVideoScreen && showIntro && introTypingFinished) {
+    // Start the loop only after video, intro, and guide are all finished
+    if (!showVideoScreen && !showIntro && !showGuide) {
+      console.log('[Game Loop Effect] Starting game tick interval.'); // Add log
       const intervalId = setInterval(() => {
         tick(); // Call the Zustand tick action
       }, 1000); // Update roughly every second
 
-      return () => clearInterval(intervalId); // Cleanup on unmount or game stop
+      return () => {
+        console.log('[Game Loop Effect] Clearing game tick interval.'); // Add log
+        clearInterval(intervalId); // Cleanup on unmount or game stop
+      }
+    } else {
+      console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { showVideoScreen, showIntro, showGuide }); // Log why not starting
     }
-  }, [tick, showVideoScreen, showIntro, introTypingFinished]);
+  // Update dependencies to reflect the new condition
+  }, [tick, showVideoScreen, showIntro, showGuide]);
 
   // Check for game end condition
   useEffect(() => {
@@ -163,52 +177,95 @@ function App() {
   }, []); // Empty dependency array ensures this runs only ONCE on mount
   // --- End useEffect Hook ---
 
-  // --- Add Audio Refs ---
-  const introAudioRef = useRef(null);
+  // --- Audio Refs --- 
+  const typingAudioRef = useRef(null); // Renamed from introAudioRef for clarity
   const gameAudioRef = useRef(null);
+  const doubleMusicAudioRef = useRef(null);
+  // shortIntroMusicRef is REMOVED
 
-  // --- Modify Audio Control Effect ---
+  // --- Audio Control Effect --- 
   useEffect(() => {
-    const introAudio = introAudioRef.current;
+    const typingSound = typingAudioRef.current;
     const gameAudio = gameAudioRef.current;
-    if (!introAudio || !gameAudio) return;
+    const doubleMusicAudio = doubleMusicAudioRef.current;
+
+    if (!typingSound || !gameAudio || !doubleMusicAudio) return; 
+
     const playAudio = (audioElement) => {
       if (audioElement && audioElement.paused) {
-         audioElement.play().catch(error => {
-           // It's fine if play fails here initially due to lack of interaction,
-           // subsequent runs triggered by state changes after interaction should succeed.
-           console.warn(`Audio play failed for ${audioElement.src}:`, error);
-         });
+        console.log(`Attempting to play: ${audioElement.src}, Paused: ${audioElement.paused}, ReadyState: ${audioElement.readyState}, Duration: ${audioElement.duration}`);
+        audioElement.play()
+          .then(() => console.log(`Successfully playing: ${audioElement.src}`))
+          .catch(error => console.warn(`Audio play failed for ${audioElement.src}:`, error));
+      } else if (audioElement) {
+        // console.log(`Not playing ${audioElement.src}: Paused: ${audioElement.paused}, ReadyState: ${audioElement.readyState}`); // Reduce log noise
       }
     };
     const pauseAudio = (audioElement) => {
       if (audioElement && !audioElement.paused) {
+        console.log(`Attempting to pause: ${audioElement.src}, Paused: ${audioElement.paused}`);
         audioElement.pause();
+        audioElement.currentTime = 0;
+        console.log(`Paused and reset: ${audioElement.src}`);
+      } else if (audioElement) {
+        // console.log(`Not pausing ${audioElement.src}: Already paused or element invalid.`); // Reduce log noise
       }
     };
 
-    // Play intro music when typing is finished AND we are still technically in the intro phase
-    if (!showVideoScreen && introTypingFinished && showIntro) { 
-      playAudio(introAudio);
-      pauseAudio(gameAudio);
-    } 
-    // Play game music only when intro is fully done AND guide is closed
-    else if (!showVideoScreen && !showIntro && !showGuide && !isGameFinished) {
-      playAudio(gameAudio);
-      pauseAudio(introAudio);
-    } 
-    // Pause both in other states
-    else { 
-      pauseAudio(introAudio);
-      pauseAudio(gameAudio);
+    // Determine the desired state for each audio track
+    // Play intro sounds AS LONG AS the intro component is showing (after video)
+    const shouldPlayIntroSounds = !showVideoScreen && showIntro;
+    const shouldPlayGameMusic = !showVideoScreen && !showIntro && !showGuide && !isGameFinished;
+
+    console.log("[Audio Effect Check]", { shouldPlayIntroSounds, shouldPlayGameMusic }); // Log decision points
+
+    // Control Intro Sounds (typing + double)
+    if (shouldPlayIntroSounds) {
+        console.log("[Audio Effect] Condition met for intro sounds.");
+        playAudio(typingSound); 
+        playAudio(doubleMusicAudio); 
+        // Ensure game music is paused if intro sounds should play
+        pauseAudio(gameAudio);
+    } else {
+        // console.log("[Audio Effect] Condition NOT met for intro sounds, ensuring paused."); // Reduce log noise
+        pauseAudio(typingSound);
+        pauseAudio(doubleMusicAudio);
     }
 
+    // Control Game Music
+    if (shouldPlayGameMusic) {
+        console.log("[Audio Effect] Condition met for game music.");
+        playAudio(gameAudio);
+        // Ensure intro sounds are paused if game music should play
+        pauseAudio(typingSound); 
+        pauseAudio(doubleMusicAudio);
+    } else {
+        // console.log("[Audio Effect] Condition NOT met for game music, ensuring paused."); // Reduce log noise
+        // Only pause game audio if intro sounds are NOT playing
+        if (!shouldPlayIntroSounds) {
+           pauseAudio(gameAudio);
+        }
+    }
+
+    // Log states if neither condition is met (useful for debugging transitions)
+    if (!shouldPlayIntroSounds && !shouldPlayGameMusic) {
+         console.log("[Audio Effect] No primary audio condition met. States:", {
+           showVideoScreen,
+           introTypingFinished, // Keep this log for context
+           showIntro,
+           showGuide,
+           isGameFinished
+         });
+    }
+
+    // Cleanup function remains the same
     return () => {
-      pauseAudio(introAudio);
+      pauseAudio(typingSound);
       pauseAudio(gameAudio);
+      pauseAudio(doubleMusicAudio);
     };
-  // Dependencies reflect states controlling music
-  }, [showVideoScreen, showIntro, introTypingFinished, showGuide, isGameFinished, ready]); 
+  // Dependencies updated: removed introTypingFinished as it's no longer directly gating intro sounds
+  }, [showVideoScreen, showIntro, showGuide, isGameFinished, ready]); 
 
   // --- Handler for Start Button Click (remains simple) ---
   const handleVideoScreenFinish = () => {
@@ -224,10 +281,11 @@ function App() {
 
   // --- Handler for when IntroScroller sequence fully ends (after delay) ---
   const handleIntroFinished = () => {
-      setShowIntro(false); // Hide IntroScroller component
-      setIntroTypingFinished(false); // Reset typing finished flag
+      // console.log('[handleIntroFinished] States:', { privyReady: ready, privyAuthenticated: authenticated, showGuideState: showGuide });
+      setShowIntro(false);
+      setIntroTypingFinished(false);
       console.log("Intro sequence (incl. delay) finished.");
-      // Guide is already shown by handleIntroTypingFinished
+      // shortIntroMusic logic is REMOVED
   };
 
   // --- Re-introduce handleGuideClose --- 
@@ -247,6 +305,52 @@ function App() {
   };
   // --- End Dialog Handlers ---
 
+  // --- Add Logout Handler to Reset State --- 
+  const handleLogout = async () => {
+    console.log("Handling logout...");
+    try {
+      await logout(); // Call Privy logout
+      console.log("Privy logout successful. Resetting state.");
+      resetPlanetState();
+      // Reset UI state to initial values
+      setShowVideoScreen(true);
+      setShowIntro(true);
+      setShowGuide(false);
+      setIntroTypingFinished(false);
+      // Optionally reset game state in Zustand if needed, e.g.:
+      // resetPlanetState(); 
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+  // --- End Logout Handler ---
+
+  // --- Automatically trigger first event after 15 seconds of main game view ---
+  useEffect(() => {
+    let eventTimer;
+    // Conditions to trigger the timer:
+    // 1. Not in video, intro, or guide
+    // 2. Game is not finished
+    // 3. No event is currently active
+    if (!showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent) {
+      console.log('[App Effect] Main game view active, starting 15s timer for first event...');
+      eventTimer = setTimeout(() => {
+        console.log('[App Effect] 15s timer elapsed, attempting to trigger next event.');
+        triggerNextEvent();
+      }, 15000); // 15 seconds
+    }
+
+    // Cleanup function to clear the timer if conditions change or component unmounts
+    return () => {
+      if (eventTimer) {
+        console.log('[App Effect] Clearing event timer.');
+        clearTimeout(eventTimer);
+      }
+    };
+  // Dependencies: include all states that define the main game view and active event status
+  }, [showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent]);
+  // --- End Auto Event Trigger ---
+
   // TODO: Create EndingCard component
   const EndingScreen = () => (
      <div className="ending-screen"> 
@@ -261,34 +365,35 @@ function App() {
 
   return (
     <div className="App">
-      {/* --- Add Hidden Audio Elements --- */}
-      <audio ref={introAudioRef} src="/assets/audio/intro_music.mp3" loop preload="auto" />
+      {/* --- Hidden Audio Elements --- */}
+      <audio ref={typingAudioRef} src="/assets/audio/typing_sound.mp3" loop preload="auto" />
       <audio ref={gameAudioRef} src="/assets/audio/game_music.mp3" loop preload="auto" />
+      <audio ref={doubleMusicAudioRef} src="/assets/audio/double_music.mp3" loop preload="auto" />
+      {/* shortIntroMusicRef audio element is REMOVED */}
 
-      {/* Log state specifically before Auth rendering */}
-      {/* {console.log('[App Render] Auth Check:', { ready, authenticated, showGuide })} */}
-      {!ready && <div className="loading-indicator">Loading Privy...</div>} 
+      {/* Log Privy ready state on every render for debugging */}
+      {console.log('[App Render] States:', { ready, authenticated, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen, hasPendingEvent: !activeEvent })}
+
+      {!ready && <div className="loading-indicator">Loading Privy...</div>}
       
-      {/* Show Logout button etc. ONLY when ready, authenticated, AND guide is NOT showing */}
-      {ready && authenticated && !showGuide && (
+      {/* --- Auth Controls: Show ONLY during active gameplay (not during intros/guides/ending) --- */}
+      {ready && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && (
         <div className="auth-controls">
-           <span>Connected: {user?.wallet?.address}</span>
-           <button onClick={logout}>Logout</button>
+          {authenticated ? (
+            <>
+              <span>Connected: {user?.wallet?.address}</span>
+              <button onClick={handleLogout}>Logout</button>
+            </>
+          ) : (
+            <button onClick={login}>Connect Wallet</button>
+          )}
         </div>
       )}
       
-      {/* Show Login button ONLY when ready, NOT authenticated, AND guide is NOT showing */}
-      {ready && !authenticated && !showGuide && (
-        <div className="auth-controls">
-           <button onClick={login}>Connect Wallet</button>
-        </div>
-      )}
-
-      {/* --- Updated Rendering Logic --- */}
+      {/* --- Main Rendering Logic --- */}
       {showVideoScreen ? (
            <VideoStartScreen onStartClick={handleVideoScreenFinish} />
        ) : showIntro ? (
-           // IntroScroller stays rendered until its onFinished delay completes
            <IntroScroller 
               onFinished={handleIntroFinished} 
               onTypingFinished={handleIntroTypingFinished}
@@ -296,18 +401,14 @@ function App() {
        ) : isGameFinished ? (
            <EndingScreen />
        ) : (
-           // Show main game view if not in video/intro/ending 
-           // Guide will overlay this if showGuide is true
            <>
               <PlanetCanvas />
               <ResourcePanel />
               <StoryLog /> 
-              <EventPopup /> 
+              {isEventPopupOpen && activeEvent && <EventPopup /> } 
            </>
        )}
 
-      {/* --- Conditionally Render Guide Overlay --- */}
-      {/* Guide shows as soon as typing finishes */}
       {showGuide && 
         <GuideOverlay 
           login={login} 
@@ -315,12 +416,11 @@ function App() {
           onClose={handleGuideClose} 
         />}
 
-      {/* ActionIcon area - Render only when game is active (no video, intro, guide, finished) */}
+      {/* ActionIcon area - Render only when game is active */}
       {!showVideoScreen && !showIntro && !showGuide && !isGameFinished && (
          <div className="action-icon-area"> 
             <ActionIcon onClick={handleOpenDialog} />
             <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title="Planet Info">
-              {/* Placeholder content for the dialog */}
               <p>This is where additional information or actions related to the planet could go.</p>
               <p>Maybe display detailed stats, upgrade options, or lore.</p>
             </DialogBox>

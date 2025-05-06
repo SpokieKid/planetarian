@@ -49,7 +49,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Background is handled by Pixi canvas now */
+  /* Background is handled by Pixi canvas now - Changed to transparent for body background */
+  background-color: transparent; /* Allow body background to show through */
 }
 
 .start-screen {
@@ -122,4 +123,31 @@
     left: 0; /* Aligns container left with viewport left */
     /* No width/height needed, just a positioning context */
     z-index: 90; /* Below the icon/dialog but above canvas */
+}
+
+.auth-controls {
+  position: absolute; /* Fixed positioning relative to the viewport */
+  top: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it's on top of most other elements */
+  background-color: rgba(26, 26, 26, 0.7); /* Dark semi-transparent background for readability */
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: #fff; /* White text color */
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Spacing between text and button */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.auth-controls button {
+  /* Inherits some button styles, but can be customized */
+  background-color: #4A4A4A; /* Darker button */
+  color: #fff;
+  border: 1px solid #666;
+}
+
+.auth-controls button:hover {
+  background-color: #5A5A5A;
+  border-color: #777;
 }

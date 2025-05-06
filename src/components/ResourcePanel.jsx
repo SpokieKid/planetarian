@@ -247,12 +247,12 @@ const ResourcePanel = () => {
                 ))}
             </div> */}
             <div className="action-buttons">
-                <button onClick={triggerNextEvent} className="debug-event-btn">
+                {/* <button onClick={triggerNextEvent} className="debug-event-btn">
                     Check for Event
                 </button>
                 <button onClick={handleAdvanceTurn} className="debug-turn-btn">
                     Advance Turn
-                </button>
+                </button> */}
                 <button 
                     onClick={handlePublish} 
                     disabled={isPublishing || !walletAddress} // Disable if publishing or wallet not connected

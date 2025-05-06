@@ -131,3 +131,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Audio files
+public/assets/audio/
