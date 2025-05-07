@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+
+    <!-- +++ Farcaster Frame Metadata +++ -->
+    <!-- These values should ideally be replaced by your build process or set if you have a way to make them dynamic -->
+    <!-- For Vite, you can use %VITE_VARIABLE_NAME% and they will be replaced at build time -->
+    <meta property="og:title" content="%VITE_ONCHAINKIT_PROJECT_NAME% - A MiniKit App" />
+    <meta property="og:description" content="Launch %VITE_ONCHAINKIT_PROJECT_NAME% within Farcaster." />
+    <meta property="og:image" content="%VITE_IMAGE_URL%" />
+
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="%VITE_IMAGE_URL%" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" /> <!-- Common aspect ratio, adjust if needed -->
+    <meta property="fc:frame:button:1" content="Launch %VITE_ONCHAINKIT_PROJECT_NAME%" />
+    <meta property="fc:frame:button:1:action" content="link" /> <!-- Or "mint" or "post_redirect" -->
+    <meta property="fc:frame:button:1:target" content="%VITE_URL%" /> <!-- URL to open -->
+    <!-- You can add more buttons (up to 4) e.g. fc:frame:button:2 -->
+
+    <!-- The MiniKit docs show a more complex JSON structure for fc:frame. -->
+    <!-- If `npx create-onchain --manifest` or MiniKit setup auto-generates a more detailed fc:frame structure -->
+    <!-- in farcaster.json and expects that to be the source of truth, or if there's a client-side way -->
+    <!-- MiniKit sets this, that would be better. The Next.js `generateMetadata` example puts a JSON string -->
+    <!-- directly into the "fc:frame" meta tag's content. -->
+    <!-- Let's try to match the Next.js example more closely, assuming a single fc:frame meta tag is preferred. -->
+    <!-- Removing individual fc:frame:* tags above and using one JSON blob. -->
+    <!-- You will need to ensure your VITE_ environment variables are correctly populated in your .env file -->
+    <!-- <meta property="fc:frame" content=\'\'\'{"version": "%VITE_VERSION%", "imageUrl": "%VITE_IMAGE_URL%", "button": {"title": "Launch %VITE_ONCHAINKIT_PROJECT_NAME%", "action": {"type": "launch_frame", "name": "%VITE_ONCHAINKIT_PROJECT_NAME%", "url": "%VITE_URL%", "splashImageUrl": "%VITE_SPLASH_IMAGE_URL%", "splashBackgroundColor": "#%VITE_SPLASH_BACKGROUND_COLOR%"}}}\'\'\' /> -->
+    <!-- +++ End Farcaster Frame Metadata +++ -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html> 
