@@ -1,231 +1,238 @@
 import React, { useState, useEffect } from 'react';
-import { useShallow } from 'zustand/react/shallow'; // Import useShallow
+import { useShallow } from 'zustand/react/shallow';
 import usePlanetStore from '../hooks/usePlanetState';
-import { PinataSDK } from 'pinata'; // Import from new package
-import { useWallets, useSendTransaction } from '@privy-io/react-auth'; // Import useSendTransaction
-import { createPublicClient, http } from 'viem'; // Only need public client utils now
-import { base } from 'viem/chains'; // Import target chain (e.g., base)
-import { createCoinCall } from '@zoralabs/coins-sdk'; // Import createCoinCall
-// import { getResourceModifiers } from '../utils/resourceMapping'; // REMOVED unused import
-import './ResourcePanel.css'; // Add basic styling
+import { createThirdwebClient } from "thirdweb";
+import { upload, resolveScheme } from "thirdweb/storage";
+import { createPublicClient, http, createWalletClient, custom } from 'viem';
+import { baseSepolia } from 'viem/chains';
+import { createCoin } from '@zoralabs/coins-sdk';
+import './ResourcePanel.css';
 
 const ResourcePanel = () => {
-    // Use useShallow for state selection involving objects or multiple primitives
     const {
-        // resources, // REMOVED
         mode,
         planetName,
         growthPoints,
-        era, // Select new state
-        turn, // Select new state
-        karma, // Select new state
-        narrativeLog, // Get narrativeLog
-        walletAddress, // Get walletAddress
-        // addResource, // REMOVED
-        triggerNextEvent, // Keep existing action access
-        incrementTurn,   // Select new action for potential use
+        era,
+        turn,
+        karma,
+        narrativeLog,
+        triggerNextEvent,
+        incrementTurn,
+        coinbaseProvider,
+        coinbaseAccount,
     } = usePlanetStore(
         useShallow(state => ({
-            // resources: state.resources, // REMOVED
             mode: state.mode,
             planetName: state.planetName,
             growthPoints: state.growthPoints,
-            era: state.era, // Add to selector
-            turn: state.turn, // Add to selector
-            karma: state.karma, // Add to selector
-            narrativeLog: state.narrativeLog, // Add narrativeLog
-            walletAddress: state.walletAddress, // Add walletAddress
-            // addResource: state.addResource, // REMOVED
+            era: state.era,
+            turn: state.turn,
+            karma: state.karma,
+            narrativeLog: state.narrativeLog,
             triggerNextEvent: state.triggerNextEvent,
-            incrementTurn: state.incrementTurn, // Add action
+            incrementTurn: state.incrementTurn,
+            coinbaseProvider: state.coinbaseProvider,
+            coinbaseAccount: state.coinbaseAccount,
         }))
     );
 
-    // --- Privy Wallet Hook --- 
-    const walletsState = useWallets();
-    const { wallets } = walletsState;
-    const connectedWallet = wallets[0]; // Fallback or primary connected external wallet
-    const { sendTransaction } = useSendTransaction(); // Use the correct hook
-    // --- End Privy Wallet Hook ---
-
-    // --- Log the entire useWallets return object --- 
-    console.log("Full useWallets() return:", walletsState);
-    // ---
-
-    // --- Component State for Publishing --- 
     const [isPublishing, setIsPublishing] = useState(false);
-    const [publishStatus, setPublishStatus] = useState(''); // To show messages
-    const [ipfsUri, setIpfsUri] = useState(null); // To store the result
-    const [zoraTxHash, setZoraTxHash] = useState(null); // State for Zora transaction hash
-    // --- Add State for Viem Clients --- 
+    const [publishStatus, setPublishStatus] = useState('');
+    const [ipfsUri, setIpfsUri] = useState(null);
+    const [zoraTxHash, setZoraTxHash] = useState(null);
+    const [coinAddress, setCoinAddress] = useState(null);
     const [publicClient, setPublicClient] = useState(null);
-    // const [walletClient, setWalletClient] = useState(null); // REMOVE walletClient state
-    // --- End State for Viem Clients --- 
+    const [walletClient, setWalletClient] = useState(null);
+    const [thirdwebClient, setThirdwebClient] = useState(null);
 
-    // --- Pinata Configuration (Using JWT - INSECURE for Frontend) --- 
-    const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
-    const PINATA_GATEWAY = import.meta.env.VITE_PINATA_GATEWAY; // e.g., your-gateway.mypinata.cloud
+    const THIRDWEB_CLIENT_ID = import.meta.env.VITE_THIRDWEB_CLIENT_ID;
+    const RPC_URL = import.meta.env.VITE_RPC_URL;
+    const TARGET_CHAIN = baseSepolia;
 
-    let pinata = null;
-    if (PINATA_JWT && PINATA_GATEWAY) {
-        pinata = new PinataSDK({
-            pinataJwt: PINATA_JWT,
-            pinataGateway: PINATA_GATEWAY
-        });
-        console.log("Pinata SDK initialized with JWT and Gateway");
-    } else {
-        console.warn("Pinata JWT or Gateway URL not found in environment variables (VITE_PINATA_JWT, VITE_PINATA_GATEWAY). Publishing will fail.");
-    }
-    // --- End Pinata Configuration ---
-
-    // --- Viem/Zora Config --- 
-    const TARGET_CHAIN = base; // Or your desired chain
-    const RPC_URL = import.meta.env.VITE_RPC_URL; // Get RPC URL from .env
-
-    // --- Effect to Initialize ONLY Public Client --- 
     useEffect(() => {
-        console.log("[Effect] Checking for RPC for PublicClient...");
-        setPublicClient(null); // Reset first
+        if (THIRDWEB_CLIENT_ID) {
+            const client = createThirdwebClient({
+                clientId: THIRDWEB_CLIENT_ID,
+            });
+            setThirdwebClient(client);
+            console.log("[ResourcePanel Effect] Thirdweb client initialized.");
+        } else {
+            console.warn("Thirdweb Client ID not found. IPFS Publishing will fail.");
+            setThirdwebClient(null);
+        }
 
-        if (RPC_URL) {
+        if (RPC_URL && coinbaseProvider && coinbaseAccount && TARGET_CHAIN) {
             try {
-                console.log("[Effect] Creating PublicClient...");
                 const newPublicClient = createPublicClient({
                     chain: TARGET_CHAIN,
                     transport: http(RPC_URL),
                 });
                 setPublicClient(newPublicClient);
-                console.log("[Effect] PublicClient state updated.");
+
+                const newWalletClient = createWalletClient({
+                    account: coinbaseAccount,
+                    chain: TARGET_CHAIN,
+                    transport: custom(coinbaseProvider)
+                });
+                setWalletClient(newWalletClient);
+                console.log("[ResourcePanel Effect] Viem PublicClient and WalletClient initialized.");
+
             } catch (error) {
-                console.error("[Effect] Error creating PublicClient:", error);
+                console.error("[ResourcePanel Effect] Error creating Viem clients:", error);
+                setPublicClient(null);
+                setWalletClient(null);
             }
         } else {
-            console.warn("[Effect] RPC_URL missing, cannot create PublicClient.");
+             setPublicClient(null);
+             setWalletClient(null);
         }
-    // Depend only on RPC_URL and TARGET_CHAIN for public client
-    }, [RPC_URL, TARGET_CHAIN]); 
-    // --- End Effect --- 
+    }, [THIRDWEB_CLIENT_ID, RPC_URL, TARGET_CHAIN, coinbaseProvider, coinbaseAccount]);
 
-    // REMOVED handleAddResource function
-    // const handleAddResource = (resourceType) => {
-    //     addResource(resourceType, 10);
-    // };
-
-    // Optional: Button to manually advance the turn for testing
-    const handleAdvanceTurn = () => {
-        incrementTurn();
-    };
-
-    // --- Publish Function --- 
     const handlePublish = async () => {
-        setPublishStatus(''); // Reset status
+        setPublishStatus('');
         setIpfsUri(null);
         setZoraTxHash(null);
+        setCoinAddress(null);
 
-        // --- Log connectedWallet right before the check --- 
-        console.log("[handlePublish] Checking connectedWallet:", connectedWallet);
-        console.log("[handlePublish] typeof connectedWallet.getProvider:", typeof connectedWallet?.getProvider);
-        // ---
-
-        // Initial Checks
-        if (!connectedWallet?.address) { 
-            setPublishStatus('Error: Wallet not connected or address not found.');
+        if (!coinbaseAccount || !coinbaseProvider || !publicClient || !walletClient) {
+            setPublishStatus('Error: Wallet not connected or Viem clients not ready.');
             return;
         }
-        if (!pinata) {
-             setPublishStatus('Error: Pinata client not configured.');
+        if (!thirdwebClient) {
+             setPublishStatus('Error: Thirdweb client not configured.');
              return;
         }
-         if (!publicClient) { // Only check publicClient from state
-             setPublishStatus('Error: Public blockchain client not ready. Check RPC URL.');
-             console.error("PublicClient not available in state.", { publicClient });
-             return;
-         }
-         // Check if sendTransaction from the hook is available
-         if (typeof sendTransaction !== 'function') {
-             setPublishStatus('Error: Privy sendTransaction hook not ready or available.');
-             console.error("sendTransaction function from useSendTransaction is not available");
-             return;
-         }
 
         setIsPublishing(true);
         
-        // --- IPFS Upload --- 
-        setPublishStatus('Generating metadata...');
+        let currentIpfsUri = null;
+        let httpsIpfsUrl = null;
+        let imageIpfsUri = null;
+
+        // 1. Upload the static image to IPFS
+        try {
+            setPublishStatus('Fetching and uploading image to IPFS...');
+            const imageResponse = await fetch('/assets/zora_upload/aa_avatar.png');
+            if (!imageResponse.ok) {
+                throw new Error(`Failed to fetch image: ${imageResponse.status} ${imageResponse.statusText}`);
+            }
+            const imageBlob = await imageResponse.blob();
+            const imageFile = new File([imageBlob], "aa_avatar.png", { type: imageBlob.type });
+
+            const imageUploadUris = await upload({ client: thirdwebClient, files: [imageFile] });
+            console.log("Raw response from thirdweb image upload:", imageUploadUris);
+
+            if (typeof imageUploadUris === 'string' && imageUploadUris.startsWith('ipfs://')) {
+                imageIpfsUri = imageUploadUris;
+            } else if (Array.isArray(imageUploadUris) && imageUploadUris.length > 0 && typeof imageUploadUris[0] === 'string' && imageUploadUris[0].startsWith('ipfs://')) {
+                imageIpfsUri = imageUploadUris[0];
+            } else {
+                console.error("Thirdweb IPFS image upload failed or returned an invalid URI format. Full response:", imageUploadUris);
+                throw new Error("Thirdweb IPFS image upload failed or did not return a valid ipfs:// URI.");
+            }
+            console.log(`Image uploaded to IPFS: ${imageIpfsUri}`);
+            setPublishStatus('Image uploaded. Generating metadata...');
+        } catch (error) {
+            console.error("Error uploading image to IPFS:", error);
+            setPublishStatus(`Error uploading image: ${error.message}`);
+            setIsPublishing(false);
+            return;
+        }
+
+        // 2. Generate metadata including the image URI, then upload metadata
         const metadata = {
-            name: `Planet ${planetName} Log (${connectedWallet.address.substring(0, 6)})`,
-            description: `A chronicle of events and karma for planet ${planetName}, owned by ${connectedWallet.address}.`,
-            external_url: "https://your-project-url.com",
+            name: `Planet ${planetName} Log (${coinbaseAccount.substring(0, 6)})`,
+            description: `A chronicle of events and karma for planet ${planetName}, owned by ${coinbaseAccount}.`,
+            image: imageIpfsUri,
+            external_url: `https://example.com/planet/${planetName}-${Date.now()}`,
             attributes: [
+                { trait_type: "Planet Name", value: planetName },
                 { trait_type: "Final Karma", value: karma },
                 { trait_type: "Era Reached", value: era },
                 { trait_type: "Turns Survived", value: turn },
                 { trait_type: "Mode", value: mode },
+                { trait_type: "Planet Log Snapshot", value: JSON.stringify(narrativeLog.slice(-5)) },
             ],
-            planet_log: narrativeLog, 
         };
-        let currentIpfsUri = null;
         try {
             const metadataString = JSON.stringify(metadata, null, 2);
             const metadataFile = new File([metadataString], `${planetName}-log-${Date.now()}.json`, { type: 'application/json' });
-            setPublishStatus('Uploading metadata to IPFS...');
-            const uploadResult = await pinata.upload.public.file(metadataFile);
-            if (!uploadResult || !uploadResult.cid) {
-                throw new Error("IPFS upload failed or did not return a CID.");
+            setPublishStatus('Uploading metadata to IPFS via thirdweb...');
+            
+            console.log("Attempting to upload to thirdweb IPFS with client:", thirdwebClient, "and file:", metadataFile);
+            const uris = await upload({ 
+                client: thirdwebClient, 
+                files: [metadataFile] 
+            });
+            console.log("Raw response from thirdweb upload:", uris);
+
+            let singleUri = null;
+            if (typeof uris === 'string') {
+                singleUri = uris; // uris is directly the string
+            } else if (Array.isArray(uris) && uris.length > 0 && typeof uris[0] === 'string') {
+                singleUri = uris[0]; // uris is an array, take the first element
             }
-            currentIpfsUri = `ipfs://${uploadResult.cid}`;
-            setIpfsUri(currentIpfsUri);
-            setPublishStatus(`Metadata pinned: ${currentIpfsUri}`);
-            console.log("IPFS URI:", currentIpfsUri);
+
+            if (!singleUri || !singleUri.startsWith('ipfs://')) {
+                console.error("Thirdweb IPFS upload failed or returned an invalid URI format. Full response:", uris);
+                throw new Error("Thirdweb IPFS upload failed or did not return a valid ipfs:// URI.");
+            }
+            currentIpfsUri = singleUri;
+
+            // Resolve to thirdweb's HTTPS gateway URL
+            httpsIpfsUrl = await resolveScheme({ client: thirdwebClient, uri: currentIpfsUri });
+            setIpfsUri(httpsIpfsUrl); // Store and display the HTTPS URL
+
+            setPublishStatus(`Metadata pinned: ${httpsIpfsUrl}. Preparing Zora Coin transaction...`);
+            console.log(`Thirdweb IPFS upload successful. IPFS URI: ${currentIpfsUri}, HTTPS URL: ${httpsIpfsUrl}`);
         } catch (error) {
-            console.error("Error uploading metadata:", error);
+            console.error("Error uploading metadata to Thirdweb IPFS or resolving scheme:", error);
             setPublishStatus(`Error uploading metadata: ${error.message}`);
             setIsPublishing(false);
-            return; 
+            return;
         }
-        // --- End IPFS Upload --- 
 
-        // --- Call Zora via useSendTransaction --- 
         if (currentIpfsUri) {
             try {
-                setPublishStatus('Preparing Zora coin creation parameters...');
+                setPublishStatus('Preparing Zora createCoin transaction...');
                 
                 const coinParams = {
-                    name: `Planet ${planetName}`, 
-                    symbol: `PL${planetName.substring(0,3).toUpperCase()}`, 
-                    uri: currentIpfsUri,
-                    payoutRecipient: connectedWallet.address, 
-                };
+                    name: `Planet ${planetName} Coin (${coinbaseAccount.substring(0,6)})`,
+                    symbol: planetName.substring(0, 3).toUpperCase() + 'C',
+                    uri: httpsIpfsUrl,
+                    payoutRecipient: coinbaseAccount,
+                  };
 
-                // Get transaction parameters from Zora SDK
-                const txParams = createCoinCall(coinParams);
-                console.log("Zora createCoinCall params:", txParams);
+                console.log("Calling createCoin with params:", coinParams);
 
-                setPublishStatus('Please approve transaction in your wallet...');
+                if (!publicClient || !walletClient) {
+                    throw new Error("Viem public or wallet client is not initialized.");
+                }
 
-                // Send transaction using the function from the hook
-                const txHash = await sendTransaction({
-                    ...txParams,
-                    chainId: `eip155:${TARGET_CHAIN.id}`, 
-                });
+                const result = await createCoin(coinParams, walletClient, publicClient);
                 
-                console.log("Zora Coin creation Tx Hash:", txHash);
-                setZoraTxHash(txHash); // Store the transaction hash
-                setPublishStatus(`Success! Zora coin creation initiated.`);
+                setZoraTxHash(result.hash);
+                setCoinAddress(result.address);
+                setPublishStatus(`Success! Zora Coin creation tx sent: ${result.hash}. Coin Address: ${result.address}`);
+                console.log("Zora Coin creation successful:", result);
 
             } catch (error) {
-                console.error("Error initiating Zora coin creation:", error);
-                setPublishStatus(`Error initiating Zora coin creation: ${error.message}`);
+                console.error("Error preparing or sending Zora createCoin transaction:", error);
+                setPublishStatus(`Error creating Zora Coin: ${error.message}`);
+                if (error?.code === 4001) {
+                     setPublishStatus('Zora transaction rejected by user.');
+                }
             } finally {
                 setIsPublishing(false);
             }
         } else {
-            setPublishStatus('Error: IPFS URI missing.');
+            setPublishStatus('Error: IPFS URI missing for Zora Coin creation.');
             setIsPublishing(false);
         }
-        // --- End Call Zora --- 
     };
-    // --- End Publish Function --- 
+
+    const handleAdvanceTurn = () => incrementTurn();
 
     return (
         <div className="resource-panel">
@@ -236,16 +243,6 @@ const ResourcePanel = () => {
                 <span>Karma: {karma}</span>
             </div>
             <p>Growth Points: {growthPoints.toFixed(2)}</p>
-            {/* REMOVED resources-grid section */}
-            {/* <div className="resources-grid">
-                {Object.entries(resources).map(([key, value]) => (
-                    <div key={key} className="resource-item">
-                        <span className="resource-name">{key.charAt(0).toUpperCase() + key.slice(1)}:</span>
-                        <span className="resource-value">{value.toFixed(2)}</span>
-                        <button onClick={() => handleAddResource(key)} className="add-resource-btn">+</button>
-                    </div>
-                ))}
-            </div> */}
             <div className="action-buttons">
                 <button onClick={triggerNextEvent} className="debug-event-btn">
                     Check for Event
@@ -255,17 +252,16 @@ const ResourcePanel = () => {
                 </button>
                 <button 
                     onClick={handlePublish} 
-                    disabled={isPublishing || !walletAddress} // Disable if publishing or wallet not connected
+                    disabled={isPublishing || !coinbaseAccount || !publicClient || !walletClient}
                     className="publish-zora-btn"
                 >
-                    {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
+                    {isPublishing ? 'Publishing Coin...' : 'Publish Planet Coin (On-Chain)'}
                 </button>
             </div>
-            {/* --- Display Publish Status --- */}
             {publishStatus && <p className="publish-status">{publishStatus}</p>}
-            {ipfsUri && !zoraTxHash && (
-                <p className="ipfs-result">IPFS URI: 
-                    <a href={`https://${PINATA_GATEWAY}/ipfs/${ipfsUri.split('//')[1]}`} target="_blank" rel="noopener noreferrer">
+            {ipfsUri && (
+                <p className="ipfs-result">Metadata URI: 
+                    <a href={ipfsUri} target="_blank" rel="noopener noreferrer">
                         {ipfsUri}
                     </a>
                 </p>
@@ -276,11 +272,12 @@ const ResourcePanel = () => {
                      <a href={`${TARGET_CHAIN.blockExplorers.default.url}/tx/${zoraTxHash}`} target="_blank" rel="noopener noreferrer">
                          {zoraTxHash}
                      </a>
-                     <p>(Coin address will be available after transaction confirmation)</p>
+                     {coinAddress && <p>Coin Address: {coinAddress}</p>}
+                     <p>(Details visible after confirmation)</p>
                 </div>
             )}
         </div>
     );
 };
 
-export default ResourcePanel; 
+export default ResourcePanel;

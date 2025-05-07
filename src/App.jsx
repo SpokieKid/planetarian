@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
+// --- Remove Privy Hook ---
+// import { usePrivy } from '@privy-io/react-auth';
+// --- End Remove Privy Hook ---
 import PlanetCanvas from './components/PlanetCanvas';
 import ResourcePanel from './components/ResourcePanel';
 import EventPopup from './components/EventPopup';
@@ -8,11 +10,22 @@ import ActionIcon from './components/ActionIcon';
 import DialogBox from './components/DialogBox';
 import IntroScroller from './components/IntroScroller';
 import usePlanetStore from './hooks/usePlanetState';
+import { useShallow } from 'zustand/react/shallow';
 import { PLANET_MODES } from './utils/resourceMapping';
 import { EVENTS_TO_FINISH } from './constants/events';
 import './App.css';
 
-// --- Add Nounii System Prompt Logic --- 
+// +++ Import Coinbase Wallet SDK +++
+import { createCoinbaseWalletSDK } from '@coinbase/wallet-sdk';
+// +++ End Import +++
+
+// +++ Coinbase Wallet Configuration +++
+const COINBASE_APP_NAME = 'Planatarian'; // Or your desired app name
+const COINBASE_RPC_URL = 'https://base-sepolia.g.alchemy.com/v2/wYLLLqg2CDlpIiTy5j6dqzBnTg1GzLPS'; // Your RPC URL
+const COINBASE_CHAIN_ID = 84532; // Your Chain ID
+// +++ End Configuration +++
+
+// --- Nounii System Prompt Logic (Existing) ---
 const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的数字生命体。
 
 你的诞生源于一次失败又浪漫的试验 —— Project Planetarian：一个试图模拟不同社会模式的链上文明实验。在这个实验中，三种模式不断冲突演化：
@@ -50,107 +63,183 @@ const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的�
 // --- End Nounii System Prompt Logic ---
 
 function App() {
-  // Select actions individually to prevent re-renders from selector returning new object
+  // Zustand actions (Existing)
   const initializePlanet = usePlanetStore(state => state.initializePlanet);
   const tick = usePlanetStore(state => state.tick);
   const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
   const isGameFinished = usePlanetStore(state => state.isGameFinished);
   const finishGame = usePlanetStore(state => state.finishGame);
-  // --- Add Zustand actions for backend interaction --- 
-  const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
   const loadPlanetState = usePlanetStore(state => state.loadPlanetState);
-  // --- End Zustand actions --- 
-
-  // --- Add Privy Hook --- 
+  // Get Coinbase state and actions from Zustand
   const {
-    ready,
-    authenticated,
-    user,
-    login,
-    logout,
-  } = usePrivy();
-  // --- End Privy Hook --- 
+    coinbaseProvider,
+    coinbaseAccount,
+    walletAddress // This is updated by setCoinbaseAccount in Zustand
+  } = usePlanetStore(
+    useShallow(state => ({
+      coinbaseProvider: state.coinbaseProvider,
+      coinbaseAccount: state.coinbaseAccount,
+      walletAddress: state.walletAddress, 
+    }))
+  );
+  const zustandSetCoinbaseProvider = usePlanetStore(state => state.setCoinbaseProvider);
+  const zustandSetCoinbaseAccount = usePlanetStore(state => state.setCoinbaseAccount);
+  const zustandClearCoinbaseConnection = usePlanetStore(state => state.clearCoinbaseConnection);
+
+  // --- Remove Privy State ---
+  // const {
+  //   ready,
+  //   authenticated,
+  //   user,
+  //   login,
+  //   logout,
+  // } = usePrivy();
+  // --- End Remove Privy State ---
+
+  // Local UI state
+  const [isCoinbaseConnecting, setIsCoinbaseConnecting] = useState(false);
+  const [coinbaseUiError, setCoinbaseUiError] = useState(null); // For UI feedback
+  const [isSdkInitialized, setIsSdkInitialized] = useState(false); // Tracks if SDK init attempt is done
 
   const [gameStarted, setGameStarted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
 
-  // --- Updated useEffect Hook to Load User State using Supabase --- 
+  // +++ Effect to Initialize Coinbase Wallet SDK +++
   useEffect(() => {
-      if (ready && authenticated && user?.wallet?.address) {
-          const userAddress = user.wallet.address;
-          console.log("User authenticated, calling loadPlanetState for:", userAddress);
-          setWalletAddress(userAddress);
-          
-          // Directly call the async loadPlanetState action
-          loadPlanetState(userAddress);
-          
-      } else if (ready && !authenticated) {
-          // Optional: Handle logout case - clear wallet address?
-          // setWalletAddress(null); 
-          // Consider if you need to reset other game state on logout
-      }
-  }, [ready, authenticated, user?.wallet?.address, setWalletAddress, loadPlanetState]); // Keep dependencies
-  // --- End Updated useEffect Hook --- 
+    console.log("Initializing Coinbase Wallet SDK in App.jsx (using create factory)...");
+    let didCancel = false; // To prevent state updates if component unmounts during async ops
 
-  // Game loop
+    async function initSDK() {
+        try {
+            const sdk = createCoinbaseWalletSDK({
+                appName: COINBASE_APP_NAME,
+                appChainIds: [COINBASE_CHAIN_ID], // Recommended to specify chain IDs
+            });
+            // For `getProvider`, the rpcUrl is often optional if the wallet is already configured
+            // or can derive it, but good to be explicit for a specific network.
+            const provider = sdk.getProvider({ rpcUrl: COINBASE_RPC_URL }); 
+
+            if (!didCancel) {
+                zustandSetCoinbaseProvider(provider);
+                console.log("Coinbase Wallet Provider ready in App.jsx and set in Zustand (using getProvider).");
+
+                // Attempt to silently reconnect or check for existing connection
+                provider.request({ method: 'eth_accounts' })
+                    .then(accounts => {
+                        if (!didCancel) {
+                            if (accounts && accounts.length > 0) {
+                                console.log("Coinbase wallet already connected:", accounts[0]);
+                                zustandSetCoinbaseAccount(accounts[0]);
+                            } else {
+                                console.log("Coinbase wallet not connected initially.");
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        if (!didCancel) {
+                            console.warn("Error checking for existing Coinbase connection:", err);
+                            setCoinbaseUiError("Could not check existing connection.");
+                        }
+                    });
+            }
+        } catch (error) {
+            if (!didCancel) {
+                console.error("Error initializing Coinbase Wallet SDK in App.jsx:", error);
+                setCoinbaseUiError(`SDK Initialization failed: ${error.message}`);
+            }
+        } finally {
+            if (!didCancel) {
+                setIsSdkInitialized(true); // Mark initialization attempt as complete
+            }
+        }
+    }
+
+    initSDK();
+
+    return () => {
+        didCancel = true; // Cleanup function to prevent state updates on unmounted component
+    };
+  }, [zustandSetCoinbaseProvider, zustandSetCoinbaseAccount]); // Keep setters, they should be stable
+
+  // Load User State using Coinbase Wallet (via Zustand's walletAddress)
+  useEffect(() => {
+      // Ensure SDK initialization has been attempted before trying to load state
+      if (isSdkInitialized && walletAddress) {
+          console.log("Coinbase Wallet connected (via Zustand), calling loadPlanetState for:", walletAddress);
+          loadPlanetState(walletAddress);
+      } else if (isSdkInitialized && !walletAddress) {
+          console.log("Coinbase Wallet not connected, or SDK init done but no account found.");
+      }
+  }, [isSdkInitialized, walletAddress, loadPlanetState]);
+
+  // Game loop (Existing)
   useEffect(() => {
     if (!gameStarted || isGameFinished) return;
-
-    const intervalId = setInterval(() => {
-      tick(); // Call the Zustand tick action
-    }, 1000); // Update roughly every second
-
-    return () => clearInterval(intervalId); // Cleanup on unmount or game stop
+    const intervalId = setInterval(() => tick(), 1000);
+    return () => clearInterval(intervalId);
   }, [tick, gameStarted, isGameFinished]);
 
-  // Check for game end condition
+  // Check for game end condition (Existing)
   useEffect(() => {
       if (!isGameFinished && resolvedEventCount >= EVENTS_TO_FINISH) {
-          finishGame(); // Trigger game end state
+          finishGame();
       }
   }, [resolvedEventCount, isGameFinished, finishGame]);
 
-  // --- Add useEffect Hook to Send Prompt --- 
+  // Send Nounii System Prompt (Existing)
   useEffect(() => {
-    // This effect runs once after the initial render
-    const sendSystemPrompt = async () => {
-      console.log("Sending Nounii system prompt to backend from App.jsx...");
-      const apiUrl = 'http://127.0.0.1:11434/v1/chat/completions';
-      const requestBody = {
-        model: "gemma3:12b", // Update model name here
-        messages: [
-          { role: "user", content: NOUNII_SYSTEM_PROMPT }
-        ],
-        stream: false
-      };
+    // const sendSystemPrompt = async () => { // Removed as it's not called
+    //   // ... (rest of sendSystemPrompt logic)
+    // };
+    // sendSystemPrompt(); // Temporarily commenting out to focus on wallet integration
+     console.log("Nounii system prompt sending is currently commented out.");
+  }, []);
 
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-          const errorText = response.statusText || `status: ${response.status}`;
-          throw new Error(`System Prompt Error: HTTP error! ${errorText}`);
+  // +++ Coinbase Connect Function +++
+  const connectCoinbaseWallet = async () => {
+    if (!coinbaseProvider) {
+        setCoinbaseUiError("Coinbase Provider not available. SDK might be initializing or failed.");
+        return;
+    }
+    setIsCoinbaseConnecting(true);
+    setCoinbaseUiError(null);
+    try {
+        const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
+        if (accounts && accounts.length > 0) {
+            zustandSetCoinbaseAccount(accounts[0]);
+        } else {
+             setCoinbaseUiError("No accounts returned from Coinbase Wallet.");
+             zustandClearCoinbaseConnection();
         }
+    } catch (error) {
+        console.error('Failed to connect Coinbase wallet:', error);
+        setCoinbaseUiError(error.message || 'Failed to connect Coinbase Wallet.');
+        if (error.code === 4001) {
+           setCoinbaseUiError('Connection request rejected by user.');
+        }
+        zustandClearCoinbaseConnection();
+    } finally {
+        setIsCoinbaseConnecting(false);
+    }
+  };
+  // +++ End Coinbase Connect Function +++
 
-        const data = await response.json();
-        console.log('System prompt sent successfully from App.jsx:', data);
+  // +++ Coinbase Disconnect Function (Basic Example) +++
+  // Coinbase Wallet SDK doesn't have an explicit "disconnect" method that clears permissions
+  // from the DApp side. The user manages connections from their wallet.
+  // This function will just clear our DApp's state.
+  const disconnectCoinbaseWallet = () => {
+      console.log("Disconnecting Coinbase Wallet (clearing app and Zustand state).");
+      zustandClearCoinbaseConnection();
+      setCoinbaseUiError(null);
+      // You might want to reset other game state here if appropriate
+      // For example, navigate to a logged-out view or clear planet data if it's user-specific
+      // setGameStarted(false); // Example: Reset game state
+      // setShowIntro(true); // Example: Show intro again
+  };
+  // +++ End Coinbase Disconnect Function +++
 
-      } catch (error) {
-        console.error('Error sending system prompt from App.jsx:', error);
-      }
-    };
-
-    sendSystemPrompt();
-
-  }, []); // Empty dependency array ensures this runs only ONCE on mount
-  // --- End useEffect Hook ---
 
   const handleStartGame = (chosenMode) => {
     initializePlanet(chosenMode);
@@ -171,7 +260,7 @@ function App() {
       console.log("Intro finished");
   };
 
-  // Start Screen Component
+  // Start Screen Component (Existing)
   const StartScreen = () => (
     <div className="start-screen">
       <h1>Welcome to Planetary Pet</h1>
@@ -191,33 +280,39 @@ function App() {
         <h1>Game Over!</h1>
         <p>Your planet evolution is complete.</p>
         {/* Add summary generation later */}
-        <button onClick={() => { setShowIntro(true); setGameStarted(false); }}>Play Again?</button>
+        <button onClick={() => { setShowIntro(true); setGameStarted(false); initializePlanet(null); /* Reset planet */ }}>Play Again?</button>
      </div>
   );
 
   return (
     <div className="App">
-      {/* --- Add Privy Auth Buttons & Loading State --- */}
-      {!ready && <div className="loading-indicator">Loading Privy...</div>} 
-      {ready && (
+      {/* --- Coinbase Wallet Auth Controls --- */}
+      {!isSdkInitialized && <div className="loading-indicator">Initializing Wallet SDK...</div>}
+      {isSdkInitialized && (
         <div className="auth-controls">
-          {authenticated ? (
+          {coinbaseAccount ? (
             <>
-              <span>Connected: {user?.wallet?.address}</span>
-              <button onClick={logout}>Logout</button>
+              <span>Connected: {coinbaseAccount.substring(0,6)}...{coinbaseAccount.substring(coinbaseAccount.length - 4)}</span>
+              <button onClick={disconnectCoinbaseWallet}>Disconnect Wallet</button>
             </>
           ) : (
-            <button onClick={login}>Connect Wallet</button>
+            <button onClick={connectCoinbaseWallet} disabled={isCoinbaseConnecting || !coinbaseProvider}>
+              {isCoinbaseConnecting ? 'Connecting...' : 'Connect with Coinbase Wallet'}
+            </button>
           )}
+          {coinbaseUiError && <div className="error-message" style={{color: 'red', marginTop: '10px'}}>{coinbaseUiError}</div>}
         </div>
       )}
-      {/* --- End Privy Auth Buttons & Loading State --- */}
+      {/* --- End Coinbase Wallet Auth Controls --- */}
 
        {/* Show Intro first if showIntro is true */} 
        {showIntro ? (
            <IntroScroller onFinished={handleIntroFinished} />
        ) : !gameStarted ? (
-        <StartScreen />
+        // Only show StartScreen if wallet is connected or if you allow starting without a wallet
+        coinbaseAccount ? <StartScreen /> : (
+          isSdkInitialized && <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>Please connect your Coinbase Wallet to start.</div>
+        )
       ) : isGameFinished ? (
           <EndingScreen />
       ) : (

@@ -10,17 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coinbase/wallet-sdk": "^4.3.2",
     "@privy-io/react-auth": "^2.13.0",
     "@privy-io/server-auth": "^1.21.3",
+    "@privy-io/wagmi": "^1.0.3",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",
     "@supabase/supabase-js": "^2.49.4",
+    "@tanstack/react-query": "^5.75.4",
     "@zoralabs/coins-sdk": "^0.1.0",
-    "pinata": "^2.2.1",
+    "@zoralabs/protocol-sdk": "^0.13.5",
+    "dotenv": "^16.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "thirdweb": "^5.97.1",
     "three": "^0.176.0",
-    "viem": "^2.28.4",
+    "viem": "^2.29.0",
+    "wagmi": "^2.15.2",
     "zustand": "^5.0.4"
   },
   "devDependencies": {

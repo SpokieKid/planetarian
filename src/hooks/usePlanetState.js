@@ -61,7 +61,7 @@ const usePlanetStore = create(
             turn: 1,
             karma: 50,
             growthPoints: 0,
-            walletAddress: null,
+            walletAddress: null, // This will now be primarily set by Coinbase Wallet
             // resources: { // REMOVED specific resources object
             //     water: 70,
             //     light: 70,
@@ -76,8 +76,19 @@ const usePlanetStore = create(
             narrativeLog: [],
             isGameFinished: false,
 
+            // +++ Coinbase Wallet State +++
+            coinbaseProvider: null, // This will NOT be persisted
+            coinbaseAccount: null,  // This CAN be persisted
+            // +++ End Coinbase Wallet State +++
+
             // --- Actions ---
             setWalletAddress: (address) => set({ walletAddress: address }),
+
+            // +++ Coinbase Wallet Actions +++
+            setCoinbaseProvider: (provider) => set({ coinbaseProvider: provider }),
+            setCoinbaseAccount: (account) => set({ coinbaseAccount: account, walletAddress: account }), // Also update walletAddress for consistency
+            clearCoinbaseConnection: () => set({ coinbaseProvider: null, coinbaseAccount: null, walletAddress: null }),
+            // +++ End Coinbase Wallet Actions +++
 
             // --- Rewritten loadPlanetState using Supabase --- 
             loadPlanetState: async (walletAddress) => {
@@ -248,72 +259,83 @@ const usePlanetStore = create(
                 console.log("Resolving event:", state.activeEvent.title, "with option:", chosenOption.id);
 
                 const randomChance = Math.random() * 100;
-                let outcome;
-                if (randomChance < chosenOption.success.probability) {
-                    outcome = chosenOption.success;
-                    console.log("Outcome: Success");
-                } else {
-                    outcome = chosenOption.failed;
-                    console.log("Outcome: Failed");
-                }
+                const outcome = randomChance < chosenOption.successChance ? chosenOption.outcomes.success : chosenOption.outcomes.fail;
 
-                const stateChanges = applyChoiceOutcomeEffects(state, outcome);
+                const effects = applyChoiceOutcomeEffects(state, outcome);
 
-                // Apply the calculated changes
-                // const updatedResources = { ...state.resources }; // REMOVED
-                // if (stateChanges.resources) { // REMOVED
-                //     Object.entries(stateChanges.resources).forEach(([res, change]) => {
-                //         updatedResources[res] = Math.max(0, (updatedResources[res] || 0) + change);
-                //     });
-                // }
-                const newGrowthPoints = state.growthPoints + stateChanges.growthPoints;
-                const newKarma = state.karma + stateChanges.karma;
-                const newNarrativeLog = [...state.narrativeLog];
-                if(stateChanges.narrative) {
-                    newNarrativeLog.push(`[${state.activeEvent.title} - Opt ${chosenOption.id}] ${stateChanges.narrative} (Karma ${stateChanges.karma > 0 ? '+' : ''}${stateChanges.karma})`);
-                }
-                const newResolvedEventCount = state.resolvedEventCount + 1;
-                const resolvedEventKey = state.activeEvent.eventKey;
-
-                set({
+                set((prevState) => ({
                     activeEvent: null,
-                    // resources: updatedResources, // REMOVED
-                    growthPoints: newGrowthPoints,
-                    karma: newKarma,
-                    narrativeLog: newNarrativeLog,
-                    resolvedEventCount: newResolvedEventCount,
-                    triggeredEventKeys: [...state.triggeredEventKeys, resolvedEventKey]
-                });
-
-                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount });
-                get().savePlanetState();
+                    growthPoints: prevState.growthPoints + effects.growthPoints,
+                    karma: Math.max(0, Math.min(100, prevState.karma + effects.karma)), // Ensure karma is between 0-100
+                    // resources: {
+                    //     ...prevState.resources,
+                    //     ...Object.fromEntries(
+                    //          Object.entries(effects.resources).map(([key, value]) => [
+                    //              key,
+                    //              Math.max(0, (prevState.resources[key] || 0) + value)
+                    //          ])
+                    //     )
+                    // }, // REMOVED resource updates
+                    narrativeLog: effects.narrative ? [...prevState.narrativeLog, effects.narrative] : prevState.narrativeLog,
+                    resolvedEventCount: prevState.resolvedEventCount + 1,
+                }));
+                console.log("Event resolved. New karma:", get().karma, "New Growth:", get().growthPoints);
             },
 
             // Action to explicitly end the game
             finishGame: () => {
+                console.log("Game Over! Final State:", get());
                 set({ isGameFinished: true });
-                console.log("Game Finished!");
+                // Potentially trigger save to Supabase here automatically or prompt user
+                get().savePlanetState();
             },
 
             // --- Add back the tick action ---
             tick: () => {
                 if (get().isGameFinished || get().activeEvent) return; // Don't tick if paused/ended
 
-                const now = Date.now();
-                const timeElapsed = now - get().lastTickTime;
+                const currentTime = Date.now();
+                const timeSinceLastTick = currentTime - get().lastTickTime;
 
-                // Add any time-based logic here in the future (e.g., resource decay?)
-                // For now, just update the last tick time.
+                if (timeSinceLastTick > 1000) { // Every second, for example
+                    // Automatic growth points generation (example)
+                    let autoGrowth = 0.1;
+                    if (get().mode === PLANET_MODES.PLANETARY) autoGrowth = 0.2;
+                    if (get().mode === PLANET_MODES.INTERNATIONAL) autoGrowth = 0.05;
 
-                set({ lastTickTime: now });
-
-                // Optional: console.log("Tick:", timeElapsed);
+                    set((state) => ({
+                        growthPoints: state.growthPoints + autoGrowth,
+                        lastTickTime: currentTime,
+                    }));
+                }
             }
             // --- End tick action ---
 
         }),
         {
-            name: 'planetary-pet-storage-v2',
+            name: 'planet-storage',
+            partialize: (state) =>
+                Object.fromEntries(
+                    Object.entries(state).filter(([key]) => !['coinbaseProvider'].includes(key))
+                ),
+            // You can also explicitly list what TO persist if that's easier:
+            // partialize: (state) => ({
+            //   planetName: state.planetName,
+            //   mode: state.mode,
+            //   era: state.era,
+            //   turn: state.turn,
+            //   karma: state.karma,
+            //   growthPoints: state.growthPoints,
+            //   walletAddress: state.walletAddress,
+            //   coinbaseAccount: state.coinbaseAccount, // Persist account address
+            //   createdAt: state.createdAt,
+            //   lastTickTime: state.lastTickTime,
+            //   activeEvent: state.activeEvent, // Be careful with persisting complex objects
+            //   triggeredEventKeys: state.triggeredEventKeys,
+            //   resolvedEventCount: state.resolvedEventCount,
+            //   narrativeLog: state.narrativeLog,
+            //   isGameFinished: state.isGameFinished,
+            // }),
         }
     )
 );
