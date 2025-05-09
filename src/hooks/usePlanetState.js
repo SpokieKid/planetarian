@@ -28,6 +28,8 @@ const initialGameState = {
     currentView: 'main_planet', // New state for current view
     hasBaseIntroBeenCompleted: false, // <-- New state for Base Intro completion
     hasSeenBaseEventTriggerDialogEver: false, // <-- New state for one-time dialog
+    hasEarnedBaseCompletionBadge: false, // <-- New state for badge earned
+    showBaseCompletionPopup: false, // <-- New state for showing badge popup
 };
 
 // Function to apply effects based on chosen option and its outcome (Success/Fail)
@@ -116,6 +118,14 @@ const usePlanetStore = create(
 
             setHasSeenBaseEventTriggerDialogEver: (seen) => set({ hasSeenBaseEventTriggerDialogEver: seen }), // <-- Action for new state
 
+            earnBaseCompletionBadge: () => set({
+                hasEarnedBaseCompletionBadge: true,
+                showBaseCompletionPopup: true,
+                narrativeLog: [...get().narrativeLog, "[历史模拟] 恭喜！已完成基地历史模拟并获得成就徽章！"], // Add log entry
+            }),
+
+            closeBaseCompletionPopup: () => set({ showBaseCompletionPopup: false }),
+
             // --- Action to reset the game state --- 
             resetPlanetState: () => {
                 const now = Date.now();
@@ -132,6 +142,8 @@ const usePlanetStore = create(
                     currentView: 'main_planet', 
                     hasBaseIntroBeenCompleted: false, // Also reset this on full game reset
                     hasSeenBaseEventTriggerDialogEver: false, // Also reset this
+                    hasEarnedBaseCompletionBadge: false, // <-- Reset badge earned
+                    showBaseCompletionPopup: false, // <-- Reset badge popup show state
                 });
                 console.log("Zustand planet state has been reset.");
                 // Optionally: Trigger save immediately after reset?
@@ -434,8 +446,11 @@ const usePlanetStore = create(
                 console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount, era: get().era, turn: get().turn });
                 get().savePlanetState(); 
 
-                // After current event is resolved and state updated, check for next event in sequence
-                if (nextEventKeyFromCurrent && state.currentView === 'base_planet') {
+                // After current event is resolved and state updated, check for next event OR badge
+                if (resolvedEventKey === 'BASE_SPRING_04') { // Check if the resolved event was the last in sequence
+                    console.log("Completed BASE_SPRING_04, earning completion badge.");
+                    get().earnBaseCompletionBadge();
+                } else if (nextEventKeyFromCurrent && state.currentView === 'base_planet') {
                     const nextEventToTrigger = baseEvents[nextEventKeyFromCurrent];
                     if (nextEventToTrigger) {
                         console.log(`Auto-triggering next event in sequence: ${nextEventKeyFromCurrent}`);

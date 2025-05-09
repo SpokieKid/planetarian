@@ -135,18 +135,17 @@
 }
 
 .auth-controls {
-  position: absolute; /* Fixed positioning relative to the viewport */
+  position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 1000; /* Ensure it's on top of most other elements */
-  background-color: rgba(26, 26, 26, 0.7); /* Dark semi-transparent background for readability */
+  background-color: rgba(0, 0, 0, 0.7);
   padding: 10px 15px;
   border-radius: 8px;
-  color: #fff; /* White text color */
+  color: white;
+  z-index: 100; /* Ensure it's above canvas but below popups */
   display: flex;
   align-items: center;
-  gap: 15px; /* Spacing between text and button */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  gap: 10px;
 }
 
 .auth-controls button {
@@ -160,3 +159,24 @@
   background-color: #5A5A5A;
   border-color: #777;
 }
+
+.persistent-badge-container {
+  position: fixed;
+  top: 20px; /* Align with auth-controls */
+  left: 20px; /* Position to the left */
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.persistent-badge-icon {
+  width: 40px; /* Adjust size as needed */
+  height: 40px;
+  border-radius: 50%; /* If badge is roundish */
+  border: 1px solid #fca311;
+  box-shadow: 0 0 8px rgba(252, 163, 17, 0.7);
+}
+
+/* Ensure App background image covers everything if needed */
+/* ... rest of App.css ... */

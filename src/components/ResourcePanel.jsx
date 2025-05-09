@@ -24,6 +24,7 @@ const ResourcePanel = () => {
         // addResource, // REMOVED
         triggerNextEvent, // Keep existing action access
         incrementTurn,   // Select new action for potential use
+        hasEarnedBaseCompletionBadge,
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
@@ -38,6 +39,7 @@ const ResourcePanel = () => {
             // addResource: state.addResource, // REMOVED
             triggerNextEvent: state.triggerNextEvent,
             incrementTurn: state.incrementTurn, // Add action
+            hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
         }))
     );
 
@@ -247,19 +249,18 @@ const ResourcePanel = () => {
                 ))}
             </div> */}
             <div className="action-buttons">
-                {/* <button onClick={triggerNextEvent} className="debug-event-btn">
-                    Check for Event
-                </button>
-                <button onClick={handleAdvanceTurn} className="debug-turn-btn">
-                    Advance Turn
-                </button> */}
-                <button 
-                    onClick={handlePublish} 
-                    disabled={isPublishing || !walletAddress} // Disable if publishing or wallet not connected
-                    className="publish-zora-btn"
-                >
-                    {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
-                </button>
+                <div className="publish-badge-btn-row">
+                  {hasEarnedBaseCompletionBadge && (
+                    <img src="/assets/images/badge.gif" alt="Completion Badge" className="mini-badge-cyberpunk" />
+                  )}
+                  <button 
+                      onClick={handlePublish} 
+                      disabled={isPublishing || !walletAddress} // Disable if publishing or wallet not connected
+                      className="publish-zora-btn"
+                  >
+                      {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
+                  </button>
+                </div>
             </div>
             {/* --- Display Publish Status --- */}
             {publishStatus && <p className="publish-status">{publishStatus}</p>}

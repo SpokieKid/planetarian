@@ -16,6 +16,7 @@ import { PLANET_MODES } from './utils/resourceMapping';
 import { EVENTS_TO_FINISH } from './constants/events';
 import ReturnToMainButton from './components/ReturnToMainButton';
 import BaseEventTriggerDialog from './components/BaseEventTriggerDialog';
+import BaseCompletionPopup from './components/BaseCompletionPopup';
 import './App.css';
 
 // --- Add Nounii System Prompt Logic --- 
@@ -79,6 +80,8 @@ function App() {
   const setBaseIntroCompleted = usePlanetStore(state => state.setBaseIntroCompleted);
   const hasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.hasSeenBaseEventTriggerDialogEver);
   const setHasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.setHasSeenBaseEventTriggerDialogEver);
+  const showBaseCompletionPopup = usePlanetStore(state => state.showBaseCompletionPopup);
+  const hasEarnedBaseCompletionBadge = usePlanetStore(state => state.hasEarnedBaseCompletionBadge);
   // --- End Zustand actions --- 
 
   // --- Add Privy Hook --- 
@@ -552,6 +555,10 @@ function App() {
           onYes={handleBaseEventDialogYes}
           onNo={handleBaseEventDialogNo}
         />
+      )}
+
+      {showBaseCompletionPopup && (
+        <BaseCompletionPopup />
       )}
 
       {showGuide && 

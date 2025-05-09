@@ -72,9 +72,10 @@ p {
 
 .action-buttons {
     display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 15px;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    margin-top: 10px;
 }
 
 /* Combined styling for debug buttons */
@@ -95,4 +96,31 @@ p {
 .debug-event-btn:hover,
 .debug-turn-btn:hover {
     background-color: #6a6aaf;
+}
+
+/* Publish徽章与按钮同排 */
+.publish-badge-btn-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.mini-badge-cyberpunk {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 60% 40%, #00eaff 60%, #003366 100%);
+    box-shadow:
+        0 0 0 3px #00eaff,
+        0 0 12px 4px #00eaff,
+        0 0 24px 8px #1a8cff44;
+    border: 2.5px solid #00eaff;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.publish-zora-btn {
+    /* 保持原有样式，可根据需要微调 */
 } 
