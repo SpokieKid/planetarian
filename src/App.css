@@ -53,6 +53,15 @@
   background-color: transparent; /* Allow body background to show through */
 }
 
+/* Styles for when the Base Planet view is active */
+.App.base-planet-active {
+  background-image: url('/assets/images/basebackground.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Optional: if you want it fixed */
+}
+
 .start-screen {
   background-color: rgba(16, 16, 24, 0.9); /* Dark background */
   padding: 40px 50px;

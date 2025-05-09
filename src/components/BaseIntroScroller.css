@@ -1,0 +1,125 @@
+.base-intro-scroller-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/assets/images/bluesky.jpg'); /* Your bluesky.jpg background */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column; /* Allow avatar and content to stack */
+    justify-content: center;
+    align-items: center;
+    z-index: 1999; /* High z-index to cover other game elements */
+    font-family: 'Press Start 2P', monospace; /* Pixel font */
+}
+
+.ai-assistant-avatar-container {
+    margin-bottom: 20px; /* Space between avatar and text box */
+    text-align: center; /* Center the avatar itself if it's inline-block */
+}
+
+.ai-assistant-avatar {
+    width: 80px; /* Adjust size as needed */
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #a9def9; /* Light blue border, similar to strong text */
+    box-shadow: 0 0 15px rgba(169, 222, 249, 0.7);
+}
+
+.base-intro-content {
+    background-color: rgba(0, 0, 0, 0.8); /* Slightly more opaque for better readability */
+    padding: 25px 30px; /* Adjusted padding */
+    border-radius: 10px;
+    border: 3px solid #50c878; /* Pixel-style border - adjust color */
+    color: #fff; /* White text */
+    max-width: 600px; /* Reduced max-width to approx 2/3 (was 800px) */
+    width: 70%;       /* Reduced width to approx 2/3 (was 80%) */
+    text-align: center; /* Center text within the content box */
+    box-shadow: 0 0 20px rgba(80, 200, 120, 0.5); /* Optional glow for the box */
+    display: flex; /* Use flex to manage internal layout */
+    flex-direction: column;
+    align-items: center; /* Center content like paragraph and nav */
+}
+
+.base-intro-paragraph {
+    min-height: 150px; /* Adjusted min-height */
+    margin-bottom: 20px;
+    line-height: 1.7;
+    font-size: 1em; /* Slightly smaller font for smaller box */
+    width: 100%; /* Ensure paragraph takes full width of the content box for centering */
+    text-align: center; /* Explicitly center text in paragraph */
+}
+
+.base-intro-paragraph strong {
+    color: #a9def9; /* Light blue for emphasized text, similar to start-screen */
+}
+
+.base-intro-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px; /* Adjusted margin */
+    width: 100%; /* Navigation takes full width of content box */
+}
+
+/* Reusing pixel-button style, ensure it's available globally or copy it here */
+/* If .pixel-button is not globally defined or needs overrides: */
+.pixel-button {
+  background-color: #9d4edd; /* A purple color (example from existing styles) */
+  border: 2px solid #000;
+  color: white;
+  padding: 10px 20px; /* Slightly smaller padding for smaller box context */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.9em; /* Slightly smaller font for buttons */
+  font-family: inherit; /* Inherit from .base-intro-scroller-container */
+  font-weight: bold;
+  cursor: pointer;
+  image-rendering: pixelated;
+  box-shadow: 3px 3px 0px #000;
+  border-radius: 0; /* Sharp corners */
+  transition: background-color 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pixel-button:hover {
+  background-color: #c77dff;
+}
+
+.pixel-button:active {
+  background-color: #7b2cbf;
+  box-shadow: 1px 1px 0px #000;
+  transform: translate(2px, 2px);
+}
+
+.prev-button {
+    /* Specific styles if needed, e.g., different color */
+    background-color: #fca311; /* Example: Orange */
+    color: #16213e;
+}
+
+.next-button {
+    /* Specific styles if needed */
+    background-color: #50c878; /* Example: Green */
+    color: black;
+}
+
+.finish-button {
+    background-color: #e94560; /* Example: Reddish */
+    color: white;
+    width: auto; /* Allow button to size to content, or set a specific width if preferred */
+    padding: 12px 25px; /* Restore padding for finish button if desired */
+    font-size: 1.1em; /* Restore font size for finish button */
+    /* If you want the finish button to be full width of the nav area: */
+    /* flex-grow: 1; text-align: center; */ 
+    /* If only finish button is present, center it */
+    margin: 0 auto; /* This will center it if it's the only button */
+}
+
+/* Adjust navigation when only one button (like FINISH or initial NEXT) is present to center it */
+.base-intro-navigation > .pixel-button:only-child {
+    margin-left: auto;
+    margin-right: auto;
+} 

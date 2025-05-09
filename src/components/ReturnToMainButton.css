@@ -1,0 +1,21 @@
+.return-to-main-button {
+    position: fixed;
+    bottom: 20px; /* Or any other position you prefer */
+    right: 20px;  /* Or any other position you prefer */
+    z-index: 1000; /* Ensure it's on top */
+    padding: 8px 12px;
+    background-color: #4a4e69; /* Muted grey-blue, adjust as needed */
+    /* Uses .pixel-button for base styling, can override here */
+}
+
+.return-to-main-button img {
+    width: 24px; /* Adjust icon size */
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.return-to-main-button span {
+    vertical-align: middle;
+    font-size: 0.9em;
+} 

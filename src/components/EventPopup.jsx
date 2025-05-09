@@ -18,9 +18,11 @@ const EventPopup = () => {
         return null; // Render nothing if there's no active event data (should be handled by App.jsx, but as safety)
     }
 
-    const isMultiPartNarrative = Array.isArray(activeEvent.narrative);
-    const currentNarrative = isMultiPartNarrative ? activeEvent.narrative[narrativeIndex] : activeEvent.narrative;
-    const isLastNarrativePage = isMultiPartNarrative && narrativeIndex === activeEvent.narrative.length - 1;
+    // Updated to use narrativePages from baseEvents structure
+    const narrativeSource = activeEvent.narrativePages || activeEvent.narrative; // Fallback to activeEvent.narrative if narrativePages is not present
+    const isMultiPartNarrative = Array.isArray(narrativeSource);
+    const currentNarrativePage = isMultiPartNarrative ? narrativeSource[narrativeIndex] : narrativeSource;
+    const isLastNarrativePage = isMultiPartNarrative && narrativeIndex === narrativeSource.length - 1;
 
     // Function to handle option selection
     const handleOptionClick = (option) => {
@@ -57,7 +59,7 @@ const EventPopup = () => {
                 {activeEvent.image && (
                     <div className="story-event-image-container">
                         <img 
-                            src={`/assets/events/${activeEvent.image}`} 
+                            src={activeEvent.image} 
                             alt={activeEvent.title} 
                             className="story-event-image"
                         />
@@ -67,7 +69,7 @@ const EventPopup = () => {
                 {/* --- Updated Narrative Section --- */}
                 {!showConflictAndOptions && (
                     <div className="story-event-narrative-paginated">
-                        <p>{currentNarrative}</p>
+                        <p>{currentNarrativePage}</p>
                         <div className="narrative-navigation">
                             {isMultiPartNarrative && narrativeIndex > 0 && (
                                 <button className="pixel-button narrative-nav-btn" onClick={handlePrev}>
@@ -109,9 +111,9 @@ const EventPopup = () => {
                                 
                                 return (
                                     <button key={option.id} onClick={() => handleOptionClick(option)}>
-                                        <span className="option-emoji">{emoji}</span> 
+                                        <span className="option-emoji">{option.emoji || emoji}</span>
                                         <span className="option-text-container">
-                                            <strong>{option.mainText}</strong>
+                                            <strong>{option.description_zh || option.mainText}</strong>
                                             {option.subText && <span className="option-subtext">{option.subText}</span>}
                                         </span>
                                     </button>

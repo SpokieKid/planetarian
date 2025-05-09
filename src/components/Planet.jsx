@@ -59,11 +59,22 @@ const Planet = () => {
     const mode = usePlanetStore(state => state.mode);
     const growthPoints = usePlanetStore(state => state.growthPoints);
     const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
+    const currentView = usePlanetStore(state => state.currentView);
+    const triggerSpecificEvent = usePlanetStore(state => state.triggerSpecificEvent);
+    const activeEvent = usePlanetStore(state => state.activeEvent); // To prevent multiple triggers
+    const createdAt = usePlanetStore(state => state.createdAt); // <-- Get createdAt
 
     // State to hold building data (positions)
     const [buildings, setBuildings] = useState([]);
     // Ref to track the previous event count
     const prevEventCountRef = useRef(resolvedEventCount);
+
+    // --- Effect to clear buildings on planet re-initialization (via createdAt or mode change) ---
+    useEffect(() => {
+        console.log("[Planet.jsx] Mode or createdAt changed, resetting buildings. New mode:", mode);
+        setBuildings([]);
+        prevEventCountRef.current = 0; 
+    }, [createdAt, mode]); // Depend on createdAt AND mode
 
     // --- Effect to add buildings when event count increases ---
     useEffect(() => {
@@ -120,9 +131,22 @@ const Planet = () => {
 
     // Placeholder for texture loading - replace with actual texture later
     // const texture = useLoader(THREE.TextureLoader, visualStyle.planetTextureKey);
+
+    // const handlePlanetClick = () => { // <-- Comment out or remove this handler
+    //     if (currentView === 'base_planet' && !activeEvent) {
+    //         console.log("Base planet clicked, triggering BASESTONE_01 event.");
+    //         triggerSpecificEvent('BASESTONE_01');
+    //     } else {
+    //         console.log("Planet clicked, but not triggering event. View:", currentView, "ActiveEvent:", activeEvent);
+    //     }
+    // };
     
     return (
-        <mesh ref={planetMeshRef} scale={planetScale}>
+        <mesh 
+            ref={planetMeshRef} 
+            scale={planetScale}
+            // onClick={handlePlanetClick} // <-- Comment out or remove click handler attachment
+        >
             <sphereGeometry args={[1, 32, 32]} />
             {/* Use MeshStandardMaterial for lighting and apply texture */}
             <meshStandardMaterial 
