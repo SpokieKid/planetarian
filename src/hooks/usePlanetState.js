@@ -402,7 +402,10 @@ const usePlanetStore = create(
                 }
                 
                 const newResolvedEventCount = state.resolvedEventCount + 1;
-                const resolvedEventKey = state.activeEvent.eventKey; // Get key before clearing activeEvent
+                const resolvedEventKey = state.activeEvent.eventKey; 
+                const nextEventKeyFromCurrent = state.activeEvent.nextEventKey; 
+                const eventEraUpdate = state.activeEvent.era; // Get era from event if defined
+                const eventTurnsUpdate = state.activeEvent.turns; // Get turns from event if defined
                 
                 let activateFlowEffect = false;
                 // IMPORTANT: Replace 'option1' with the actual ID or a distinguishing property 
@@ -414,22 +417,43 @@ const usePlanetStore = create(
                     activateFlowEffect = true;
                 }
 
-                set({
-                    activeEvent: null,
+                set(prevState => ({
+                    activeEvent: null, 
                     growthPoints: newGrowthPoints,
                     karma: newKarma,
                     narrativeLog: newNarrativeLog,
                     resolvedEventCount: newResolvedEventCount,
-                    triggeredEventKeys: resolvedEventKey ? [...state.triggeredEventKeys, resolvedEventKey] : state.triggeredEventKeys, 
-                    isEventPopupOpen: false, // Close popup after resolving
-                    hasPendingEvent: false, // Clear pending flag
-                    isFlowEffectActive: activateFlowEffect, // Set FlowEffect state
-                });
+                    triggeredEventKeys: resolvedEventKey ? [...prevState.triggeredEventKeys, resolvedEventKey] : prevState.triggeredEventKeys, 
+                    isEventPopupOpen: false, 
+                    hasPendingEvent: false, 
+                    isFlowEffectActive: activateFlowEffect,
+                    era: eventEraUpdate !== undefined ? eventEraUpdate : prevState.era, // Update era if defined in event
+                    turn: eventTurnsUpdate !== undefined ? eventTurnsUpdate : prevState.turn, // Update turn if defined in event
+                }));
 
-                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount });
-                get().savePlanetState(); // Save state after resolving
+                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount, era: get().era, turn: get().turn });
+                get().savePlanetState(); 
 
-                // If FlowEffect was activated, set a timeout to deactivate it
+                // After current event is resolved and state updated, check for next event in sequence
+                if (nextEventKeyFromCurrent && state.currentView === 'base_planet') {
+                    const nextEventToTrigger = baseEvents[nextEventKeyFromCurrent];
+                    if (nextEventToTrigger) {
+                        console.log(`Auto-triggering next event in sequence: ${nextEventKeyFromCurrent}`);
+                        // Use a brief timeout to allow UI to settle before showing the next event
+                        setTimeout(() => {
+                            set({
+                                activeEvent: { ...nextEventToTrigger, eventKey: nextEventKeyFromCurrent },
+                                isEventPopupOpen: true,
+                                isEventPopupMinimized: false,
+                                hasPendingEvent: false,
+                                narrativeLog: [...get().narrativeLog, `Event triggered: ${nextEventToTrigger.title || nextEventKeyFromCurrent}`],
+                            });
+                        }, 500); // 0.5 second delay
+                    } else {
+                        console.warn(`Next event key "${nextEventKeyFromCurrent}" not found in baseEvents.`);
+                    }
+                }
+
                 if (activateFlowEffect) {
                     setTimeout(() => {
                         set({ isFlowEffectActive: false });
