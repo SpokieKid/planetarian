@@ -65,6 +65,12 @@ function App() {
   const zustandSetCoinbaseAccount = usePlanetStore(state => state.setCoinbaseAccount);
   const zustandClearCoinbaseConnection = usePlanetStore(state => state.clearCoinbaseConnection);
 
+  // +++ Get additional state and action from Zustand +++
+  const currentView = usePlanetStore(state => state.currentView);
+  const activeEvent = usePlanetStore(state => state.activeEvent);
+  const triggerNextEvent = usePlanetStore(state => state.triggerNextEvent);
+  // +++ End Get additional state and action from Zustand +++
+
   // Local UI state
   const [isCoinbaseConnecting, setIsCoinbaseConnecting] = useState(false);
   const [coinbaseUiError, setCoinbaseUiError] = useState(null); // For UI feedback
@@ -73,6 +79,10 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  // +++ Add state for video and guide screens +++
+  const [showVideoScreen, setShowVideoScreen] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  // +++ End Add state for video and guide screens +++
 
   // +++ Effect to Initialize Coinbase Wallet SDK +++
   useEffect(() => {
@@ -233,6 +243,33 @@ function App() {
         <button onClick={() => { setShowIntro(true); setGameStarted(false); initializePlanet(null); /* Reset planet */ }}>Play Again?</button>
      </div>
   );
+
+  // --- Automatically trigger first event after 15 seconds of main game view ---
+  useEffect(() => {
+    let eventTimer;
+    // Conditions to trigger the timer:
+    // 1. Not in video, intro, or guide
+    // 2. Game is not finished
+    // 3. No event is currently active
+    // 4. Only on main_planet view
+    if (currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent) {
+      console.log('[App Effect] Main game view active, starting 15s timer for first event...');
+      eventTimer = setTimeout(() => {
+        console.log('[App Effect] 15s timer elapsed, attempting to trigger next event.');
+        triggerNextEvent();
+      }, 15000); // 15 seconds
+    }
+
+    // Cleanup function to clear the timer if conditions change or component unmounts
+    return () => {
+      if (eventTimer) {
+        console.log('[App Effect] Clearing event timer.');
+        clearTimeout(eventTimer);
+      }
+    };
+  // Dependencies: include all states that define the main game view and active event status
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent]);
+  // --- End Auto Event Trigger ---
 
   return (
     <div className="App">

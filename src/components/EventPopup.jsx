@@ -6,6 +6,7 @@ const EventPopup = () => {
     const activeEvent = usePlanetStore(state => state.activeEvent);
     const resolveEvent = usePlanetStore(state => state.resolveEvent);
     const minimizeEventPopup = usePlanetStore(state => state.minimizeEventPopup); // Import minimize action
+    const isEventPopupOpen = usePlanetStore(state => state.isEventPopupOpen);
     const [narrativeIndex, setNarrativeIndex] = useState(0);
     const [showConflictAndOptions, setShowConflictAndOptions] = useState(false);
 
@@ -14,8 +15,9 @@ const EventPopup = () => {
         setShowConflictAndOptions(false);
     }, [activeEvent]);
 
-    if (!activeEvent) {
-        return null; // Render nothing if there's no active event data (should be handled by App.jsx, but as safety)
+    if (!activeEvent || !isEventPopupOpen) {
+        console.log("[EventPopup] Not rendering: activeEvent", !!activeEvent, "isEventPopupOpen", isEventPopupOpen);
+        return null;
     }
 
     // Updated to use narrativePages from baseEvents structure
