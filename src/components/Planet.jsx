@@ -6,14 +6,23 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import usePlanetStore from '../hooks/usePlanetState';
 import { getVisualStyle } from '../utils/resourceMapping'; // Use for colors/textures
 
+// Array of available models
+const AVAILABLE_MODELS = [
+    { name: 'tree', mtl: '/assets/models/tree.mtl', obj: '/assets/models/tree.obj', scale: [0.0002, 0.0002, 0.0002] },
+    { name: 'robot', mtl: '/assets/models/robot.mtl', obj: '/assets/models/robot.obj', scale: [0.0002, 0.0002, 0.0002] },
+    { name: 'room', mtl: '/assets/models/room.mtl', obj: '/assets/models/room.obj', scale: [0.01, 0.01, 0.01] },
+    // Add more models here, e.g.:
+    // { name: 'rock', mtl: '/assets/models/rock.mtl', obj: '/assets/models/rock.obj', scale: [0.01, 0.01, 0.01] },
+];
+
 // Updated Building Component to load the Tree model
-const Building = ({ position }) => {
+const Building = ({ position, modelInfo }) => {
     const buildingRef = useRef();
 
     // Load materials first
-    const materials = useLoader(MTLLoader, '/assets/models/tree.mtl');
+    const materials = useLoader(MTLLoader, modelInfo.mtl);
     // Load the obj model, applying the loaded materials
-    const obj = useLoader(OBJLoader, '/assets/models/tree.obj', loader => {
+    const obj = useLoader(OBJLoader, modelInfo.obj, loader => {
       materials.preload();
       loader.setMaterials(materials);
     });
@@ -34,11 +43,9 @@ const Building = ({ position }) => {
             buildingRef.current.lookAt(0, 0, 0); // Orient towards planet center
             buildingRef.current.rotateX(Math.PI / 2); // Rotate base to surface
             
-            // !!! IMPORTANT: Adjust scale as needed !!!
-            // Start with a small scale and increase until the tree size looks right.
-            buildingRef.current.scale.set(0.1, 0.05, 0.05); // Adjust this value!
+            buildingRef.current.scale.set(...modelInfo.scale);
         }
-    }, [obj]); // Re-run effect when the obj model is loaded
+    }, [obj, modelInfo.scale]); // Re-run effect when the obj model is loaded or scale changes
 
     // Render the loaded model using <primitive>
     // Use Suspense to handle the asynchronous loading
@@ -59,9 +66,9 @@ const Planet = () => {
     const mode = usePlanetStore(state => state.mode);
     const growthPoints = usePlanetStore(state => state.growthPoints);
     const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
-    const currentView = usePlanetStore(state => state.currentView);
-    const triggerSpecificEvent = usePlanetStore(state => state.triggerSpecificEvent);
-    const activeEvent = usePlanetStore(state => state.activeEvent); // To prevent multiple triggers
+    // const currentView = usePlanetStore(state => state.currentView);
+    // const triggerSpecificEvent = usePlanetStore(state => state.triggerSpecificEvent);
+    // const activeEvent = usePlanetStore(state => state.activeEvent); // To prevent multiple triggers
     const createdAt = usePlanetStore(state => state.createdAt); // <-- Get createdAt
 
     // State to hold building data (positions)
@@ -82,26 +89,30 @@ const Planet = () => {
         if (resolvedEventCount > prevEventCountRef.current) {
             console.log("Adding *two* trees (buildings) due to event resolution..."); // Updated log
             
-            const newTrees = [];
-            for (let i = 0; i < 2; i++) { // Loop to add two trees
+            const newObjects = [];
+            for (let i = 0; i < 2; i++) { // Loop to add two objects
                 const phi = Math.acos(-1 + (2 * Math.random())); // Inclination (0..pi)
                 const theta = Math.random() * Math.PI * 2; // Azimuth (0..2pi)
 
-                const position = new THREE.Vector3();
+                const positionVec = new THREE.Vector3();
                 // Adjust radius slightly based on scale to sit on surface properly
                 const planetScale = 1 + usePlanetStore.getState().growthPoints * 0.005;
-                position.setFromSphericalCoords(planetScale * 1.01, phi, theta); // Slightly above surface
+                positionVec.setFromSphericalCoords(planetScale * 1.01, phi, theta); // Slightly above surface
                 
+                // Randomly select a model
+                const randomModel = AVAILABLE_MODELS[Math.floor(Math.random() * AVAILABLE_MODELS.length)];
+
                 // Add new building data to state with a slightly modified ID for uniqueness if adding multiple
-                newTrees.push({
-                    id: `${resolvedEventCount}-${i}`, // Ensure unique key for React
-                    position: [position.x, position.y, position.z]
+                newObjects.push({
+                    id: `${resolvedEventCount}-${i}-${randomModel.name}`,
+                    position: [positionVec.x, positionVec.y, positionVec.z],
+                    modelInfo: randomModel // Store the selected model info
                 });
             }
             
             setBuildings(prev => [
                  ...prev,
-                 ...newTrees // Add both new trees to the array
+                 ...newObjects // Add both new objects to the array
             ]);
         }
         // Update the ref for the next comparison
@@ -156,7 +167,7 @@ const Planet = () => {
             />
             {/* Render buildings (now trees) as children */} 
             {buildings.map(building => (
-                 <Building key={building.id} position={building.position} />
+                 <Building key={building.id} position={building.position} modelInfo={building.modelInfo} />
              ))}
             {/* TODO: Add atmosphere later */}
         </mesh>
