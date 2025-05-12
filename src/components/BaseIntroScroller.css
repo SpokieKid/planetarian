@@ -67,7 +67,7 @@
 /* Reusing pixel-button style, ensure it's available globally or copy it here */
 /* If .pixel-button is not globally defined or needs overrides: */
 .pixel-button {
-  background-color: #9d4edd; /* A purple color (example from existing styles) */
+  background-color: #3B82F6; /* A purple color (example from existing styles) */
   border: 2px solid #000;
   color: white;
   padding: 10px 20px; /* Slightly smaller padding for smaller box context */
@@ -85,11 +85,11 @@
 }
 
 .pixel-button:hover {
-  background-color: #c77dff;
+  background-color: #3B82F6;
 }
 
 .pixel-button:active {
-  background-color: #7b2cbf;
+  background-color: #3B82F6;
   box-shadow: 1px 1px 0px #000;
   transform: translate(2px, 2px);
 }

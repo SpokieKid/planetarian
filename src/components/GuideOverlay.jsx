@@ -78,8 +78,10 @@ const GuideOverlay = ({ login, authenticated, onClose }) => {
                     </div>
                     <div className="guide-text-box">
                         <h2>{t('请选择语言 Please select language')}</h2>
-                        <button className="language-select-btn pixel-button" onClick={() => handleLanguageSelect('en')}>English</button>
-                        <button className="language-select-btn pixel-button" onClick={() => handleLanguageSelect('zh')}>中文</button>
+                        <div className="language-buttons-container">
+                            <button className="language-select-btn pixel-button" onClick={() => handleLanguageSelect('en')}>English</button>
+                            <button className="language-select-btn pixel-button" onClick={() => handleLanguageSelect('zh')}>中文</button>
+                        </div>
                     </div>
                 </div>
             </div>
