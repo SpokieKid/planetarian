@@ -421,8 +421,6 @@ const usePlanetStore = create(
                 const newResolvedEventCount = state.resolvedEventCount + 1;
                 const resolvedEventKey = state.activeEvent.eventKey; 
                 const nextEventKeyFromCurrent = state.activeEvent.nextEventKey; 
-                const eventEraUpdate = state.activeEvent.era; // Get era from event if defined
-                const eventTurnsUpdate = state.activeEvent.turns; // Get turns from event if defined
                 
                 let activateFlowEffect = false;
                 // IMPORTANT: Replace 'option1' with the actual ID or a distinguishing property 
@@ -444,8 +442,6 @@ const usePlanetStore = create(
                     isEventPopupOpen: false, 
                     hasPendingEvent: false, 
                     isFlowEffectActive: activateFlowEffect,
-                    era: eventEraUpdate !== undefined ? eventEraUpdate : prevState.era, // Update era if defined in event
-                    turn: eventTurnsUpdate !== undefined ? eventTurnsUpdate : prevState.turn, // Update turn if defined in event
                 }));
 
                 console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount, era: get().era, turn: get().turn });
