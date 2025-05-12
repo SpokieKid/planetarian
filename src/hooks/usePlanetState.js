@@ -123,24 +123,26 @@ const usePlanetStore = create(
 
             setHasSeenBaseEventTriggerDialogEver: (seen) => set({ hasSeenBaseEventTriggerDialogEver: seen }), // <-- Action for new state
 
-            earnBaseCompletionBadge: () => set({
-                hasEarnedBaseCompletionBadge: true,
-                showBaseCompletionPopup: true,
-                narrativeLog: [...get().narrativeLog, "[历史模拟] 恭喜！已完成基地历史模拟并获得成就徽章！"], // Add log entry
-            }),
+            earnBaseCompletionBadge: () => {
+                set((state) => ({
+                    hasEarnedBaseCompletionBadge: true,
+                    showBaseCompletionPopup: true,
+                    narrativeLog: [...state.narrativeLog, "[历史模拟] 恭喜！已完成基地历史模拟并获得成就徽章！"], // Add log entry
+                }));
+                get().savePlanetState(); // Immediately save the updated state
+            },
 
             closeBaseCompletionPopup: () => set({ showBaseCompletionPopup: false }),
 
             // --- Action to reset the game state --- 
             resetPlanetState: () => {
                 const now = Date.now();
-                const newPlanetName = `Planet-${Math.random().toString(36).substring(2, 7)}`;
                 set({
                     ...initialGameState, // Reset to initial values defined above
-                    planetName: newPlanetName, // Give a new random name
+                    planetName: `Planet-${Math.random().toString(36).substring(2, 7)}`, // Always give a new random name on full reset
                     createdAt: now,
                     lastTickTime: now,
-                    narrativeLog: [`Planet state reset (${newPlanetName}). Welcome back.`], // Add an initial log entry
+                    narrativeLog: [`Planet state reset. Welcome back.`], // Add an initial log entry (simplified name for reset log)
                     isEventPopupOpen: false, 
                     hasPendingEvent: false, 
                     isFlowEffectActive: false, 
@@ -149,10 +151,9 @@ const usePlanetStore = create(
                     hasSeenBaseEventTriggerDialogEver: false, // Also reset this
                     hasEarnedBaseCompletionBadge: false, // <-- Reset badge earned
                     showBaseCompletionPopup: false, // <-- Reset badge popup show state
-                });
-                console.log("Zustand planet state has been reset.");
-                // Optionally: Trigger save immediately after reset?
-                // get().savePlanetState(); 
+                 });
+                 console.log("Zustand planet state has been reset to initial.");
+                 // Note: This reset does NOT auto-save. Saving happens on load or subsequent actions.
             },
 
             // --- Rewritten loadPlanetState using Supabase --- 
@@ -167,7 +168,7 @@ const usePlanetStore = create(
                 try {
                     const { data, error } = await supabase
                         .from('planets')
-                        .select('karma, narrative_log, resolved_event_count, is_game_finished, game_mode, era, turn, growth_points, planet_name, triggered_event_keys') // Load more complete state
+                        .select('karma, narrative_log, resolved_event_count, is_game_finished, game_mode, era, turn, growth_points, planet_name, triggered_event_keys, earned_base_badge') // Load more complete state including badge
                         .eq('wallet_address', walletAddress)
                         .maybeSingle(); // Returns single object or null
 
@@ -190,16 +191,26 @@ const usePlanetStore = create(
                             era: data.era ?? initialGameState.era,
                             turn: data.turn ?? initialGameState.turn,
                             growthPoints: data.growth_points ?? initialGameState.growthPoints,
-                            planetName: data.planet_name ?? `Planet-${Math.random().toString(36).substring(2, 7)}`,
+                            planetName: data.planet_name ?? initialGameState.planetName, // Load name from DB, default to initial if null
                             triggeredEventKeys: data.triggered_event_keys ?? initialGameState.triggeredEventKeys,
+                            hasEarnedBaseCompletionBadge: data.earned_base_badge ?? initialGameState.hasEarnedBaseCompletionBadge, // Load badge state
                             // currentView will be reset or handled by navigation logic, not loaded from DB for now
                         });
                     } else {
-                        console.log("No saved state found in Supabase for this address. Resetting to defaults and saving initial state.");
-                         // Reset to initial state if no data found
-                        get().resetPlanetState(); 
-                        // Immediately save the initial state to Supabase
-                        get().savePlanetState(); 
+                        console.log("No saved state found in Supabase for this address. Generating new planet and saving initial state.");
+                        // No data found, initialize with a NEW random name and initial state, then save.
+                        const newPlanetName = `Planet-${Math.random().toString(36).substring(2, 7)}`;
+                        const now = Date.now();
+                        set({
+                            ...initialGameState, // Start with initial state defaults
+                            planetName: newPlanetName, // Assign the new random name
+                            walletAddress: walletAddress, // Ensure wallet address is set in state
+                            createdAt: now,
+                            lastTickTime: now,
+                            narrativeLog: [`Planet ${newPlanetName} initialized for ${walletAddress.substring(0, 6)}...`], // Log entry
+                        });
+                        // Immediately save this newly initialized state
+                        get().savePlanetState();
                     }
                 } catch (error) {
                      console.error("Caught error during state loading, resetting state:", error);
@@ -212,7 +223,7 @@ const usePlanetStore = create(
             // --- Rewritten savePlanetState using Supabase --- 
             savePlanetState: async () => {
                  // Include is_game_finished and resolved_event_count in save
-                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, game_mode, era, turn, growthPoints, planetName, triggeredEventKeys } = get(); 
+                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, game_mode, era, turn, growthPoints, planetName, triggeredEventKeys, hasEarnedBaseCompletionBadge } = get(); 
                  if (!walletAddress) {
                      console.warn("Cannot save state: No wallet address set.");
                      return;
@@ -236,6 +247,7 @@ const usePlanetStore = create(
                              growth_points: growthPoints,
                              planet_name: planetName,
                              triggered_event_keys: triggeredEventKeys,
+                             earned_base_badge: hasEarnedBaseCompletionBadge, // Save badge state
                              // last_updated_at is handled by DB trigger/default
                          })
                          .select(); // Optionally select the result

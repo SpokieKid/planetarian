@@ -19,6 +19,7 @@ import BaseEventTriggerDialog from './components/BaseEventTriggerDialog';
 import BaseCompletionPopup from './components/BaseCompletionPopup';
 import { createCoinbaseWalletSDK } from '@coinbase/wallet-sdk';
 import './App.css';
+import { useTranslation } from 'react-i18next';
 
 // --- Add Nounii System Prompt Logic ---
 const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的数字生命体。
@@ -66,6 +67,8 @@ const COINBASE_CHAIN_ID = 84532; // Base Sepolia Chain ID
 // +++ End Configuration +++
 
 function App() {
+  const { t } = useTranslation();
+
   // Zustand State and Actions (Modified for Coinbase SDK)
   const {
     initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
@@ -133,7 +136,7 @@ function App() {
     // Check if RPC URL is placeholder
     if (COINBASE_RPC_URL.includes('YOUR_ALCHEMY_API_KEY')) {
         console.warn("Coinbase Wallet SDK Initialization skipped: VITE_BASE_SEPOLIA_RPC_URL is not set in .env file. Please add it.");
-        setCoinbaseUiError("Configuration Error: RPC URL is missing. Set VITE_BASE_SEPOLIA_RPC_URL in your .env file.");
+        setCoinbaseUiError(t('configurationErrorRPCLinkMissing'));
         setIsSdkInitialized(true); // Mark as 'done' even if failed, to avoid blocking UI indefinitely
         return;
     }
@@ -171,7 +174,6 @@ function App() {
     return () => {
         didCancel = true;
     };
-    // Ensure zustandSetCoinbaseProvider is stable or add it if needed, but typically setters are stable.
   }, [zustandSetCoinbaseProvider]);
 
   // --- Load User State using Coinbase Account (from Zustand) ---
@@ -221,7 +223,7 @@ function App() {
   // Check for game end condition
   useEffect(() => {
       if (!isGameFinished && resolvedEventCount >= EVENTS_TO_FINISH && currentView === 'main_planet') {
-          finishGame();
+          // finishGame(); // Commented out to prevent game ending when events are finished
       }
   }, [resolvedEventCount, isGameFinished, finishGame, currentView]);
 
@@ -240,7 +242,7 @@ function App() {
   // --- Coinbase Connect Function ---
   const connectCoinbaseWallet = async () => {
     if (!coinbaseProvider) {
-        setCoinbaseUiError("Coinbase Provider not available. SDK might be initializing or failed.");
+        setCoinbaseUiError(t('configurationErrorRPCLinkMissing')); // Reuse key
         console.error("Connect attempt failed: Provider not available.");
         return;
     }
@@ -255,16 +257,19 @@ function App() {
             // setWalletAddress(accounts[0]); // Ensure walletAddress is also updated if needed elsewhere
         } else {
              console.warn("No accounts returned from Coinbase Wallet.");
-             setCoinbaseUiError("Connection successful, but no accounts returned.");
+             setCoinbaseUiError(t('connectionSuccessfulNoAccounts'));
              zustandClearCoinbaseConnection(); // Clear state if no account
         }
     } catch (error) {
         console.error('Failed to connect Coinbase wallet:', error);
-        let errorMessage = 'Failed to connect Coinbase Wallet.';
+        let errorMessage = t('connectionFailedGeneric');
         if (error.code === 4001) { // Standard EIP-1193 user rejection code
-           errorMessage = 'Connection request rejected by user.';
+           errorMessage = t('connectionFailedUserRejected');
         } else if (error.message) {
-            errorMessage = error.message;
+            // Keep specific error message if available, but can prepend generic part
+            // errorMessage = `${t('connectionFailedGeneric')} ${error.message}`; // Option 1: Prepend
+            // errorMessage = error.message; // Option 2: Use only error message
+            // For simplicity, let's just use the generic ones or specific known codes
         }
         setCoinbaseUiError(errorMessage);
         zustandClearCoinbaseConnection(); // Clear state on error
@@ -308,7 +313,7 @@ function App() {
   };
   const handleBaseEventDialogNo = () => {
     setShowBaseEventTriggerDialog(false);
-    const newLog = [...narrativeLog, '[Base Simulation] User chose not to start the historical simulation at this time.'];
+    const newLog = [...narrativeLog, t('baseSimulationUserChoseNo')];
     usePlanetStore.setState({ narrativeLog: newLog });
     console.log("User chose 'No' for base event trigger.");
   };
@@ -356,19 +361,6 @@ function App() {
     };
   }, [currentView, isGameFinished, hasBaseIntroBeenCompleted, hasSeenBaseEventTriggerDialogEver, showBaseEventTriggerDialog, setHasSeenBaseEventTriggerDialogEver]);
 
-  // Ending Screen Component
-  const EndingScreen = () => (
-     <div className="ending-screen">
-        <h1>Game Over!</h1>
-        <p>Your planet evolution is complete.</p>
-        <button className="pixel-button" onClick={() => {
-            disconnectCoinbaseWallet(); // Use disconnect to reset state
-            // Additional reset logic if disconnect doesn't cover everything
-            // resetPlanetState(); // Might be called in disconnect
-        }}>Play Again?</button>
-     </div>
-  );
-
   // Main Content Rendering Logic (Adjusted for new auth state)
   let mainContent = null;
   if (currentView === 'base_intro') {
@@ -378,11 +370,9 @@ function App() {
   } else if (showIntro && currentView === 'main_planet') {
     // Pass connect function and status to IntroScroller if it needs them
     mainContent = <IntroScroller onFinished={handleIntroFinished} onTypingFinished={handleIntroTypingFinished} />;
-  } else if (isGameFinished) {
-    mainContent = <EndingScreen />;
   } else if (!coinbaseAccount && isSdkInitialized && !showIntro && !showVideoScreen && currentView !== 'base_planet') {
       // If SDK is ready but no account connected (and past intros), show prompt to connect
-      mainContent = <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>Please connect your Coinbase Wallet to continue.</div>;
+      mainContent = <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>{t('pleaseConnectWallet')}</div>;
   } else if (coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet')) {
     // Only render game content if connected and on a planet view
     mainContent = (
@@ -412,17 +402,17 @@ function App() {
 
       {/* --- Coinbase Wallet Auth Controls --- */}
       <div className="auth-controls">
-          {!isSdkInitialized && <div className="loading-indicator">Initializing Wallet SDK...</div>}
+          {!isSdkInitialized && <div className="loading-indicator">{t('initializingWalletSDK')}</div>}
           {isSdkInitialized && coinbaseAccount && (
               <>
                 {/* Shorten displayed address */}
-                <span>Connected: {`${coinbaseAccount.substring(0, 6)}...${coinbaseAccount.substring(coinbaseAccount.length - 4)}`}</span>
-                <button onClick={disconnectCoinbaseWallet}>Disconnect</button>
+                <span>{t('connected')} {`${coinbaseAccount.substring(0, 6)}...${coinbaseAccount.substring(coinbaseAccount.length - 4)}`}</span>
+                <button onClick={disconnectCoinbaseWallet}>{t('disconnect')}</button>
               </>
           )}
           {isSdkInitialized && !coinbaseAccount && (
               <button onClick={connectCoinbaseWallet} disabled={isCoinbaseConnecting || !coinbaseProvider}>
-                  {isCoinbaseConnecting ? 'Connecting...' : 'Connect Wallet'}
+                  {isCoinbaseConnecting ? t('connecting') : t('connectWallet')}
               </button>
           )}
            {/* Display UI Error */}
@@ -454,12 +444,12 @@ function App() {
         />}
 
       {/* ActionIcon area (Existing, but condition on coinbaseAccount?) */}
-      {/* Render only when wallet connected, game active */}
-      {coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet') && !isGameFinished && !showIntro && !showVideoScreen && (
+      {/* Render only when wallet connected, game active, intro/video finished */}
+      {coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && (
          <div className="action-icon-area">
             <ActionIcon onClick={handleOpenDialog} />
-            <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title="Planet Info">
-              <p>Additional planet information or actions.</p>
+            <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title={t('planetInfoTitle')}>
+              <p>{t('planetInfoDescription')}</p>
             </DialogBox>
          </div>
       )}
