@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 import PlanetCanvas from './components/PlanetCanvas';
 import ResourcePanel from './components/ResourcePanel';
 import EventPopup from './components/EventPopup';
@@ -16,10 +17,9 @@ import { EVENTS_TO_FINISH } from './constants/events';
 import ReturnToMainButton from './components/ReturnToMainButton';
 import BaseEventTriggerDialog from './components/BaseEventTriggerDialog';
 import BaseCompletionPopup from './components/BaseCompletionPopup';
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
 import './App.css';
 
-// --- Add Nounii System Prompt Logic ---
+// --- Add Nounii System Prompt Logic --- 
 const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的数字生命体。
 
 你的诞生源于一次失败又浪漫的试验 —— Project Planetarian：一个试图模拟不同社会模式的链上文明实验。在这个实验中，三种模式不断冲突演化：
@@ -66,6 +66,7 @@ function App() {
   const resetPlanetState = usePlanetStore(state => state.resetPlanetState);
   const triggerNextEvent = usePlanetStore(state => state.triggerNextEvent);
   const activeEvent = usePlanetStore(state => state.activeEvent);
+  const isEventPopupMinimized = usePlanetStore(state => state.isEventPopupMinimized);
   const isEventPopupOpen = usePlanetStore(state => state.isEventPopupOpen);
   // --- Add Zustand actions for backend interaction --- 
   const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
@@ -80,19 +81,22 @@ function App() {
   const hasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.hasSeenBaseEventTriggerDialogEver);
   const setHasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.setHasSeenBaseEventTriggerDialogEver);
   const showBaseCompletionPopup = usePlanetStore(state => state.showBaseCompletionPopup);
+  const hasEarnedBaseCompletionBadge = usePlanetStore(state => state.hasEarnedBaseCompletionBadge);
   // --- End Zustand actions --- 
 
-  // --- Coinbase MiniKit Hook --- 
+  // --- Add Privy Hook --- 
   const {
-    address,
-    isConnected,
-    connectWallet,
-    disconnectWallet,
-  } = useMiniKit();
-  // --- End Coinbase MiniKit Hook ---
+    ready,
+    authenticated,
+    user,
+    login,
+    logout,
+  } = usePrivy();
+  // --- End Privy Hook --- 
 
   const [showIntro, setShowIntro] = useState(true);
   const [showVideoScreen, setShowVideoScreen] = useState(true);
+  const [introTypingFinished, setIntroTypingFinished] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
@@ -103,26 +107,24 @@ function App() {
 
   // --- Updated useEffect Hook to Load User State & Handle Post-Login Guide Close --- 
   useEffect(() => {
-      // Replace with Coinbase Wallet connection logic
-      console.log('[Auth Effect] Running. States:', { isConnected, address, showGuide }); // Log entry
-      if (isConnected && address) {
-          console.log("Wallet connected, calling loadPlanetState for:", address);
-          setWalletAddress(address); // Set address in Zustand
-          loadPlanetState(address); // Load state using the connected address
+      console.log('[Auth Effect] Running. States:', { ready, authenticated, showGuide }); // Log entry
+      if (ready && authenticated && user?.wallet?.address) {
+          const userAddress = user.wallet.address;
+          console.log("User authenticated, calling loadPlanetState for:", userAddress);
+          setWalletAddress(userAddress);
+          loadPlanetState(userAddress);
           
           // If user becomes authenticated WHILE the guide is showing, close the guide.
           if (showGuide) {
-              console.log('[Auth Effect] Wallet connected AND guide showing. Closing guide...'); // Log decision
+              console.log('[Auth Effect] User authenticated AND guide showing. Closing guide...'); // Log decision
               setShowGuide(false);
           }
           
-      } else if (!isConnected) {
-          console.log('[Auth Effect] Wallet not connected.');
-          // Optionally reset state if wallet disconnects during gameplay
-          // resetPlanetState(); 
+      } else if (ready && !authenticated) {
+          console.log('[Auth Effect] User not authenticated or not ready.');
       }
-  // Update dependencies to include MiniKit state
-  }, [isConnected, address, setWalletAddress, loadPlanetState, showGuide]);
+  // Add showGuide to dependency array to correctly handle the closing logic
+  }, [ready, authenticated, user?.wallet?.address, setWalletAddress, loadPlanetState, showGuide]);
   // --- End Updated useEffect Hook --- 
 
   // Game loop
@@ -259,7 +261,7 @@ function App() {
       pauseAudio(doubleMusicAudio);
       pauseAudio(baseMusic);
     };
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished]);
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, ready]);
 
   // --- Handler for Start Button Click (remains simple) ---
   const handleVideoScreenFinish = () => {
@@ -268,6 +270,7 @@ function App() {
 
   // --- Handler for when IntroScroller finishes TYPING ---
   const handleIntroTypingFinished = () => {
+    setIntroTypingFinished(true);
     setShowGuide(true); // Show guide immediately when typing finishes
     console.log("Intro typing finished, showing guide and attempting to play music.");
   };
@@ -276,11 +279,12 @@ function App() {
   const handleIntroFinished = () => {
       // console.log('[handleIntroFinished] States:', { privyReady: ready, privyAuthenticated: authenticated, showGuideState: showGuide });
       setShowIntro(false);
+      setIntroTypingFinished(false);
       console.log("Intro sequence (incl. delay) finished.");
       // shortIntroMusic logic is REMOVED
   };
 
-  // --- Re-introduce handleGuideClose ---
+  // --- Re-introduce handleGuideClose --- 
   const handleGuideClose = () => {
     setShowGuide(false);
     console.log("Guide closed manually or because user was already logged in.");
@@ -297,22 +301,25 @@ function App() {
   };
   // --- End Dialog Handlers ---
 
-  // --- Add Disconnect Handler --- 
-  const handleDisconnect = async () => {
-    console.log("Handling disconnect...");
+  // --- Add Logout Handler to Reset State --- 
+  const handleLogout = async () => {
+    console.log("Handling logout...");
     try {
-      await disconnectWallet(); // Call MiniKit disconnect
-      console.log("Wallet disconnected successfully. Resetting state.");
+      await logout(); // Call Privy logout
+      console.log("Privy logout successful. Resetting state.");
       resetPlanetState();
       // Reset UI state to initial values
       setShowVideoScreen(true);
       setShowIntro(true);
       setShowGuide(false);
+      setIntroTypingFinished(false);
+      // Optionally reset game state in Zustand if needed, e.g.:
+      // resetPlanetState(); 
     } catch (error) {
-      console.error("Error during disconnect:", error);
+      console.error("Error during logout:", error);
     }
   };
-  // --- End Disconnect Handler ---
+  // --- End Logout Handler ---
 
   // --- Automatically trigger first event after 15 seconds of main game view ---
   useEffect(() => {
@@ -445,7 +452,7 @@ function App() {
       pauseAudio(doubleMusicAudio);
       pauseAudio(baseMusic);
     };
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished]);
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, ready]);
 
   const handleBaseIntroFinish = () => {
     console.log("Base Intro Finished. Initializing Base Planet view and mode for the first time...");
@@ -470,7 +477,7 @@ function App() {
         <PlanetCanvas /> {/* This will need to adapt to currentView/currentPlanetMode */}
         <ResourcePanel /> {/* This might need to adapt or be hidden for Base planet */}
         <StoryLog /> {/* This might need to adapt or be hidden for Base planet */}
-        {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />} 
+        {(currentView === 'main_planet' || currentView === 'base_planet') && isEventPopupOpen && activeEvent && <EventPopup />} 
         {currentView === 'main_planet' && isFlowEffectActive && <FlowEffect isActive={true} />}
         {currentView === 'main_planet' && <WormholeIcon />} {/* Show wormhole only on main planet for now */}
         {currentView === 'base_planet' && <ReturnToMainButton />} {/* <<< Render ReturnToMainButton for base_planet view */}
@@ -521,21 +528,20 @@ function App() {
       {/* shortIntroMusicRef audio element is REMOVED */}
 
       {/* Log Privy ready state on every render for debugging */}
-      {console.log('[App Render] States:', { currentView, /*ready, authenticated,*/ showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })}
+      {console.log('[App Render] States:', { currentView, ready, authenticated, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })}
 
-      {/* {!ready && currentView !== 'base_intro' && <div className="loading-indicator">Loading Privy...</div>} */} 
-      {/* TODO: Add loading indicator for Coinbase Wallet connection if needed */} 
+      {!ready && currentView !== 'base_intro' && <div className="loading-indicator">Loading Privy...</div>}
       
       {/* --- Auth Controls: Show ONLY during active gameplay (not during intros/guides/ending) --- */}
-      {(currentView === 'main_planet' || currentView === 'base_planet') && !isGameFinished && (
+      {ready && (currentView === 'main_planet' || currentView === 'base_planet') && !isGameFinished && (
         <div className="auth-controls">
-          {isConnected && address ? (
+          {authenticated ? (
             <>
-              <span>Connected: {address}</span>
-              <button onClick={handleDisconnect}>Disconnect</button>
+              <span>Connected: {user?.wallet?.address}</span>
+              <button onClick={handleLogout}>Logout</button>
             </>
           ) : (
-            <button onClick={connectWallet}>Connect Wallet</button>
+            <button onClick={login}>Connect Wallet</button>
           )}
         </div>
       )}
@@ -557,9 +563,8 @@ function App() {
 
       {showGuide && 
         <GuideOverlay 
-          // Pass Coinbase Wallet connect function and status
-          login={connectWallet}
-          authenticated={isConnected} // Use MiniKit's isConnected
+          login={login} 
+          authenticated={authenticated} 
           onClose={handleGuideClose} 
         />}
 
