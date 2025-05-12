@@ -85,12 +85,17 @@ const usePlanetStore = create(
             // --- Core State --- Spread initial state here for defaults ---
             ...initialGameState, 
             // --- Overwrite specific initial values if needed ---
+            coinbaseProvider: null, // New state for Coinbase Provider
+            coinbaseAccount: null, // New state for Coinbase Account
             walletAddress: null, 
             createdAt: Date.now(),
             lastTickTime: Date.now(),
 
             // --- Actions ---
             setWalletAddress: (address) => set({ walletAddress: address }),
+            setCoinbaseProvider: (provider) => set({ coinbaseProvider: provider }),
+            setCoinbaseAccount: (account) => set({ coinbaseAccount: account, walletAddress: account }), // Update walletAddress here
+            clearCoinbaseConnection: () => set({ coinbaseProvider: null, coinbaseAccount: null, walletAddress: null }), // Action to clear connection
             setCurrentView: (view) => set(state => {
                 console.log(`Setting current view from ${state.currentView} to ${view}`);
                 let newMode = state.mode;
@@ -524,7 +529,11 @@ const usePlanetStore = create(
         { // Persist configuration
             name: 'planetary-pet-storage-v3', // Consider changing name if schema changed significantly
             // Optionally specify parts of the state to persist or ignore
-            // partialize: (state) => ({ ... }), 
+            partialize: (state) => {
+                // Return only the state that should be persisted
+                const { coinbaseProvider, coinbaseAccount, ...rest } = state;
+                return rest; // Exclude coinbaseProvider and coinbaseAccount
+            },
             // onRehydrateStorage: (state) => {
             //   console.log("hydration starts");
             //   return (state, error) => {

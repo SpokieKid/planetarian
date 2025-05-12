@@ -12,9 +12,6 @@
   "dependencies": {
     "@coinbase/onchainkit": "^0.38.10",
     "@coinbase/wallet-sdk": "^4.3.2",
-    "@privy-io/react-auth": "^2.13.0",
-    "@privy-io/server-auth": "^1.21.3",
-    "@privy-io/wagmi": "^1.0.3",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",
     "@supabase/supabase-js": "^2.49.4",
@@ -22,6 +19,7 @@
     "@zoralabs/coins-sdk": "^0.1.0",
     "@zoralabs/protocol-sdk": "^0.13.5",
     "dotenv": "^16.5.0",
+    "pinata": "^2.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "thirdweb": "^5.97.1",

@@ -65,16 +65,6 @@ function App() {
   const zustandSetCoinbaseAccount = usePlanetStore(state => state.setCoinbaseAccount);
   const zustandClearCoinbaseConnection = usePlanetStore(state => state.clearCoinbaseConnection);
 
-  // --- Remove Privy State ---
-  // const {
-  //   ready,
-  //   authenticated,
-  //   user,
-  //   login,
-  //   logout,
-  // } = usePrivy();
-  // --- End Remove Privy State ---
-
   // Local UI state
   const [isCoinbaseConnecting, setIsCoinbaseConnecting] = useState(false);
   const [coinbaseUiError, setCoinbaseUiError] = useState(null); // For UI feedback
@@ -102,25 +92,6 @@ function App() {
             if (!didCancel) {
                 zustandSetCoinbaseProvider(provider);
                 console.log("Coinbase Wallet Provider ready in App.jsx and set in Zustand (using getProvider).");
-
-                // Attempt to silently reconnect or check for existing connection
-                provider.request({ method: 'eth_accounts' })
-                    .then(accounts => {
-                        if (!didCancel) {
-                            if (accounts && accounts.length > 0) {
-                                console.log("Coinbase wallet already connected:", accounts[0]);
-                                zustandSetCoinbaseAccount(accounts[0]);
-                            } else {
-                                console.log("Coinbase wallet not connected initially.");
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        if (!didCancel) {
-                            console.warn("Error checking for existing Coinbase connection:", err);
-                            setCoinbaseUiError("Could not check existing connection.");
-                        }
-                    });
             }
         } catch (error) {
             if (!didCancel) {

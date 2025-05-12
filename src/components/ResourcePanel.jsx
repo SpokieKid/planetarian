@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow'; // Import useShallow
 import usePlanetStore from '../hooks/usePlanetState';
 import { PinataSDK } from 'pinata'; // Import from new package
-import { useWallets, useSendTransaction } from '@privy-io/react-auth'; // Import useSendTransaction
 import { createPublicClient, http } from 'viem'; // Only need public client utils now
 import { base } from 'viem/chains'; // Import target chain (e.g., base)
 import { createCoinCall } from '@zoralabs/coins-sdk'; // Import createCoinCall
@@ -21,9 +20,8 @@ const ResourcePanel = () => {
         karma, // Select new state
         narrativeLog, // Get narrativeLog
         walletAddress, // Get walletAddress
+        coinbaseProvider, // Get Coinbase provider
         // addResource, // REMOVED
-        triggerNextEvent, // Keep existing action access
-        incrementTurn,   // Select new action for potential use
         hasEarnedBaseCompletionBadge,
     } = usePlanetStore(
         useShallow(state => ({
@@ -36,22 +34,14 @@ const ResourcePanel = () => {
             karma: state.karma, // Add to selector
             narrativeLog: state.narrativeLog, // Add narrativeLog
             walletAddress: state.walletAddress, // Add walletAddress
+            coinbaseProvider: state.coinbaseProvider, // Add provider
             // addResource: state.addResource, // REMOVED
-            triggerNextEvent: state.triggerNextEvent,
-            incrementTurn: state.incrementTurn, // Add action
             hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
         }))
     );
 
-    // --- Privy Wallet Hook --- 
-    const walletsState = useWallets();
-    const { wallets } = walletsState;
-    const connectedWallet = wallets[0]; // Fallback or primary connected external wallet
-    const { sendTransaction } = useSendTransaction(); // Use the correct hook
-    // --- End Privy Wallet Hook ---
-
     // --- Log the entire useWallets return object --- 
-    console.log("Full useWallets() return:", walletsState);
+    console.log("Zustand walletAddress:", walletAddress);
     // ---
 
     // --- Component State for Publishing --- 
@@ -114,9 +104,9 @@ const ResourcePanel = () => {
     // };
 
     // Optional: Button to manually advance the turn for testing
-    const handleAdvanceTurn = () => {
-        incrementTurn();
-    };
+    // const handleAdvanceTurn = () => {
+    //     incrementTurn();
+    // };
 
     // --- Publish Function --- 
     const handlePublish = async () => {
@@ -125,13 +115,13 @@ const ResourcePanel = () => {
         setZoraTxHash(null);
 
         // --- Log connectedWallet right before the check --- 
-        console.log("[handlePublish] Checking connectedWallet:", connectedWallet);
-        console.log("[handlePublish] typeof connectedWallet.getProvider:", typeof connectedWallet?.getProvider);
+        console.log("[handlePublish] Checking connectedWallet:", walletAddress);
+        console.log("[handlePublish] typeof connectedWallet.getProvider:", typeof walletAddress?.getProvider);
         // ---
 
         // Initial Checks
-        if (!connectedWallet?.address) { 
-            setPublishStatus('Error: Wallet not connected or address not found.');
+        if (!walletAddress) { 
+            setPublishStatus('Error: Wallet not connected.');
             return;
         }
         if (!pinata) {
@@ -143,10 +133,10 @@ const ResourcePanel = () => {
              console.error("PublicClient not available in state.", { publicClient });
              return;
          }
-         // Check if sendTransaction from the hook is available
-         if (typeof sendTransaction !== 'function') {
-             setPublishStatus('Error: Privy sendTransaction hook not ready or available.');
-             console.error("sendTransaction function from useSendTransaction is not available");
+         // Check if Coinbase Provider is available
+         if (!coinbaseProvider) {
+             setPublishStatus('Error: Coinbase Wallet provider not available.');
+             console.error("Coinbase Provider not available in state.");
              return;
          }
 
@@ -155,8 +145,8 @@ const ResourcePanel = () => {
         // --- IPFS Upload --- 
         setPublishStatus('Generating metadata...');
         const metadata = {
-            name: `Planet ${planetName} Log (${connectedWallet.address.substring(0, 6)})`,
-            description: `A chronicle of events and karma for planet ${planetName}, owned by ${connectedWallet.address}.`,
+            name: `Planet ${planetName} Log (${walletAddress.substring(0, 6)})`,
+            description: `A chronicle of events and karma for planet ${planetName}, owned by ${walletAddress}.`,
             external_url: "https://your-project-url.com",
             attributes: [
                 { trait_type: "Final Karma", value: karma },
@@ -196,7 +186,7 @@ const ResourcePanel = () => {
                     name: `Planet ${planetName}`, 
                     symbol: `PL${planetName.substring(0,3).toUpperCase()}`, 
                     uri: currentIpfsUri,
-                    payoutRecipient: connectedWallet.address, 
+                    payoutRecipient: walletAddress, 
                 };
 
                 // Get transaction parameters from Zora SDK
@@ -205,10 +195,20 @@ const ResourcePanel = () => {
 
                 setPublishStatus('Please approve transaction in your wallet...');
 
-                // Send transaction using the function from the hook
-                const txHash = await sendTransaction({
-                    ...txParams,
-                    chainId: `eip155:${TARGET_CHAIN.id}`, 
+                // Construct the transaction parameters for eth_sendTransaction
+                const transactionParameters = {
+                  from: walletAddress, // The user's address
+                  to: txParams.to,       // The contract address from Zora SDK
+                  data: txParams.data,    // The encoded function call from Zora SDK
+                  value: txParams.value?.toString(), // Optional: value in wei (as string if bigint)
+                };
+
+                console.log("Sending transaction via eth_sendTransaction:", transactionParameters);
+
+                // Send transaction using the Coinbase Wallet provider
+                const txHash = await coinbaseProvider.request({
+                  method: 'eth_sendTransaction',
+                  params: [transactionParameters],
                 });
                 
                 console.log("Zora Coin creation Tx Hash:", txHash);
