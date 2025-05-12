@@ -72,7 +72,7 @@ const ResourcePanel = () => {
 
     // --- Viem/Zora Config --- 
     const TARGET_CHAIN = base; // Or your desired chain
-    const RPC_URL = import.meta.env.VITE_RPC_URL; // Get RPC URL from .env
+    const RPC_URL = import.meta.env.VITE_BASE_SEPOLIA_RPC_URL; // Get RPC URL from .env
 
     // --- Effect to Initialize ONLY Public Client --- 
     useEffect(() => {
@@ -167,7 +167,7 @@ const ResourcePanel = () => {
             }
             currentIpfsUri = `ipfs://${uploadResult.cid}`;
             setIpfsUri(currentIpfsUri);
-            setPublishStatus(`Metadata pinned: ${currentIpfsUri}`);
+            setPublishStatus('IPFS Uploaded! Check it out.');
             console.log("IPFS URI:", currentIpfsUri);
         } catch (error) {
             console.error("Error uploading metadata:", error);
@@ -264,10 +264,11 @@ const ResourcePanel = () => {
             </div>
             {/* --- Display Publish Status --- */}
             {publishStatus && <p className="publish-status">{publishStatus}</p>}
-            {ipfsUri && !zoraTxHash && (
-                <p className="ipfs-result">IPFS URI: 
+            {/* Show IPFS link specifically when IPFS URI is available and status indicates success */}
+            {ipfsUri && publishStatus.startsWith('IPFS Uploaded') && (
+                <p className="ipfs-result">IPFS Link: 
                     <a href={`https://${PINATA_GATEWAY}/ipfs/${ipfsUri.split('//')[1]}`} target="_blank" rel="noopener noreferrer">
-                        {ipfsUri}
+                        Check it out here
                     </a>
                 </p>
             )}

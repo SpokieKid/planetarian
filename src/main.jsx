@@ -14,8 +14,8 @@ import { ThirdwebProvider } from 'thirdweb/react'
 // const queryClient = new QueryClient()
 
 // +++ Add MiniKit Imports +++
-import { MiniKitProvider } from '@coinbase/onchainkit/minikit'
-import { base } from 'viem/chains' // Assuming 'base' is the desired chain
+// import { MiniKitProvider } from '@coinbase/onchainkit/minikit' // REMOVED
+// import { base } from 'viem/chains' // REMOVED (Chain info now likely managed in App.jsx)
 // +++ End MiniKit Imports +++
 
 // You will need to create a .env file in your project root
@@ -50,16 +50,16 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     > */}
     {/* --- End PrivyProvider Removed --- */}
     {/* +++ Wrap with MiniKitProvider +++ */}
-    <MiniKitProvider
+    {/* <MiniKitProvider
       apiKey={cdpClientApiKey}
       chain={base}
       // wagmiConfig={wagmiConfig} // Example: if MiniKitProvider accepts wagmiConfig
       // Refer to MiniKitProvider documentation for how it handles Wagmi config
-    >
+    > */}
       <ThirdwebProvider> {/* Keep ThirdwebProvider if used independently */}
         <App />
       </ThirdwebProvider>
-    </MiniKitProvider>
+    {/* </MiniKitProvider> */}
     {/* +++ End Wrap with MiniKitProvider +++ */}
     {/* </PrivyProvider> */}
   </React.StrictMode>,

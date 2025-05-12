@@ -89,7 +89,16 @@ const GuideOverlay = ({ login, authenticated, onClose }) => {
                     {currentStepIndex === guideSteps.length - 1 && (
                         <button 
                            className="guide-final-step-btn pixel-button" 
-                           onClick={authenticated ? onClose : login} // Conditional onClick
+                           onClick={() => {
+                                console.log('[GuideOverlay] Final button clicked. Authenticated:', authenticated);
+                                if (authenticated) {
+                                    console.log('[GuideOverlay] Calling onClose...');
+                                    onClose();
+                                } else {
+                                    console.log('[GuideOverlay] Calling login (connectWallet)... ');
+                                    login(); // This should be connectWallet from App.jsx
+                                }
+                           }}
                         >
                             Connect Wallet 
                         </button>

@@ -18,6 +18,7 @@
     "@tanstack/react-query": "^5.75.4",
     "@zoralabs/coins-sdk": "^0.1.0",
     "@zoralabs/protocol-sdk": "^0.13.5",
+    "buffer": "^6.0.3",
     "dotenv": "^16.5.0",
     "pinata": "^2.2.2",
     "react": "^19.0.0",
@@ -37,6 +38,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-node-polyfills": "^0.23.0"
   }
 }

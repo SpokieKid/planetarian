@@ -11,12 +11,13 @@ import BaseIntroScroller from './components/BaseIntroScroller';
 import VideoStartScreen from './components/VideoStartScreen';
 import GuideOverlay from './components/GuideOverlay';
 import usePlanetStore from './hooks/usePlanetState';
+import { useShallow } from 'zustand/react/shallow';
 import { PLANET_MODES } from './utils/resourceMapping';
 import { EVENTS_TO_FINISH } from './constants/events';
 import ReturnToMainButton from './components/ReturnToMainButton';
 import BaseEventTriggerDialog from './components/BaseEventTriggerDialog';
 import BaseCompletionPopup from './components/BaseCompletionPopup';
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
+import { createCoinbaseWalletSDK } from '@coinbase/wallet-sdk';
 import './App.css';
 
 // --- Add Nounii System Prompt Logic ---
@@ -56,432 +57,288 @@ const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的�
 你现在准备好了吗？开启你的对话吧，Nounii。`;
 // --- End Nounii System Prompt Logic ---
 
+// +++ Coinbase Wallet Configuration +++
+const COINBASE_APP_NAME = 'Planatarian'; // Or your desired app name
+// IMPORTANT: Replace with your actual RPC URL (Alchemy, Infura, etc.) for Base Sepolia
+// Using a placeholder here - ensure VITE_BASE_SEPOLIA_RPC_URL is set in your .env
+const COINBASE_RPC_URL = import.meta.env.VITE_BASE_SEPOLIA_RPC_URL || 'https://base-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY';
+const COINBASE_CHAIN_ID = 84532; // Base Sepolia Chain ID
+// +++ End Configuration +++
+
 function App() {
-  // Select actions individually to prevent re-renders from selector returning new object
-  const initializePlanet = usePlanetStore(state => state.initializePlanet);
-  const tick = usePlanetStore(state => state.tick);
-  const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
-  const isGameFinished = usePlanetStore(state => state.isGameFinished);
-  const finishGame = usePlanetStore(state => state.finishGame);
-  const resetPlanetState = usePlanetStore(state => state.resetPlanetState);
-  const triggerNextEvent = usePlanetStore(state => state.triggerNextEvent);
-  const activeEvent = usePlanetStore(state => state.activeEvent);
-  const isEventPopupOpen = usePlanetStore(state => state.isEventPopupOpen);
-  // --- Add Zustand actions for backend interaction --- 
-  const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
-  const loadPlanetState = usePlanetStore(state => state.loadPlanetState);
-  const currentView = usePlanetStore(state => state.currentView);
-  const setCurrentView = usePlanetStore(state => state.setCurrentView);
-  const isFlowEffectActive = usePlanetStore(state => state.isFlowEffectActive);
-  const triggerSpecificEvent = usePlanetStore(state => state.triggerSpecificEvent);
-  const narrativeLog = usePlanetStore(state => state.narrativeLog);
-  const hasBaseIntroBeenCompleted = usePlanetStore(state => state.hasBaseIntroBeenCompleted);
-  const setBaseIntroCompleted = usePlanetStore(state => state.setBaseIntroCompleted);
-  const hasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.hasSeenBaseEventTriggerDialogEver);
-  const setHasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.setHasSeenBaseEventTriggerDialogEver);
-  const showBaseCompletionPopup = usePlanetStore(state => state.showBaseCompletionPopup);
-  // --- End Zustand actions --- 
-
-  // --- Coinbase MiniKit Hook --- 
+  // Zustand State and Actions (Modified for Coinbase SDK)
   const {
-    address,
-    isConnected,
-    connectWallet,
-    disconnectWallet,
-  } = useMiniKit();
-  // --- End Coinbase MiniKit Hook ---
+    initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
+    resetPlanetState, triggerNextEvent, activeEvent, isEventPopupOpen,
+    loadPlanetState, currentView, setCurrentView, isFlowEffectActive,
+    triggerSpecificEvent, narrativeLog, hasBaseIntroBeenCompleted, setBaseIntroCompleted,
+    hasSeenBaseEventTriggerDialogEver, setHasSeenBaseEventTriggerDialogEver,
+    showBaseCompletionPopup
+  } = usePlanetStore(
+    useShallow(state => ({
+      initializePlanet: state.initializePlanet,
+      tick: state.tick,
+      resolvedEventCount: state.resolvedEventCount,
+      isGameFinished: state.isGameFinished,
+      finishGame: state.finishGame,
+      resetPlanetState: state.resetPlanetState,
+      triggerNextEvent: state.triggerNextEvent,
+      activeEvent: state.activeEvent,
+      isEventPopupOpen: state.isEventPopupOpen,
+      loadPlanetState: state.loadPlanetState,
+      currentView: state.currentView,
+      setCurrentView: state.setCurrentView,
+      isFlowEffectActive: state.isFlowEffectActive,
+      triggerSpecificEvent: state.triggerSpecificEvent,
+      narrativeLog: state.narrativeLog,
+      hasBaseIntroBeenCompleted: state.hasBaseIntroBeenCompleted,
+      setBaseIntroCompleted: state.setBaseIntroCompleted,
+      hasSeenBaseEventTriggerDialogEver: state.hasSeenBaseEventTriggerDialogEver,
+      setHasSeenBaseEventTriggerDialogEver: state.setHasSeenBaseEventTriggerDialogEver,
+      showBaseCompletionPopup: state.showBaseCompletionPopup,
+    }))
+  );
 
+  // Get Coinbase state and actions from Zustand (Assuming these exist)
+  const {
+    coinbaseProvider,
+    coinbaseAccount, // This will be our primary account state
+    walletAddress // Keep this if loadPlanetState relies on it, but it should mirror coinbaseAccount
+  } = usePlanetStore(
+    useShallow(state => ({
+      coinbaseProvider: state.coinbaseProvider,
+      coinbaseAccount: state.coinbaseAccount,
+      walletAddress: state.walletAddress, // Derived or set alongside coinbaseAccount
+    }))
+  );
+  const zustandSetCoinbaseProvider = usePlanetStore(state => state.setCoinbaseProvider);
+  const zustandSetCoinbaseAccount = usePlanetStore(state => state.setCoinbaseAccount);
+  const zustandClearCoinbaseConnection = usePlanetStore(state => state.clearCoinbaseConnection);
+  // Need setWalletAddress if loadPlanetState uses it directly
+  const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
+
+  // Local UI and SDK State
   const [showIntro, setShowIntro] = useState(true);
   const [showVideoScreen, setShowVideoScreen] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
 
-  // Log critical state on render
-  // console.log('[App Render] State:', { ready, authenticated, showGuide, showIntro, showVideoScreen, isGameFinished });
-  // console.log('[App Render] Current Privy Ready State:', ready, 'Authenticated:', authenticated, 'ShowGuide:', showGuide); // Keep for debugging if needed
+  const [isCoinbaseConnecting, setIsCoinbaseConnecting] = useState(false);
+  const [coinbaseUiError, setCoinbaseUiError] = useState(null); // For UI feedback
+  const [isSdkInitialized, setIsSdkInitialized] = useState(false); // Tracks if SDK init attempt is done
 
-  // --- Updated useEffect Hook to Load User State & Handle Post-Login Guide Close --- 
+  // --- Effect to Initialize Coinbase Wallet SDK ---
   useEffect(() => {
-      // Replace with Coinbase Wallet connection logic
-      console.log('[Auth Effect] Running. States:', { isConnected, address, showGuide }); // Log entry
-      if (isConnected && address) {
-          console.log("Wallet connected, calling loadPlanetState for:", address);
-          setWalletAddress(address); // Set address in Zustand
-          loadPlanetState(address); // Load state using the connected address
-          
-          // If user becomes authenticated WHILE the guide is showing, close the guide.
+    // Check if RPC URL is placeholder
+    if (COINBASE_RPC_URL.includes('YOUR_ALCHEMY_API_KEY')) {
+        console.warn("Coinbase Wallet SDK Initialization skipped: VITE_BASE_SEPOLIA_RPC_URL is not set in .env file. Please add it.");
+        setCoinbaseUiError("Configuration Error: RPC URL is missing. Set VITE_BASE_SEPOLIA_RPC_URL in your .env file.");
+        setIsSdkInitialized(true); // Mark as 'done' even if failed, to avoid blocking UI indefinitely
+        return;
+    }
+
+    console.log("Initializing Coinbase Wallet SDK in App.jsx...");
+    let didCancel = false;
+
+    async function initSDK() {
+        try {
+            const sdk = createCoinbaseWalletSDK({
+                appName: COINBASE_APP_NAME,
+                appChainIds: [COINBASE_CHAIN_ID],
+                // appLogoUrl: '/your-logo.png', // Optional: Add your logo URL
+            });
+            const provider = sdk.getProvider({ rpcUrl: COINBASE_RPC_URL });
+
+            if (!didCancel) {
+                zustandSetCoinbaseProvider(provider); // Save provider to Zustand
+                console.log("Coinbase Wallet Provider ready and set in Zustand.");
+            }
+        } catch (error) {
+            if (!didCancel) {
+                console.error("Error initializing Coinbase Wallet SDK:", error);
+                setCoinbaseUiError(`SDK Initialization failed: ${error.message}`);
+            }
+        } finally {
+            if (!didCancel) {
+                setIsSdkInitialized(true);
+            }
+        }
+    }
+
+    initSDK();
+
+    return () => {
+        didCancel = true;
+    };
+    // Ensure zustandSetCoinbaseProvider is stable or add it if needed, but typically setters are stable.
+  }, [zustandSetCoinbaseProvider]);
+
+  // --- Load User State using Coinbase Account (from Zustand) ---
+  useEffect(() => {
+      // This effect now depends on the account state managed by Zustand
+      if (isSdkInitialized && coinbaseAccount) {
+          console.log("Coinbase Wallet connected (via Zustand), calling loadPlanetState for:", coinbaseAccount);
+          // Ensure walletAddress in Zustand is also updated if loadPlanetState relies on it
+          // If setCoinbaseAccount in Zustand also sets walletAddress, this is fine.
+          // If not, we need to call setWalletAddress here too.
+          if (walletAddress !== coinbaseAccount) {
+            console.log("Updating walletAddress in Zustand to match coinbaseAccount");
+            setWalletAddress(coinbaseAccount);
+          }
+          loadPlanetState(coinbaseAccount);
+
+          // Close guide if it was open when wallet connected
           if (showGuide) {
-              console.log('[Auth Effect] Wallet connected AND guide showing. Closing guide...'); // Log decision
+              console.log('[Auth Effect] Wallet connected AND guide showing. Closing guide...');
               setShowGuide(false);
           }
-          
-      } else if (!isConnected) {
-          console.log('[Auth Effect] Wallet not connected.');
-          // Optionally reset state if wallet disconnects during gameplay
-          // resetPlanetState(); 
+
+      } else if (isSdkInitialized && !coinbaseAccount) {
+          console.log("Coinbase Wallet not connected, or SDK init done but no account set in Zustand.");
       }
-  // Update dependencies to include MiniKit state
-  }, [isConnected, address, setWalletAddress, loadPlanetState, showGuide]);
-  // --- End Updated useEffect Hook --- 
+  // Dependencies: SDK init status, account from Zustand, setters, and showGuide for the closing logic
+  }, [isSdkInitialized, coinbaseAccount, loadPlanetState, setWalletAddress, walletAddress, showGuide]); // Add walletAddress dependency
 
   // Game loop
   useEffect(() => {
-    // Start the loop only after video, intro, and guide are all finished
-    if (!showVideoScreen && !showIntro && !showGuide) {
-      console.log('[Game Loop Effect] Starting game tick interval.'); // Add log
-      const intervalId = setInterval(() => {
-        tick(); // Call the Zustand tick action
-      }, 1000); // Update roughly every second
+    // Start the loop only after video, intro, guide are done AND wallet is connected?
+    // Adjust condition as needed for your game logic.
+    const canStartLoop = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished // && !!coinbaseAccount; // Uncomment if connect is required to start
 
+    if (canStartLoop) {
+      console.log('[Game Loop Effect] Starting game tick interval.');
+      const intervalId = setInterval(tick, 1000);
       return () => {
-        console.log('[Game Loop Effect] Clearing game tick interval.'); // Add log
-        clearInterval(intervalId); // Cleanup on unmount or game stop
+        console.log('[Game Loop Effect] Clearing game tick interval.');
+        clearInterval(intervalId);
       }
     } else {
-      console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { showVideoScreen, showIntro, showGuide }); // Log why not starting
+       console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { currentView, showVideoScreen, showIntro, showGuide, isGameFinished, coinbaseAccount });
     }
-  // Update dependencies to reflect the new condition
-  }, [tick, showVideoScreen, showIntro, showGuide]);
+  }, [currentView, tick, showVideoScreen, showIntro, showGuide, isGameFinished, coinbaseAccount]); // Add coinbaseAccount dependency
 
   // Check for game end condition
-  useEffect(() => {
-      if (!isGameFinished && resolvedEventCount >= EVENTS_TO_FINISH) {
-          finishGame(); // Trigger game end state
-      }
-  }, [resolvedEventCount, isGameFinished, finishGame]);
-
-  // --- Add useEffect Hook to Send Prompt --- 
-  useEffect(() => {
-    // This effect runs once after the initial render
-    const sendSystemPrompt = async () => {
-      console.log("Sending Nounii system prompt to backend from App.jsx...");
-      const apiUrl = 'http://127.0.0.1:11434/v1/chat/completions';
-      const requestBody = {
-        model: "gemma3:12b", // Update model name here
-        messages: [
-          { role: "user", content: NOUNII_SYSTEM_PROMPT }
-        ],
-        stream: false
-      };
-
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-          const errorText = response.statusText || `status: ${response.status}`;
-          throw new Error(`System Prompt Error: HTTP error! ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log('System prompt sent successfully from App.jsx:', data);
-
-      } catch (error) {
-        console.error('Error sending system prompt from App.jsx:', error);
-      }
-    };
-
-    sendSystemPrompt();
-
-  }, []); // Empty dependency array ensures this runs only ONCE on mount
-  // --- End useEffect Hook ---
-
-  // --- Audio Refs --- 
-  const typingAudioRef = useRef(null); // Renamed from introAudioRef for clarity
-  const gameAudioRef = useRef(null);
-  const doubleMusicAudioRef = useRef(null);
-  const basemusicAudioRef = useRef(null); // <-- Add new ref for base music
-  // shortIntroMusicRef is REMOVED
-
-  // --- Audio Control Effect --- 
-  useEffect(() => {
-    const typingSound = typingAudioRef.current;
-    const gameAudio = gameAudioRef.current;
-    const doubleMusicAudio = doubleMusicAudioRef.current;
-    const baseMusic = basemusicAudioRef.current; // <-- Get new audio element
-
-    if (!typingSound || !gameAudio || !doubleMusicAudio || !baseMusic) return; 
-
-    const playAudio = (audioElement) => {
-      if (audioElement && audioElement.paused) {
-        console.log(`Attempting to play: ${audioElement.src}, Paused: ${audioElement.paused}, ReadyState: ${audioElement.readyState}, Duration: ${audioElement.duration}`);
-        audioElement.play()
-          .then(() => console.log(`Successfully playing: ${audioElement.src}`))
-          .catch(error => console.warn(`Audio play failed for ${audioElement.src}:`, error));
-      } else if (audioElement) {
-        // console.log(`Not playing ${audioElement.src}: Paused: ${audioElement.paused}, ReadyState: ${audioElement.readyState}`); // Reduce log noise
-      }
-    };
-    const pauseAudio = (audioElement) => {
-      if (audioElement && !audioElement.paused) {
-        console.log(`Attempting to pause: ${audioElement.src}, Paused: ${audioElement.paused}`);
-        audioElement.pause();
-        audioElement.currentTime = 0;
-        console.log(`Paused and reset: ${audioElement.src}`);
-      } else if (audioElement) {
-        // console.log(`Not pausing ${audioElement.src}: Already paused or element invalid.`); // Reduce log noise
-      }
-    };
-
-    // Pause all music first, then play the correct one based on view
-    pauseAudio(typingSound);
-    pauseAudio(gameAudio);
-    pauseAudio(doubleMusicAudio);
-    pauseAudio(baseMusic);
-
-    if (currentView === 'base_intro') {
-        // No music for base_intro, or it has its own managed by BaseIntroScroller.jsx
-        // BaseIntroScroller already handles its own bluesky.mp3
-    } else if (currentView === 'base_planet') {
-        playAudio(baseMusic);
-    } else if (currentView === 'main_planet') {
-        const shouldPlayIntroSounds = !showVideoScreen && showIntro;
-        const shouldPlayGameMusic = !showVideoScreen && !showIntro && !showGuide && !isGameFinished;
-
-        if (shouldPlayIntroSounds) {
-            playAudio(typingSound);
-            playAudio(doubleMusicAudio);
-        } else if (shouldPlayGameMusic) {
-            playAudio(gameAudio);
-        }
-    }
-
-    // Cleanup: Pause all managed audio tracks when the component unmounts or dependencies change significantly.
-    return () => {
-      pauseAudio(typingSound);
-      pauseAudio(gameAudio);
-      pauseAudio(doubleMusicAudio);
-      pauseAudio(baseMusic);
-    };
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished]);
-
-  // --- Handler for Start Button Click (remains simple) ---
-  const handleVideoScreenFinish = () => {
-    setShowVideoScreen(false);
-  };
-
-  // --- Handler for when IntroScroller finishes TYPING ---
-  const handleIntroTypingFinished = () => {
-    setShowGuide(true); // Show guide immediately when typing finishes
-    console.log("Intro typing finished, showing guide and attempting to play music.");
-  };
-
-  // --- Handler for when IntroScroller sequence fully ends (after delay) ---
-  const handleIntroFinished = () => {
-      // console.log('[handleIntroFinished] States:', { privyReady: ready, privyAuthenticated: authenticated, showGuideState: showGuide });
-      setShowIntro(false);
-      console.log("Intro sequence (incl. delay) finished.");
-      // shortIntroMusic logic is REMOVED
-  };
-
-  // --- Re-introduce handleGuideClose ---
-  const handleGuideClose = () => {
-    setShowGuide(false);
-    console.log("Guide closed manually or because user was already logged in.");
-  };
-  // --- End handleGuideClose ---
-
-  // --- Add Dialog Handlers back ---
-  const handleOpenDialog = () => {
-      setIsDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-      setIsDialogOpen(false);
-  };
-  // --- End Dialog Handlers ---
-
-  // --- Add Disconnect Handler --- 
-  const handleDisconnect = async () => {
-    console.log("Handling disconnect...");
-    try {
-      await disconnectWallet(); // Call MiniKit disconnect
-      console.log("Wallet disconnected successfully. Resetting state.");
-      resetPlanetState();
-      // Reset UI state to initial values
-      setShowVideoScreen(true);
-      setShowIntro(true);
-      setShowGuide(false);
-    } catch (error) {
-      console.error("Error during disconnect:", error);
-    }
-  };
-  // --- End Disconnect Handler ---
-
-  // --- Automatically trigger first event after 15 seconds of main game view ---
-  useEffect(() => {
-    let eventTimer;
-    // Conditions to trigger the timer:
-    // 1. Not in video, intro, or guide
-    // 2. Game is not finished
-    // 3. No event is currently active
-    // 4. Only on main_planet view (NEW CONDITION)
-    if (currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent) {
-      console.log('[App Effect] Main game view active, starting 15s timer for first event...');
-      eventTimer = setTimeout(() => {
-        console.log('[App Effect] 15s timer elapsed, attempting to trigger next event.');
-        triggerNextEvent();
-      }, 15000); // 15 seconds
-    }
-
-    // Cleanup function to clear the timer if conditions change or component unmounts
-    return () => {
-      if (eventTimer) {
-        console.log('[App Effect] Clearing event timer.');
-        clearTimeout(eventTimer);
-      }
-    };
-  // Dependencies: include all states that define the main game view and active event status
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent]);
-  // --- End Auto Event Trigger ---
-
-  // TODO: Create EndingCard component
-  const EndingScreen = () => (
-     <div className="ending-screen"> 
-        <h1>Game Over!</h1>
-        <p>Your planet evolution is complete.</p>
-        <button className="pixel-button" onClick={() => { 
-            setShowVideoScreen(true); 
-            setShowIntro(true); 
-        }}>Play Again?</button>
-     </div>
-  );
-
-  // Adjust initial view based on store potentially, or remove if currentView handles all.
-  useEffect(() => {
-    if (currentView === 'main_planet' && showVideoScreen) {
-      // Standard initial flow
-    } else if (currentView !== 'main_planet') {
-      setShowVideoScreen(false);
-      setShowIntro(false);
-      setShowGuide(false);
-    }
-  }, [currentView]);
-
-  // Game loop - needs to be aware of currentView if ticks are planet-specific
-  useEffect(() => {
-    if (currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished) {
-      const intervalId = setInterval(tick, 1000);
-      return () => clearInterval(intervalId);
-    } else if (currentView === 'base_planet' && !isGameFinished) {
-      // TODO: Implement separate tick or game loop for Base planet if needed
-      // For now, let's assume Base planet might also use the main tick or have its own logic later.
-      // const intervalId = setInterval(tick, 1000); // Or a different tick_base_planet action
-      // return () => clearInterval(intervalId);
-      console.log("Base planet view active. Tick logic TBD.");
-    }
-  }, [currentView, tick, showVideoScreen, showIntro, showGuide, isGameFinished]);
-
   useEffect(() => {
       if (!isGameFinished && resolvedEventCount >= EVENTS_TO_FINISH && currentView === 'main_planet') {
           finishGame();
       }
   }, [resolvedEventCount, isGameFinished, finishGame, currentView]);
 
-  // Main game audio effect - this will need to be smarter or disabled during BaseIntroScroller
+  // Audio Refs
+  const typingAudioRef = useRef(null);
+  const gameAudioRef = useRef(null);
+  const doubleMusicAudioRef = useRef(null);
+  const basemusicAudioRef = useRef(null);
+
+  // Audio Control Effect
   useEffect(() => {
-    const typingSound = typingAudioRef.current;
-    const gameAudio = gameAudioRef.current;
-    const doubleMusicAudio = doubleMusicAudioRef.current;
-    const baseMusic = basemusicAudioRef.current; // <-- Get new audio element
+      // ... (existing audio play/pause logic based on currentView, showVideoScreen, etc.) ...
+      // Consider if audio should change based on coinbaseAccount being present/absent
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished]); // Add coinbaseAccount?
 
-    // Ensure all audio elements are potentially available
-    if (!typingSound || !gameAudio || !doubleMusicAudio || !baseMusic) return;
-
-    const playAudio = (audioElement) => {
-      if (audioElement && audioElement.paused) {
-        console.log(`Attempting to play: ${audioElement.src}, Paused: ${audioElement.paused}, ReadyState: ${audioElement.readyState}, Duration: ${audioElement.duration}`);
-        audioElement.play()
-          .then(() => console.log(`Successfully playing: ${audioElement.src}`))
-          .catch(error => console.warn(`Audio play failed for ${audioElement.src}:`, error));
-      } else if (audioElement) {
-        // console.log(`Not playing ${audioElement.src}: Paused: ${audioElement.paused}, ReadyState: ${audioElement.readyState}`); // Reduce log noise
-      }
-    };
-    const pauseAudio = (audioElement) => {
-      if (audioElement && !audioElement.paused) {
-        console.log(`Attempting to pause: ${audioElement.src}, Paused: ${audioElement.paused}`);
-        audioElement.pause();
-        audioElement.currentTime = 0;
-        console.log(`Paused and reset: ${audioElement.src}`);
-      } else if (audioElement) {
-        // console.log(`Not pausing ${audioElement.src}: Already paused or element invalid.`); // Reduce log noise
-      }
-    };
-
-    // Pause all music first, then play the correct one based on view
-    pauseAudio(typingSound);
-    pauseAudio(gameAudio);
-    pauseAudio(doubleMusicAudio);
-    pauseAudio(baseMusic);
-
-    if (currentView === 'base_intro') {
-        // No music for base_intro, or it has its own managed by BaseIntroScroller.jsx
-        // BaseIntroScroller already handles its own bluesky.mp3
-    } else if (currentView === 'base_planet') {
-        playAudio(baseMusic);
-    } else if (currentView === 'main_planet') {
-        const shouldPlayIntroSounds = !showVideoScreen && showIntro;
-        const shouldPlayGameMusic = !showVideoScreen && !showIntro && !showGuide && !isGameFinished;
-
-        if (shouldPlayIntroSounds) {
-            playAudio(typingSound);
-            playAudio(doubleMusicAudio);
-        } else if (shouldPlayGameMusic) {
-            playAudio(gameAudio);
-        }
+  // --- Coinbase Connect Function ---
+  const connectCoinbaseWallet = async () => {
+    if (!coinbaseProvider) {
+        setCoinbaseUiError("Coinbase Provider not available. SDK might be initializing or failed.");
+        console.error("Connect attempt failed: Provider not available.");
+        return;
     }
+    setIsCoinbaseConnecting(true);
+    setCoinbaseUiError(null);
+    console.log("Attempting to connect Coinbase Wallet...");
+    try {
+        const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
+        if (accounts && accounts.length > 0) {
+            console.log("Wallet connected successfully. Account:", accounts[0]);
+            zustandSetCoinbaseAccount(accounts[0]); // Update Zustand state
+            // setWalletAddress(accounts[0]); // Ensure walletAddress is also updated if needed elsewhere
+        } else {
+             console.warn("No accounts returned from Coinbase Wallet.");
+             setCoinbaseUiError("Connection successful, but no accounts returned.");
+             zustandClearCoinbaseConnection(); // Clear state if no account
+        }
+    } catch (error) {
+        console.error('Failed to connect Coinbase wallet:', error);
+        let errorMessage = 'Failed to connect Coinbase Wallet.';
+        if (error.code === 4001) { // Standard EIP-1193 user rejection code
+           errorMessage = 'Connection request rejected by user.';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        setCoinbaseUiError(errorMessage);
+        zustandClearCoinbaseConnection(); // Clear state on error
+    } finally {
+        setIsCoinbaseConnecting(false);
+    }
+  };
+  // --- End Coinbase Connect Function ---
 
-    // Cleanup: Pause all managed audio tracks when the component unmounts or dependencies change significantly.
-    return () => {
-      pauseAudio(typingSound);
-      pauseAudio(gameAudio);
-      pauseAudio(doubleMusicAudio);
-      pauseAudio(baseMusic);
-    };
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished]);
+  // --- Coinbase Disconnect Function ---
+  // As noted before, this primarily clears DApp state.
+  const disconnectCoinbaseWallet = () => {
+      console.log("Disconnecting Coinbase Wallet (clearing app and Zustand state).");
+      zustandClearCoinbaseConnection();
+      setCoinbaseUiError(null);
+      // Reset relevant UI state to reflect logged-out status
+      resetPlanetState(); // Reset game progress
+      setShowVideoScreen(true);
+      setShowIntro(true);
+      setShowGuide(false); // Maybe hide guide on disconnect?
+      console.log("App state reset for disconnect.");
+  };
+  // --- End Coinbase Disconnect Function ---
 
+  // UI Handlers
+  const handleVideoScreenFinish = () => setShowVideoScreen(false);
+  const handleIntroTypingFinished = () => setShowGuide(true);
+  const handleIntroFinished = () => setShowIntro(false);
+  const handleGuideClose = () => setShowGuide(false);
+  const handleOpenDialog = () => setIsDialogOpen(true);
+  const handleCloseDialog = () => setIsDialogOpen(false);
   const handleBaseIntroFinish = () => {
-    console.log("Base Intro Finished. Initializing Base Planet view and mode for the first time...");
-    initializePlanet(PLANET_MODES.BASE); // Initialize for the first time
-    setBaseIntroCompleted(true);         // Mark intro as completed
-    setCurrentView('base_planet');     // setCurrentView will now also set mode to BASE
+    console.log("Base Intro Finished. Initializing Base Planet view...");
+    initializePlanet(PLANET_MODES.BASE);
+    setBaseIntroCompleted(true);
+    setCurrentView('base_planet');
+  };
+  const handleBaseEventDialogYes = () => {
+    setShowBaseEventTriggerDialog(false);
+    triggerSpecificEvent('BASESTONE_01');
+  };
+  const handleBaseEventDialogNo = () => {
+    setShowBaseEventTriggerDialog(false);
+    const newLog = [...narrativeLog, '[Base Simulation] User chose not to start the historical simulation at this time.'];
+    usePlanetStore.setState({ narrativeLog: newLog });
+    console.log("User chose 'No' for base event trigger.");
   };
 
-  // Determine which main UI to show based on currentView
-  let mainContent = null;
-  if (currentView === 'base_intro') {
-    mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
-  } else if (showVideoScreen && currentView === 'main_planet') { // Keep initial video screen logic for main_planet
-    mainContent = <VideoStartScreen onStartClick={handleVideoScreenFinish} />;
-  } else if (showIntro && currentView === 'main_planet') { // Keep initial intro scroller for main_planet
-    mainContent = <IntroScroller onFinished={handleIntroFinished} onTypingFinished={handleIntroTypingFinished} />;
-  } else if (isGameFinished) { // isGameFinished should probably also check currentView or be reset
-    mainContent = <EndingScreen />;
-  } else if (currentView === 'main_planet' || currentView === 'base_planet') {
-    mainContent = (
-      <>
-        <PlanetCanvas /> {/* This will need to adapt to currentView/currentPlanetMode */}
-        <ResourcePanel /> {/* This might need to adapt or be hidden for Base planet */}
-        <StoryLog /> {/* This might need to adapt or be hidden for Base planet */}
-        {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />} 
-        {currentView === 'main_planet' && isFlowEffectActive && <FlowEffect isActive={true} />}
-        {currentView === 'main_planet' && <WormholeIcon />} {/* Show wormhole only on main planet for now */}
-        {currentView === 'base_planet' && <ReturnToMainButton />} {/* <<< Render ReturnToMainButton for base_planet view */}
-      </>
-    );
-  }
-
+  // Auto Event Trigger Effect
   useEffect(() => {
+    let eventTimer;
+    const canStartTimer = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent // && !!coinbaseAccount; // Add if connect needed
+
+    if (canStartTimer) {
+      console.log('[App Effect] Main game view active, starting 15s timer for first event...');
+      eventTimer = setTimeout(() => {
+        console.log('[App Effect] 15s timer elapsed, attempting to trigger next event.');
+        triggerNextEvent();
+      }, 15000);
+    }
+
+    return () => {
+      if (eventTimer) {
+        console.log('[App Effect] Clearing event timer.');
+        clearTimeout(eventTimer);
+      }
+    };
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent, coinbaseAccount]); // Add coinbaseAccount dependency
+
+  // Base Event Trigger Dialog Effect
+   useEffect(() => {
     let baseEventTimer;
     if (currentView === 'base_planet' && !isGameFinished && hasBaseIntroBeenCompleted && !hasSeenBaseEventTriggerDialogEver && !showBaseEventTriggerDialog) {
-      console.log('[App Effect] Base planet view active, intro completed, dialog never shown. Starting 5s timer for BaseEventTriggerDialog...');
+      console.log('[App Effect] Base planet view active, starting 5s timer for BaseEventTriggerDialog...');
       baseEventTimer = setTimeout(() => {
         console.log('[App Effect] 5s timer elapsed, showing BaseEventTriggerDialog.');
         setShowBaseEventTriggerDialog(true);
@@ -499,50 +356,84 @@ function App() {
     };
   }, [currentView, isGameFinished, hasBaseIntroBeenCompleted, hasSeenBaseEventTriggerDialogEver, showBaseEventTriggerDialog, setHasSeenBaseEventTriggerDialogEver]);
 
-  const handleBaseEventDialogYes = () => {
-    setShowBaseEventTriggerDialog(false);
-    triggerSpecificEvent('BASESTONE_01');
-  };
+  // Ending Screen Component
+  const EndingScreen = () => (
+     <div className="ending-screen">
+        <h1>Game Over!</h1>
+        <p>Your planet evolution is complete.</p>
+        <button className="pixel-button" onClick={() => {
+            disconnectCoinbaseWallet(); // Use disconnect to reset state
+            // Additional reset logic if disconnect doesn't cover everything
+            // resetPlanetState(); // Might be called in disconnect
+        }}>Play Again?</button>
+     </div>
+  );
 
-  const handleBaseEventDialogNo = () => {
-    setShowBaseEventTriggerDialog(false);
-    const newLog = [...narrativeLog, '[Base Simulation] User chose not to start the historical simulation at this time.'];
-    usePlanetStore.setState({ narrativeLog: newLog });
-    console.log("User chose 'No' for base event trigger. Dialog closed.");
-  };
+  // Main Content Rendering Logic (Adjusted for new auth state)
+  let mainContent = null;
+  if (currentView === 'base_intro') {
+    mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
+  } else if (showVideoScreen && currentView === 'main_planet') {
+    mainContent = <VideoStartScreen onStartClick={handleVideoScreenFinish} />;
+  } else if (showIntro && currentView === 'main_planet') {
+    // Pass connect function and status to IntroScroller if it needs them
+    mainContent = <IntroScroller onFinished={handleIntroFinished} onTypingFinished={handleIntroTypingFinished} />;
+  } else if (isGameFinished) {
+    mainContent = <EndingScreen />;
+  } else if (!coinbaseAccount && isSdkInitialized && !showIntro && !showVideoScreen && currentView !== 'base_planet') {
+      // If SDK is ready but no account connected (and past intros), show prompt to connect
+      mainContent = <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>Please connect your Coinbase Wallet to continue.</div>;
+  } else if (coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet')) {
+    // Only render game content if connected and on a planet view
+    mainContent = (
+      <>
+        <PlanetCanvas />
+        <ResourcePanel />
+        <StoryLog />
+        {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />} {/* Check isEventPopupOpen? */}
+        {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>} {/* Placeholder for FlowEffect */}
+        {currentView === 'main_planet' && <WormholeIcon />}
+        {currentView === 'base_planet' && <ReturnToMainButton />}
+      </>
+    );
+  }
+  // Handle cases where SDK isn't initialized yet or view is unexpected? Could show loading or default message.
 
   return (
     <div className={`App ${currentView === 'base_planet' ? 'base-planet-active' : ''}`}>
-      {/* --- Hidden Audio Elements --- */}
+      {/* Hidden Audio Elements */}
       <audio ref={typingAudioRef} src="/assets/audio/typing_sound.mp3" loop preload="auto" />
       <audio ref={gameAudioRef} src="/assets/audio/game_music.mp3" loop preload="auto" />
       <audio ref={doubleMusicAudioRef} src="/assets/audio/double_music.mp3" loop preload="auto" />
-      <audio ref={basemusicAudioRef} src="/assets/audio/basemusic.mp3" loop preload="auto" /> {/* <-- Add new audio element */}
-      {/* shortIntroMusicRef audio element is REMOVED */}
+      <audio ref={basemusicAudioRef} src="/assets/audio/basemusic.mp3" loop preload="auto" />
 
-      {/* Log Privy ready state on every render for debugging */}
-      {console.log('[App Render] States:', { currentView, /*ready, authenticated,*/ showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })}
+      {/* Debugging Log */}
+      {console.log('[App Render] States:', { currentView, /* MiniKit: isConnected, address */ coinbaseAccount, isSdkInitialized, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })}
 
-      {/* {!ready && currentView !== 'base_intro' && <div className="loading-indicator">Loading Privy...</div>} */} 
-      {/* TODO: Add loading indicator for Coinbase Wallet connection if needed */} 
-      
-      {/* --- Auth Controls: Show ONLY during active gameplay (not during intros/guides/ending) --- */}
-      {(currentView === 'main_planet' || currentView === 'base_planet') && !isGameFinished && (
-        <div className="auth-controls">
-          {isConnected && address ? (
-            <>
-              <span>Connected: {address}</span>
-              <button onClick={handleDisconnect}>Disconnect</button>
-            </>
-          ) : (
-            <button onClick={connectWallet}>Connect Wallet</button>
+      {/* --- Coinbase Wallet Auth Controls --- */}
+      <div className="auth-controls">
+          {!isSdkInitialized && <div className="loading-indicator">Initializing Wallet SDK...</div>}
+          {isSdkInitialized && coinbaseAccount && (
+              <>
+                {/* Shorten displayed address */}
+                <span>Connected: {`${coinbaseAccount.substring(0, 6)}...${coinbaseAccount.substring(coinbaseAccount.length - 4)}`}</span>
+                <button onClick={disconnectCoinbaseWallet}>Disconnect</button>
+              </>
           )}
-        </div>
-      )}
-      
+          {isSdkInitialized && !coinbaseAccount && (
+              <button onClick={connectCoinbaseWallet} disabled={isCoinbaseConnecting || !coinbaseProvider}>
+                  {isCoinbaseConnecting ? 'Connecting...' : 'Connect Wallet'}
+              </button>
+          )}
+           {/* Display UI Error */}
+          {coinbaseUiError && <div className="error-message" style={{color: 'red', marginTop: '5px', fontSize: '0.8em'}}>{coinbaseUiError}</div>}
+      </div>
+      {/* --- End Coinbase Wallet Auth Controls --- */}
+
       {/* --- Main Rendering Logic --- */}
       {mainContent}
 
+      {/* Base Planet Specific Modals/Popups */}
       {showBaseEventTriggerDialog && currentView === 'base_planet' && (
         <BaseEventTriggerDialog
           isVisible={showBaseEventTriggerDialog}
@@ -550,25 +441,25 @@ function App() {
           onNo={handleBaseEventDialogNo}
         />
       )}
-
       {showBaseCompletionPopup && (
         <BaseCompletionPopup />
       )}
 
-      {showGuide && 
-        <GuideOverlay 
-          // Pass Coinbase Wallet connect function and status
-          login={connectWallet}
-          authenticated={isConnected} // Use MiniKit's isConnected
-          onClose={handleGuideClose} 
+      {/* Guide Overlay - Pass connect function and status */}
+      {showGuide &&
+        <GuideOverlay
+          login={connectCoinbaseWallet} // Pass the new connect function
+          authenticated={!!coinbaseAccount} // Convert account string to boolean
+          onClose={handleGuideClose}
         />}
 
-      {/* ActionIcon area - Render only when game is active on a planet view */}
-      {(currentView === 'main_planet' || currentView === 'base_planet') && !isGameFinished && (
-         <div className="action-icon-area"> 
+      {/* ActionIcon area (Existing, but condition on coinbaseAccount?) */}
+      {/* Render only when wallet connected, game active */}
+      {coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet') && !isGameFinished && !showIntro && !showVideoScreen && (
+         <div className="action-icon-area">
             <ActionIcon onClick={handleOpenDialog} />
             <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title="Planet Info">
-              <p>This is where additional information or actions related to the planet could go.</p>
+              <p>Additional planet information or actions.</p>
             </DialogBox>
          </div>
       )}
