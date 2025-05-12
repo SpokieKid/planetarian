@@ -1,0 +1,75 @@
+.base-event-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200; /* Higher than event popup */
+    backdrop-filter: blur(3px);
+}
+
+.base-event-dialog-card {
+    background-color: #1e1e2f; /* Darker base color */
+    color: #e0e0f0;
+    padding: 25px 30px;
+    border-radius: 8px; /* Slightly less rounded */
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace; /* Pixel font */
+}
+
+.base-event-dialog-text {
+    font-size: 0.9em;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    color: #f0f0f0; /* Brighter text */
+}
+
+.base-event-dialog-options {
+    display: flex;
+    justify-content: space-around; /* Space out buttons */
+    align-items: center;
+}
+
+.base-event-dialog-options .pixel-button {
+    padding: 10px 20px;
+    font-size: 0.9em;
+    border-width: 2px; /* More pronounced pixel border */
+    min-width: 100px;
+}
+
+.base-event-dialog-options .yes-button {
+    background-color: #3a86ff; /* Blue for yes */
+    color: white;
+}
+
+.base-event-dialog-options .yes-button:hover {
+    background-color: #5c9cff;
+}
+
+.base-event-dialog-options .no-button {
+    background-color: #ff4d4d; /* Red for no */
+    color: white;
+}
+
+.base-event-dialog-options .no-button:hover {
+    background-color: #ff7070;
+}
+
+/* Reusable pixel corner style if needed elsewhere */
+.pixel-corners {
+    border-style: solid;
+    border-width: 3px;
+    border-image-slice: 2;
+    border-image-width: 2;
+    border-image-repeat: stretch;
+    border-image-source: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" version="1.1" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><path d="m0 2h2v-2h2v2h2v2h-2v2h-2v-2h-2z" fill="%23e0e0f0"/></svg>');
+    border-image-outset: 2;
+} 

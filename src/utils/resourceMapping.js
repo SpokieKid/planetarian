@@ -4,6 +4,7 @@ export const PLANET_MODES = {
   INTERNATIONAL: 'International',
   GLOBAL: 'Global',
   PLANETARY: 'Planetary',
+  BASE: 'Base', // New mode for Base Planet
 };
 
 const MODIFIERS = {
@@ -61,6 +62,14 @@ export const getVisualStyle = (mode) => {
                 backgroundColor: 0x16213e, // Deeper blue
                 borderColor: '#fca311', // Orange border
                 atmosphereColor: 0x0f3460, // Standard blue
+            };
+        case PLANET_MODES.BASE: // Visuals for Base Planet
+            return {
+                planetTextureKey: 'planet_base',
+                planetTextureUrl: '/assets/planets/planet_texture_base.jpg', // Path for Base planet texture
+                backgroundColor: 0x000000, // Example: Black, or could be transparent if basebackground.jpg is handled elsewhere
+                borderColor: '#8888FF', // Example border color for Base
+                atmosphereColor: 0xCCCCCC, // Example atmosphere for Base
             };
         case PLANET_MODES.PLANETARY:
         default:
