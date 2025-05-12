@@ -12,7 +12,7 @@ import { baseEvents } from '../data/baseEvents.js'; // Import base events
 // Define initial state values outside the main function for clarity and reuse
 const initialGameState = {
     planetName: 'Genesis', 
-    mode: PLANET_MODES.GLOBAL, // Default mode
+    game_mode: PLANET_MODES.GLOBAL, // Default mode
     era: 1,
     turn: 1,
     karma: 20,
@@ -98,7 +98,7 @@ const usePlanetStore = create(
             clearCoinbaseConnection: () => set({ coinbaseProvider: null, coinbaseAccount: null, walletAddress: null }), // Action to clear connection
             setCurrentView: (view) => set(state => {
                 console.log(`Setting current view from ${state.currentView} to ${view}`);
-                let newMode = state.mode;
+                let newMode = state.game_mode;
                 if (view === 'base_planet') {
                     newMode = PLANET_MODES.BASE;
                 } else if (view === 'main_planet') {
@@ -115,7 +115,7 @@ const usePlanetStore = create(
                     activeEvent: null, // Clear events on any view change
                     isEventPopupOpen: false,
                     hasPendingEvent: false,
-                    mode: newMode, // Set the correct mode for the view
+                    game_mode: newMode, // Set the correct mode for the view
                 };
             }), 
 
@@ -167,7 +167,7 @@ const usePlanetStore = create(
                 try {
                     const { data, error } = await supabase
                         .from('planets')
-                        .select('karma, narrative_log, resolved_event_count, is_game_finished, mode, era, turn, growth_points, planet_name, triggered_event_keys') // Load more complete state
+                        .select('karma, narrative_log, resolved_event_count, is_game_finished, game_mode, era, turn, growth_points, planet_name, triggered_event_keys') // Load more complete state
                         .eq('wallet_address', walletAddress)
                         .maybeSingle(); // Returns single object or null
 
@@ -186,7 +186,7 @@ const usePlanetStore = create(
                             narrativeLog: data.narrative_log ?? initialGameState.narrativeLog,
                             resolvedEventCount: data.resolved_event_count ?? initialGameState.resolvedEventCount,
                             isGameFinished: data.is_game_finished ?? initialGameState.isGameFinished,
-                            mode: data.mode ?? initialGameState.mode,
+                            game_mode: data.game_mode ?? initialGameState.game_mode,
                             era: data.era ?? initialGameState.era,
                             turn: data.turn ?? initialGameState.turn,
                             growthPoints: data.growth_points ?? initialGameState.growthPoints,
@@ -195,9 +195,11 @@ const usePlanetStore = create(
                             // currentView will be reset or handled by navigation logic, not loaded from DB for now
                         });
                     } else {
-                        console.log("No saved state found in Supabase for this address. Resetting to defaults.");
+                        console.log("No saved state found in Supabase for this address. Resetting to defaults and saving initial state.");
                          // Reset to initial state if no data found
                         get().resetPlanetState(); 
+                        // Immediately save the initial state to Supabase
+                        get().savePlanetState(); 
                     }
                 } catch (error) {
                      console.error("Caught error during state loading, resetting state:", error);
@@ -210,7 +212,7 @@ const usePlanetStore = create(
             // --- Rewritten savePlanetState using Supabase --- 
             savePlanetState: async () => {
                  // Include is_game_finished and resolved_event_count in save
-                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, mode, era, turn, growthPoints, planetName, triggeredEventKeys } = get(); 
+                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, game_mode, era, turn, growthPoints, planetName, triggeredEventKeys } = get(); 
                  if (!walletAddress) {
                      console.warn("Cannot save state: No wallet address set.");
                      return;
@@ -228,7 +230,7 @@ const usePlanetStore = create(
                              narrative_log: narrativeLog,
                              is_game_finished: isGameFinished, // Save game finished status
                              resolved_event_count: resolvedEventCount, // Save resolved count
-                             mode: mode,
+                             game_mode: game_mode,
                              era: era,
                              turn: turn,
                              growth_points: growthPoints,
@@ -256,14 +258,13 @@ const usePlanetStore = create(
             // --- End rewritten savePlanetState ---
 
             initializePlanet: (chosenMode) => {
-                const state = get();
                 const now = Date.now();
                 const newPlanetName = `Planet-${Math.random().toString(36).substring(2, 7)}`;
                 set({
                     // Explicitly set fields instead of spreading all of initialGameState
                     // to preserve global progress like triggeredEventKeys and resolvedEventCount across mode initializations.
                     planetName: newPlanetName,
-                    mode: chosenMode,
+                    game_mode: chosenMode,
                     era: initialGameState.era, // Reset era for the new mode
                     turn: initialGameState.turn, // Reset turn for the new mode
                     karma: initialGameState.karma, // Reset karma or set to a mode-specific start
@@ -491,7 +492,8 @@ const usePlanetStore = create(
                 if (get().isGameFinished || get().activeEvent) return; // Don't tick if paused/ended
 
                 const now = Date.now();
-                const timeElapsed = now - get().lastTickTime;
+                // Remove unused timeElapsed variable
+                // const timeElapsed = now - get().lastTickTime;
 
                 // Add any time-based logic here in the future (e.g., resource decay?)
                 // For now, just update the last tick time.
@@ -527,6 +529,7 @@ const usePlanetStore = create(
             // Optionally specify parts of the state to persist or ignore
             partialize: (state) => {
                 // Return only the state that should be persisted
+                // eslint-disable-next-line no-unused-vars
                 const { coinbaseProvider, coinbaseAccount, ...rest } = state;
                 return rest; // Exclude coinbaseProvider and coinbaseAccount
             },
