@@ -31,4 +31,23 @@
     width: 60%;
     height: 60%;
     object-fit: contain;
+}
+
+.event-notification-bubble {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red; /* Example background color */
+    color: white; /* Example text color */
+    border-radius: 50%;
+    width: 20px; /* Example size */
+    height: 20px; /* Example size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8em; /* Adjust emoji size */
+    font-weight: bold;
+    z-index: 101; /* Ensure it's above the icon button */
+    transform: translate(40%, -40%); /* Adjust position to be outside the corner */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); /* Optional shadow */
 } 

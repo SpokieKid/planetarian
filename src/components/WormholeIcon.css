@@ -1,0 +1,24 @@
+.wormhole-icon-container {
+    position: fixed; /* Position relative to the viewport */
+    top: 140px; /* Adjust as needed, leave space for auth controls if they are at top: 20px */
+    right: 140px;
+    width: 100px; /* Adjust size as needed */
+    height: 80px; /* Adjust size as needed */
+    cursor: pointer;
+    z-index: 999; /* Ensure it's above most content but potentially below modals */
+    border-radius: 50%; /* Make it circular */
+    overflow: hidden; /* Clip the image to the circle */
+    box-shadow: 0 0 15px 5px rgba(150, 50, 255, 0.7); /* Purple glow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wormhole-icon-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the area, maintaining aspect ratio */
+}
+
+.wormhole-icon-container:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px 10px rgba(180, 80, 255, 0.9); /* Brighter purple glow on hover */
+} 

@@ -31,7 +31,6 @@ const PlanetCanvas = () => {
                     <Planet />
                     <OrbitingObjects count={8} /> {/* Add orbiting objects */} 
                     <BackgroundShips count={5} /> {/* Add background ships */} 
-                    <CollectibleSuns count={10} planetRadius={1.0} /> {/* Add collectible suns */}
                     <Preload all /> {/* Preload assets */} 
                 </Suspense>
                 
@@ -44,7 +43,7 @@ const PlanetCanvas = () => {
             {/* Style background color via CSS as hex is tricky in r3f color attach */}
             <style>{`
                 .planet-canvas-container {
-                    background-color: #${visualStyle.backgroundColor.toString(16).padStart(6, '0')};
+                    background-color: transparent; /* Allow underlying CSS background to show */
                 }
             `}</style>
         </div>

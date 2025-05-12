@@ -1,0 +1,18 @@
+{
+  "events": {
+    "evt_001_info_freedom": {
+      "title": "Information Freedom Act Proposed",
+      "text": "A proposal suggests making all non-critical planetary data freely accessible. This could spur innovation but might decrease centralized control.",
+      "options": {
+        "option1": "Approve (+2 Ideas, +5 Growth)",
+        "option2": "Study Further (-1 Ideas, +2 Growth)",
+        "option3": "Reject (-3 Ideas)"
+      },
+      "narratives": {
+        "option1": "Open data sparks a wave of creativity across the settlements.",
+        "option2": "Caution prevails. You commission further studies on the potential impacts.",
+        "option3": "The proposal is shelved, maintaining the status quo for information control."
+      }
+    }
+  }
+} 

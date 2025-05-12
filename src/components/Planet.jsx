@@ -1,29 +1,62 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import usePlanetStore from '../hooks/usePlanetState';
 import { getVisualStyle } from '../utils/resourceMapping'; // Use for colors/textures
 
-// Simple Building Component
-const Building = ({ position }) => {
+// Array of available models
+const AVAILABLE_MODELS = [
+    { name: 'tree', mtl: '/assets/models/tree.mtl', obj: '/assets/models/tree.obj', scale: [0.0002, 0.0002, 0.0002] },
+    { name: 'robot', mtl: '/assets/models/robot.mtl', obj: '/assets/models/robot.obj', scale: [0.0002, 0.0002, 0.0002] },
+    { name: 'room', mtl: '/assets/models/room.mtl', obj: '/assets/models/room.obj', scale: [0.01, 0.01, 0.01] },
+    // Add more models here, e.g.:
+    // { name: 'rock', mtl: '/assets/models/rock.mtl', obj: '/assets/models/rock.obj', scale: [0.01, 0.01, 0.01] },
+];
+
+// Updated Building Component to load the Tree model
+const Building = ({ position, modelInfo }) => {
     const buildingRef = useRef();
-    const height = 0.1 + Math.random() * 0.2; // Random height
-    const width = 0.05;
-    
-    // Orient the building outwards from the center
+
+    // Load materials first
+    const materials = useLoader(MTLLoader, modelInfo.mtl);
+    // Load the obj model, applying the loaded materials
+    const obj = useLoader(OBJLoader, modelInfo.obj, loader => {
+      materials.preload();
+      loader.setMaterials(materials);
+    });
+
     useEffect(() => {
         if (buildingRef.current) {
-            buildingRef.current.lookAt(0, 0, 0); 
-            // Rotate it so the base is on the surface
-            buildingRef.current.rotateX(Math.PI / 2); 
-        }
-    }, []); // Run once on mount
+            // Traverse is not strictly necessary if materials are loaded via MTL,
+            // but keeping it doesn't hurt and might be useful for other tweaks.
+            buildingRef.current.traverse((child) => {
+                if (child.isMesh) {
+                    // Materials should be applied by the loader now.
+                    // child.castShadow = true; // Optional: if you want buildings to cast shadows
+                    // child.receiveShadow = true; // Optional: if you want buildings to receive shadows
+                }
+            });
 
+            // Adjust transformations for the entire loaded object group
+            buildingRef.current.lookAt(0, 0, 0); // Orient towards planet center
+            buildingRef.current.rotateX(Math.PI / 2); // Rotate base to surface
+            
+            buildingRef.current.scale.set(...modelInfo.scale);
+        }
+    }, [obj, modelInfo.scale]); // Re-run effect when the obj model is loaded or scale changes
+
+    // Render the loaded model using <primitive>
+    // Use Suspense to handle the asynchronous loading
     return (
-        <mesh ref={buildingRef} position={position}>
-            <boxGeometry args={[width, height, width]} /> {/* Y is height */} 
-            <meshStandardMaterial color={0xcccccc} roughness={0.6} metalness={0.3} />
-        </mesh>
+        <Suspense fallback={null}> 
+            <primitive 
+                ref={buildingRef} 
+                object={obj.clone()} // Use clone for multiple instances
+                position={position} 
+            />
+        </Suspense>
     );
 };
 
@@ -33,28 +66,53 @@ const Planet = () => {
     const mode = usePlanetStore(state => state.mode);
     const growthPoints = usePlanetStore(state => state.growthPoints);
     const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
+    // const currentView = usePlanetStore(state => state.currentView);
+    // const triggerSpecificEvent = usePlanetStore(state => state.triggerSpecificEvent);
+    // const activeEvent = usePlanetStore(state => state.activeEvent); // To prevent multiple triggers
+    const createdAt = usePlanetStore(state => state.createdAt); // <-- Get createdAt
 
     // State to hold building data (positions)
     const [buildings, setBuildings] = useState([]);
     // Ref to track the previous event count
     const prevEventCountRef = useRef(resolvedEventCount);
 
+    // --- Effect to clear buildings on planet re-initialization (via createdAt or mode change) ---
+    useEffect(() => {
+        console.log("[Planet.jsx] Mode or createdAt changed, resetting buildings. New mode:", mode);
+        setBuildings([]);
+        prevEventCountRef.current = 0; 
+    }, [createdAt, mode]); // Depend on createdAt AND mode
+
     // --- Effect to add buildings when event count increases ---
     useEffect(() => {
         // Check if the count actually increased since last render
         if (resolvedEventCount > prevEventCountRef.current) {
-            console.log("Adding building due to event resolution...");
-            // Calculate a random point on the sphere surface (radius 1)
-            const phi = Math.acos(-1 + (2 * Math.random())); // Inclination (0..pi)
-            const theta = Math.random() * Math.PI * 2; // Azimuth (0..2pi)
-
-            const position = new THREE.Vector3();
-            position.setFromSphericalCoords(1.05, phi, theta); // Radius slightly > 1 to sit on surface
+            console.log("Adding *two* trees (buildings) due to event resolution..."); // Updated log
             
-            // Add new building data to state
+            const newObjects = [];
+            for (let i = 0; i < 2; i++) { // Loop to add two objects
+                const phi = Math.acos(-1 + (2 * Math.random())); // Inclination (0..pi)
+                const theta = Math.random() * Math.PI * 2; // Azimuth (0..2pi)
+
+                const positionVec = new THREE.Vector3();
+                // Adjust radius slightly based on scale to sit on surface properly
+                const planetScale = 1 + usePlanetStore.getState().growthPoints * 0.005;
+                positionVec.setFromSphericalCoords(planetScale * 1.01, phi, theta); // Slightly above surface
+                
+                // Randomly select a model
+                const randomModel = AVAILABLE_MODELS[Math.floor(Math.random() * AVAILABLE_MODELS.length)];
+
+                // Add new building data to state with a slightly modified ID for uniqueness if adding multiple
+                newObjects.push({
+                    id: `${resolvedEventCount}-${i}-${randomModel.name}`,
+                    position: [positionVec.x, positionVec.y, positionVec.z],
+                    modelInfo: randomModel // Store the selected model info
+                });
+            }
+            
             setBuildings(prev => [
                  ...prev,
-                 { id: resolvedEventCount, position: [position.x, position.y, position.z] } // Store as array for prop
+                 ...newObjects // Add both new objects to the array
             ]);
         }
         // Update the ref for the next comparison
@@ -84,9 +142,22 @@ const Planet = () => {
 
     // Placeholder for texture loading - replace with actual texture later
     // const texture = useLoader(THREE.TextureLoader, visualStyle.planetTextureKey);
+
+    // const handlePlanetClick = () => { // <-- Comment out or remove this handler
+    //     if (currentView === 'base_planet' && !activeEvent) {
+    //         console.log("Base planet clicked, triggering BASESTONE_01 event.");
+    //         triggerSpecificEvent('BASESTONE_01');
+    //     } else {
+    //         console.log("Planet clicked, but not triggering event. View:", currentView, "ActiveEvent:", activeEvent);
+    //     }
+    // };
     
     return (
-        <mesh ref={planetMeshRef} scale={planetScale}>
+        <mesh 
+            ref={planetMeshRef} 
+            scale={planetScale}
+            // onClick={handlePlanetClick} // <-- Comment out or remove click handler attachment
+        >
             <sphereGeometry args={[1, 32, 32]} />
             {/* Use MeshStandardMaterial for lighting and apply texture */}
             <meshStandardMaterial 
@@ -94,9 +165,9 @@ const Planet = () => {
                 metalness={0.1} // Low metalness for less shine
                 roughness={0.8} // High roughness for a matte look
             />
-            {/* Render buildings as children */} 
+            {/* Render buildings (now trees) as children */} 
             {buildings.map(building => (
-                 <Building key={building.id} position={building.position} />
+                 <Building key={building.id} position={building.position} modelInfo={building.modelInfo} />
              ))}
             {/* TODO: Add atmosphere later */}
         </mesh>

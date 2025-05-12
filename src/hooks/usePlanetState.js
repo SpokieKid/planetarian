@@ -5,45 +5,73 @@ import { persist } from 'zustand/middleware';
 import { supabase } from '../lib/supabaseClient'; // Import Supabase client
 import { PLANET_MODES } from '../utils/resourceMapping'; // Removed getResourceModifiers import as it's not used directly here anymore
 import { events } from '../data/events.js'; // Import the new events structure
-// Removed import { checkAndTriggerEvent } from '../utils/eventTrigger'; as it's being replaced
+import { baseEvents } from '../data/baseEvents.js'; // Import base events
+// Line below was causing syntax error, removed. Event triggering is refactored.
+// import { checkAndTriggerEvent } from '../utils/eventTrigger'; as it's being replaced 
+
+// Define initial state values outside the main function for clarity and reuse
+const initialGameState = {
+    planetName: 'Genesis', 
+    game_mode: PLANET_MODES.GLOBAL, // Default mode
+    era: 1,
+    turn: 1,
+    karma: 20,
+    growthPoints: 0,
+    activeEvent: null,
+    triggeredEventKeys: [],
+    resolvedEventCount: 0,
+    narrativeLog: [], // Start with an empty log
+    isGameFinished: false,
+    isEventPopupOpen: false, // Tracks if the popup UI is currently open
+    hasPendingEvent: false, // Tracks if an event is waiting to be shown
+    isFlowEffectActive: false, // New state for FlowEffect
+    currentView: 'main_planet', // New state for current view
+    hasBaseIntroBeenCompleted: false, // <-- New state for Base Intro completion
+    hasSeenBaseEventTriggerDialogEver: false, // <-- New state for one-time dialog
+    hasEarnedBaseCompletionBadge: false, // <-- New state for badge earned
+    showBaseCompletionPopup: false, // <-- New state for showing badge popup
+};
 
 // Function to apply effects based on chosen option and its outcome (Success/Fail)
 const applyChoiceOutcomeEffects = (currentGameState, outcome) => {
     const stateChanges = {
-        // Remove resources field if it's no longer used for specific types
-        // resources: {}, // REMOVED or keep if generic resources exist
         growthPoints: 0,
         karma: 0,
         narrative: null,
+        hashtag: null, // Ensure hashtag is initialized
     };
 
     if (!outcome) return stateChanges;
 
-    // Apply state changes defined in the outcome
+    // Apply state changes defined in the outcome (e.g., growthPoints)
     if (outcome.stateChanges) {
-        // Remove resource changes section if specific resources are gone
-        // if (outcome.stateChanges.resources) {
-        //      for (const [resource, change] of Object.entries(outcome.stateChanges.resources)) {
-        //          if (resource in currentGameState.resources) {
-        //              stateChanges.resources[resource] = change;
-        //          }
-        //      }
-        // }
-        // Apply growth point changes
         if (outcome.stateChanges.growthPoints) {
             stateChanges.growthPoints = outcome.stateChanges.growthPoints;
         }
-        // Apply other specific state changes here (e.g., technology, stability)
     }
 
-     // Apply karma change
-     if (outcome.karmaChange) {
+    // Apply karma change
+    if (outcome.karmaChange) {
         stateChanges.karma = outcome.karmaChange;
-     }
+    }
 
     // Capture narrative text from the outcome
-    if (outcome.narrative) {
+    if (outcome.result_zh) { // For Base Events
+        stateChanges.narrative = outcome.result_zh;
+    } else if (outcome.narrative) { // For Main Events
         stateChanges.narrative = outcome.narrative;
+    }
+
+    // Capture hashtag from the outcome
+    if (outcome.hashtag_zh) { // For Base Events (from success/failed outcome)
+        stateChanges.hashtag = outcome.hashtag_zh;
+    } else if (currentGameState.activeEvent && currentGameState.activeEvent.options && currentGameState.activeEvent.options.find(opt => opt.id === outcome.optionId)?.hashtag) {
+        // For Main Events, try to get hashtag from the chosen option itself if outcome doesn't have one directly
+        // This assumes outcome object will have an 'optionId' if it's from a main event option choice
+        const chosenOption = currentGameState.activeEvent.options.find(opt => opt.id === outcome.optionId);
+        if (chosenOption && chosenOption.hashtag) {
+            stateChanges.hashtag = chosenOption.hashtag;
+        }
     }
 
     console.log("Calculated state changes from outcome:", stateChanges);
@@ -54,71 +82,137 @@ const applyChoiceOutcomeEffects = (currentGameState, outcome) => {
 const usePlanetStore = create(
     persist(
         (set, get) => ({
-            // --- Core State ---
-            planetName: 'Genesis',
-            mode: PLANET_MODES.GLOBAL,
-            era: 1,
-            turn: 1,
-            karma: 50,
-            growthPoints: 0,
-            walletAddress: null,
-            // resources: { // REMOVED specific resources object
-            //     water: 70,
-            //     light: 70,
-            //     air: 70,
-            //     ideas: 50,
-            // },
+            // --- Core State --- Spread initial state here for defaults ---
+            ...initialGameState, 
+            // --- Overwrite specific initial values if needed ---
+            coinbaseProvider: null, // New state for Coinbase Provider
+            coinbaseAccount: null, // New state for Coinbase Account
+            walletAddress: null, 
             createdAt: Date.now(),
             lastTickTime: Date.now(),
-            activeEvent: null,
-            triggeredEventKeys: [],
-            resolvedEventCount: 0,
-            narrativeLog: [],
-            isGameFinished: false,
 
             // --- Actions ---
             setWalletAddress: (address) => set({ walletAddress: address }),
+            setCoinbaseProvider: (provider) => set({ coinbaseProvider: provider }),
+            setCoinbaseAccount: (account) => set({ coinbaseAccount: account, walletAddress: account }), // Update walletAddress here
+            clearCoinbaseConnection: () => set({ coinbaseProvider: null, coinbaseAccount: null, walletAddress: null }), // Action to clear connection
+            setCurrentView: (view) => set(state => {
+                console.log(`Setting current view from ${state.currentView} to ${view}`);
+                let newMode = state.game_mode;
+                if (view === 'base_planet') {
+                    newMode = PLANET_MODES.BASE;
+                } else if (view === 'main_planet') {
+                    // When returning to main_planet, set its mode. 
+                    // Assuming GLOBAL is the primary mode for main_planet view.
+                    // If main_planet can have multiple modes (e.g. GLOBAL, INTERNATIONAL) and you want to remember the last one,
+                    // you'd need another state variable like 'lastMainPlanetMode'.
+                    newMode = PLANET_MODES.GLOBAL; 
+                }
+                // Other views like 'base_intro' don't necessarily change the underlying planet mode directly.
+
+                return {
+                    currentView: view,
+                    activeEvent: null, // Clear events on any view change
+                    isEventPopupOpen: false,
+                    hasPendingEvent: false,
+                    game_mode: newMode, // Set the correct mode for the view
+                };
+            }), 
+
+            setBaseIntroCompleted: (completed) => set({ hasBaseIntroBeenCompleted: completed }), // <-- Action to set completion
+
+            setHasSeenBaseEventTriggerDialogEver: (seen) => set({ hasSeenBaseEventTriggerDialogEver: seen }), // <-- Action for new state
+
+            earnBaseCompletionBadge: () => set({
+                hasEarnedBaseCompletionBadge: true,
+                showBaseCompletionPopup: true,
+                narrativeLog: [...get().narrativeLog, "[历史模拟] 恭喜！已完成基地历史模拟并获得成就徽章！"], // Add log entry
+            }),
+
+            closeBaseCompletionPopup: () => set({ showBaseCompletionPopup: false }),
+
+            // --- Action to reset the game state --- 
+            resetPlanetState: () => {
+                const now = Date.now();
+                const newPlanetName = `Planet-${Math.random().toString(36).substring(2, 7)}`;
+                set({
+                    ...initialGameState, // Reset to initial values defined above
+                    planetName: newPlanetName, // Give a new random name
+                    createdAt: now,
+                    lastTickTime: now,
+                    narrativeLog: [`Planet state reset (${newPlanetName}). Welcome back.`], // Add an initial log entry
+                    isEventPopupOpen: false, 
+                    hasPendingEvent: false, 
+                    isFlowEffectActive: false, 
+                    currentView: 'main_planet', 
+                    hasBaseIntroBeenCompleted: false, // Also reset this on full game reset
+                    hasSeenBaseEventTriggerDialogEver: false, // Also reset this
+                    hasEarnedBaseCompletionBadge: false, // <-- Reset badge earned
+                    showBaseCompletionPopup: false, // <-- Reset badge popup show state
+                });
+                console.log("Zustand planet state has been reset.");
+                // Optionally: Trigger save immediately after reset?
+                // get().savePlanetState(); 
+            },
 
             // --- Rewritten loadPlanetState using Supabase --- 
             loadPlanetState: async (walletAddress) => {
                 if (!walletAddress) {
                     console.warn("Cannot load state: No wallet address provided.");
+                    // Reset to initial state if no address (or handle as needed)
+                    get().resetPlanetState(); 
                     return;
                 }
                 console.log(`Loading state from Supabase for ${walletAddress}...`);
                 try {
                     const { data, error } = await supabase
                         .from('planets')
-                        .select('karma, narrative_log') // Select only needed fields
+                        .select('karma, narrative_log, resolved_event_count, is_game_finished, game_mode, era, turn, growth_points, planet_name, triggered_event_keys') // Load more complete state
                         .eq('wallet_address', walletAddress)
-                        .maybeSingle(); // Returns single object or null, not error if not found
+                        .maybeSingle(); // Returns single object or null
 
                     if (error) {
                         console.error("Error loading planet state from Supabase:", error.message);
-                        throw error; // Rethrow if needed elsewhere
+                         // If loading fails, reset to initial state
+                        get().resetPlanetState(); 
+                        throw error;
                     }
 
                     if (data) {
                         console.log("Supabase state loaded:", data);
                         set({
-                            karma: data.karma,
-                            narrativeLog: data.narrative_log || [], // Ensure it's an array
+                            // Set state from loaded data, providing defaults if null/undefined
+                            karma: data.karma ?? initialGameState.karma,
+                            narrativeLog: data.narrative_log ?? initialGameState.narrativeLog,
+                            resolvedEventCount: data.resolved_event_count ?? initialGameState.resolvedEventCount,
+                            isGameFinished: data.is_game_finished ?? initialGameState.isGameFinished,
+                            game_mode: data.game_mode ?? initialGameState.game_mode,
+                            era: data.era ?? initialGameState.era,
+                            turn: data.turn ?? initialGameState.turn,
+                            growthPoints: data.growth_points ?? initialGameState.growthPoints,
+                            planetName: data.planet_name ?? `Planet-${Math.random().toString(36).substring(2, 7)}`,
+                            triggeredEventKeys: data.triggered_event_keys ?? initialGameState.triggeredEventKeys,
+                            // currentView will be reset or handled by navigation logic, not loaded from DB for now
                         });
                     } else {
-                        console.log("No saved state found in Supabase for this address. Using defaults.");
-                        // Optional: Explicitly reset to defaults if needed, 
-                        // but initial state should handle this.
-                        // set({ karma: 50, narrativeLog: [] });
+                        console.log("No saved state found in Supabase for this address. Resetting to defaults and saving initial state.");
+                         // Reset to initial state if no data found
+                        get().resetPlanetState(); 
+                        // Immediately save the initial state to Supabase
+                        get().savePlanetState(); 
                     }
                 } catch (error) {
-                     console.error("Caught error during state loading:", error);
+                     console.error("Caught error during state loading, resetting state:", error);
+                     // Reset state on any other caught error during loading
+                     get().resetPlanetState();
                 }
             },
             // --- End rewritten loadPlanetState ---
 
             // --- Rewritten savePlanetState using Supabase --- 
             savePlanetState: async () => {
-                 const { walletAddress, karma, narrativeLog } = get();
+                 // Include is_game_finished and resolved_event_count in save
+                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, game_mode, era, turn, growthPoints, planetName, triggeredEventKeys } = get(); 
                  if (!walletAddress) {
                      console.warn("Cannot save state: No wallet address set.");
                      return;
@@ -134,6 +228,14 @@ const usePlanetStore = create(
                              wallet_address: walletAddress,
                              karma: karma,
                              narrative_log: narrativeLog,
+                             is_game_finished: isGameFinished, // Save game finished status
+                             resolved_event_count: resolvedEventCount, // Save resolved count
+                             game_mode: game_mode,
+                             era: era,
+                             turn: turn,
+                             growth_points: growthPoints,
+                             planet_name: planetName,
+                             triggered_event_keys: triggeredEventKeys,
                              // last_updated_at is handled by DB trigger/default
                          })
                          .select(); // Optionally select the result
@@ -156,24 +258,30 @@ const usePlanetStore = create(
             // --- End rewritten savePlanetState ---
 
             initializePlanet: (chosenMode) => {
-                // const initialResources = { water: 70, light: 70, air: 70, ideas: 50 }; // REMOVED
+                const now = Date.now();
+                const newPlanetName = `Planet-${Math.random().toString(36).substring(2, 7)}`;
                 set({
-                    planetName: `Planet-${Math.random().toString(36).substring(2, 7)}`,
-                    mode: chosenMode,
-                    era: 1,
-                    turn: 1,
-                    karma: 50,
-                    growthPoints: 0,
-                    // resources: { ...initialResources }, // REMOVED
-                    createdAt: Date.now(),
-                    lastTickTime: Date.now(),
-                    activeEvent: null,
-                    triggeredEventKeys: [],
-                    resolvedEventCount: 0,
-                    narrativeLog: [`Planet ${chosenMode} initialized. Era: 1, Turn: 1, Karma: 50`],
-                    isGameFinished: false,
+                    // Explicitly set fields instead of spreading all of initialGameState
+                    // to preserve global progress like triggeredEventKeys and resolvedEventCount across mode initializations.
+                    planetName: newPlanetName,
+                    game_mode: chosenMode,
+                    era: initialGameState.era, // Reset era for the new mode
+                    turn: initialGameState.turn, // Reset turn for the new mode
+                    karma: initialGameState.karma, // Reset karma or set to a mode-specific start
+                    growthPoints: initialGameState.growthPoints, // Reset growth points
+                    activeEvent: null, // Clear active event
+                    isEventPopupOpen: false,
+                    hasPendingEvent: false,
+                    isFlowEffectActive: false, 
+                    // narrativeLog: [`Planet ${newPlanetName} (${chosenMode}) initialized. Era: 1, Turn: 1, Karma: 50`], // Log entry might be better handled in calling context or based on new/existing
+                    // Keep existing narrativeLog, resolvedEventCount, triggeredEventKeys, walletAddress
+                    createdAt: now, // Update createdAt to signify re-initialization for this mode context
+                    lastTickTime: now,
+                    currentView: chosenMode === PLANET_MODES.BASE ? 'base_planet' : 'main_planet',
                 });
-                console.log(`Planet initialized in ${chosenMode} mode.`);
+                console.log(`Planet initialized in ${chosenMode} mode. Critical gameplay states like overall resolved events and triggered keys are preserved.`);
+                // Save state after this specific type of initialization
+                 get().savePlanetState();
             },
 
             incrementTurn: () => {
@@ -189,8 +297,8 @@ const usePlanetStore = create(
                  console.log(`Turn advanced to: ${newTurn}`);
 
                  // Automatically try to trigger an event after incrementing the turn
-                 get().triggerNextEvent();
-            },
+                 get().triggerNextEvent(); 
+            }, // Closing brace for incrementTurn was missing
 
             // REFACTORED Action to trigger the next available event using the new structure
             triggerNextEvent: () => {
@@ -204,118 +312,239 @@ const usePlanetStore = create(
 
                  // Find the first eligible event that hasn't been triggered yet
                  for (const event of availableEvents) {
-                     const isEraMatch = event.era === state.era;
-                     const isKarmaMatch = state.karma >= event.karmaLevel[0] && state.karma <= event.karmaLevel[1];
-                     const isTurnMatch = state.turn >= event.turns[0] && state.turn <= event.turns[1];
-                     // Optional: Check if already triggered (using triggeredEventKeys now)
-                     // const isAlreadyTriggered = state.triggeredEventKeys.includes(event.eventKey);
+                     const isEraMatch = !event.era || event.era === state.era; // Allow events without era constraint
+                     const isKarmaMatch = !event.karmaLevel || (state.karma >= event.karmaLevel[0] && state.karma <= event.karmaLevel[1]);
+                     const isTurnMatch = !event.turns || (state.turn >= event.turns[0] && state.turn <= event.turns[1]);
+                     // Ensure eventKey exists before checking triggered list
+                     const isAlreadyTriggered = event.eventKey && state.triggeredEventKeys.includes(event.eventKey); 
 
-                     if (isEraMatch && isKarmaMatch && isTurnMatch /* && !isAlreadyTriggered */) {
+                     // Trigger if matches AND not already triggered
+                     if (isEraMatch && isKarmaMatch && isTurnMatch && !isAlreadyTriggered) {
                          eligibleEvent = event;
                          break; // Found one, stop searching (simple strategy)
                      }
                  }
 
                  if (eligibleEvent) {
-                      console.log("Triggering event:", eligibleEvent.title);
-                      set({
-                           activeEvent: eligibleEvent, // Store the full event object
-                           // Add the key to triggered list to prevent immediate repeat
-                           // triggeredEventKeys: [...state.triggeredEventKeys, eligibleEvent.eventKey]
-                      });
+                      console.log("Triggering event:", eligibleEvent.title, "(Key:", eligibleEvent.eventKey, ")");
+                       set({
+                            activeEvent: eligibleEvent, // Store the full event object
+                            hasPendingEvent: true, // Indicate an event is waiting
+                            isEventPopupOpen: false, // Ensure popup isn't open yet
+                       });
+                      console.log("[triggerNextEvent] Set activeEvent:", eligibleEvent?.title, "(Pending notification)");
                  } else {
                       console.log("No eligible events found to trigger for the current state.");
                       // Optionally add a message to the narrative log
                       // set(prevState => ({ narrativeLog: [...prevState.narrativeLog, "The winds are calm, no major events stir."] }));
                  }
+                 // Optionally, could pass the 'events' object if it varies by mode or other state
+                 get().checkAndTriggerEvent(events); // Pass the main events object
+            }, // End of triggerNextEvent
+
+            triggerSpecificEvent: (eventKey) => {
+                const state = get();
+                if (state.isGameFinished || state.activeEvent) {
+                    console.log("Cannot trigger specific event: Game finished or an event is already active.");
+                    return;
+                }
+
+                // For now, assume eventKey is for baseEvents.
+                // This could be expanded to check main events or other event sources if needed.
+                const eventToTrigger = baseEvents[eventKey];
+
+                if (eventToTrigger) {
+                    console.log(`Triggering specific event: ${eventKey}`);
+                    set({
+                        activeEvent: { ...eventToTrigger, eventKey: eventKey }, // Ensure eventKey is part of activeEvent
+                        isEventPopupOpen: true,
+                        isEventPopupMinimized: false,
+                        hasPendingEvent: false, // Clear any pending event flag
+                        narrativeLog: [...state.narrativeLog, `Event triggered: ${eventToTrigger.title || eventKey}`],
+                    });
+                } else {
+                    console.warn(`Specific event not found: ${eventKey}`);
+                }
             },
 
-            // Add resources manually // REMOVED addResource action
-            // addResource: (resourceType, amount) => {
-            //     set((state) => ({
-            //         resources: {
-            //             ...state.resources,
-            //             [resourceType]: Math.max(0, (state.resources[resourceType] || 0) + amount),
-            //         },
-            //     }));
-            // },
-
-            // Action to handle user choice on an event - REFACTORED for new structure
-             resolveEvent: (chosenOption) => {
+            // REFACTORED resolveEvent to use the new event structure and applyChoiceOutcomeEffects
+            resolveEvent: (chosenOption) => {
                 const state = get();
                 if (!state.activeEvent || state.isGameFinished) return;
 
-                console.log("Resolving event:", state.activeEvent.title, "with option:", chosenOption.id);
+                // --- DETAILED LOGGING --- 
+                console.log("[resolveEvent] Called. Current activeEvent:", state.activeEvent?.title);
+                console.log("[resolveEvent] Chosen Option:", chosenOption);
+                // --- END LOGGING --- 
 
-                const randomChance = Math.random() * 100;
-                let outcome;
-                if (randomChance < chosenOption.success.probability) {
-                    outcome = chosenOption.success;
-                    console.log("Outcome: Success");
-                } else {
-                    outcome = chosenOption.failed;
-                    console.log("Outcome: Failed");
-                }
+                 // If no option chosen (e.g., auto-resolve event), treat as default success/no specific outcome
+                 let outcome;
+                 if (chosenOption) {
+                    const randomChance = Math.random() * 100;
+                    if (randomChance < (chosenOption.success?.probability ?? 100)) { // Default to 100% success if not specified
+                        outcome = { ...chosenOption.success, optionId: chosenOption.id }; // Add optionId
+                        console.log("Outcome: Success");
+                    } else {
+                        outcome = { ...chosenOption.failed, optionId: chosenOption.id }; // Add optionId
+                        console.log("Outcome: Failed");
+                    }
+                 } else {
+                     // Handle events without options or auto-resolve logic
+                     outcome = state.activeEvent.defaultOutcome || {}; // Use a default outcome if defined, else empty
+                     console.log("Outcome: Auto-resolved or No option chosen");
+                 }
+
 
                 const stateChanges = applyChoiceOutcomeEffects(state, outcome);
 
                 // Apply the calculated changes
-                // const updatedResources = { ...state.resources }; // REMOVED
-                // if (stateChanges.resources) { // REMOVED
-                //     Object.entries(stateChanges.resources).forEach(([res, change]) => {
-                //         updatedResources[res] = Math.max(0, (updatedResources[res] || 0) + change);
-                //     });
-                // }
                 const newGrowthPoints = state.growthPoints + stateChanges.growthPoints;
                 const newKarma = state.karma + stateChanges.karma;
                 const newNarrativeLog = [...state.narrativeLog];
-                if(stateChanges.narrative) {
-                    newNarrativeLog.push(`[${state.activeEvent.title} - Opt ${chosenOption.id}] ${stateChanges.narrative} (Karma ${stateChanges.karma > 0 ? '+' : ''}${stateChanges.karma})`);
-                }
-                const newResolvedEventCount = state.resolvedEventCount + 1;
-                const resolvedEventKey = state.activeEvent.eventKey;
 
-                set({
-                    activeEvent: null,
-                    // resources: updatedResources, // REMOVED
+                if (chosenOption && stateChanges.narrative) {
+                    // More detailed log for chosen option and its outcome
+                    const chosenOptionText = chosenOption.description_zh || chosenOption.id;
+                    const outcomeNarrative = stateChanges.narrative;
+                    const outcomeHashtag = stateChanges.hashtag ? ` ${stateChanges.hashtag}` : "";
+                    const karmaChangeText = stateChanges.karma !== 0 ? ` (Karma ${stateChanges.karma > 0 ? '+' : ''}${stateChanges.karma})` : "";
+                    newNarrativeLog.push(`[${state.activeEvent.title}] Chose: "${chosenOptionText}". Result: "${outcomeNarrative}"${outcomeHashtag}${karmaChangeText}`);
+                } else if (stateChanges.narrative) {
+                    // Log for events that might auto-resolve or have a narrative without distinct options shown to user before resolving
+                    const outcomeNarrative = stateChanges.narrative;
+                    const outcomeHashtag = stateChanges.hashtag ? ` ${stateChanges.hashtag}` : "";
+                    const karmaChangeText = stateChanges.karma !== 0 ? ` (Karma ${stateChanges.karma > 0 ? '+' : ''}${stateChanges.karma})` : "";
+                    newNarrativeLog.push(`[${state.activeEvent.title}] Outcome: "${outcomeNarrative}"${outcomeHashtag}${karmaChangeText}`);
+                } else if (!chosenOption) {
+                     newNarrativeLog.push(`[${state.activeEvent.title}] Event period concluded.`);
+                }
+                
+                const newResolvedEventCount = state.resolvedEventCount + 1;
+                const resolvedEventKey = state.activeEvent.eventKey; 
+                const nextEventKeyFromCurrent = state.activeEvent.nextEventKey; 
+                
+                let activateFlowEffect = false;
+                // IMPORTANT: Replace 'option1' with the actual ID or a distinguishing property 
+                // of the choice that should trigger the FlowEffect.
+                // For example, if your chosenOption object has a specific `effectType` or `name`:
+                // if (chosenOption && chosenOption.id === 'option1_id_from_event_data') {
+                if (chosenOption && chosenOption.id === 'option1') { 
+                    console.log("[resolveEvent] Option 1 chosen, activating FlowEffect.");
+                    activateFlowEffect = true;
+                }
+
+                set(prevState => ({
+                    activeEvent: null, 
                     growthPoints: newGrowthPoints,
                     karma: newKarma,
                     narrativeLog: newNarrativeLog,
                     resolvedEventCount: newResolvedEventCount,
-                    triggeredEventKeys: [...state.triggeredEventKeys, resolvedEventKey]
-                });
+                    triggeredEventKeys: resolvedEventKey ? [...prevState.triggeredEventKeys, resolvedEventKey] : prevState.triggeredEventKeys, 
+                    isEventPopupOpen: false, 
+                    hasPendingEvent: false, 
+                    isFlowEffectActive: activateFlowEffect,
+                }));
 
-                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount });
-                get().savePlanetState();
-            },
+                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount, era: get().era, turn: get().turn });
+                get().savePlanetState(); 
+
+                // After current event is resolved and state updated, check for next event OR badge
+                if (resolvedEventKey === 'BASE_SPRING_04') { // Check if the resolved event was the last in sequence
+                    console.log("Completed BASE_SPRING_04, earning completion badge.");
+                    get().earnBaseCompletionBadge();
+                } else if (nextEventKeyFromCurrent && state.currentView === 'base_planet') {
+                    const nextEventToTrigger = baseEvents[nextEventKeyFromCurrent];
+                    if (nextEventToTrigger) {
+                        console.log(`Auto-triggering next event in sequence: ${nextEventKeyFromCurrent}`);
+                        // Use a brief timeout to allow UI to settle before showing the next event
+                        setTimeout(() => {
+                            set({
+                                activeEvent: { ...nextEventToTrigger, eventKey: nextEventKeyFromCurrent },
+                                isEventPopupOpen: true,
+                                isEventPopupMinimized: false,
+                                hasPendingEvent: false,
+                                narrativeLog: [...get().narrativeLog, `Event triggered: ${nextEventToTrigger.title || nextEventKeyFromCurrent}`],
+                            });
+                        }, 500); // 0.5 second delay
+                    } else {
+                        console.warn(`Next event key "${nextEventKeyFromCurrent}" not found in baseEvents.`);
+                    }
+                }
+
+                if (activateFlowEffect) {
+                    setTimeout(() => {
+                        set({ isFlowEffectActive: false });
+                        console.log("[resolveEvent] FlowEffect automatically deactivated after 5 seconds.");
+                    }, 5000); // Deactivate after 5 seconds (adjust as needed)
+                }
+            }, // Closing brace for resolveEvent
 
             // Action to explicitly end the game
             finishGame: () => {
+                 if (get().isGameFinished) return; // Prevent multiple calls
                 set({ isGameFinished: true });
                 console.log("Game Finished!");
-            },
+                get().savePlanetState(); // Save the final finished state
+            }, // Closing brace for finishGame
 
             // --- Add back the tick action ---
             tick: () => {
                 if (get().isGameFinished || get().activeEvent) return; // Don't tick if paused/ended
 
                 const now = Date.now();
-                const timeElapsed = now - get().lastTickTime;
+                // Remove unused timeElapsed variable
+                // const timeElapsed = now - get().lastTickTime;
 
                 // Add any time-based logic here in the future (e.g., resource decay?)
                 // For now, just update the last tick time.
 
                 set({ lastTickTime: now });
+                
+                // --- Check for event trigger on tick ---
+                // Decide if events should trigger on tick or only on turn increment.
+                // If on tick, uncomment below:
+                // get().triggerNextEvent(); 
 
                 // Optional: console.log("Tick:", timeElapsed);
+            }, // Closing brace for tick action ---
+
+            // --- Actions for Event Popup State ---
+            maximizeEventPopup: () => {
+                if (get().activeEvent) { // Only open if there is an event to show
+                   set({ isEventPopupOpen: true, hasPendingEvent: false });
+                   console.log("Event popup opened/maximized.");
+                } else {
+                    console.log("Tried to open event popup, but no active event.");
+                }
+            },
+            minimizeEventPopup: () => {
+                set({ isEventPopupOpen: false });
+                console.log("Event popup closed/minimized.");
             }
-            // --- End tick action ---
+            // --- End Popup State Actions ---
 
-        }),
-        {
-            name: 'planetary-pet-storage-v2',
+        }), // Closing parenthesis for the main state object
+        { // Persist configuration
+            name: 'planetary-pet-storage-v3', // Consider changing name if schema changed significantly
+            // Optionally specify parts of the state to persist or ignore
+            partialize: (state) => {
+                // Return only the state that should be persisted
+                // eslint-disable-next-line no-unused-vars
+                const { coinbaseProvider, coinbaseAccount, ...rest } = state;
+                return rest; // Exclude coinbaseProvider and coinbaseAccount
+            },
+            // onRehydrateStorage: (state) => {
+            //   console.log("hydration starts");
+            //   return (state, error) => {
+            //     if (error) {
+            //       console.log("an error happened during hydration", error);
+            //     } else {
+            //       console.log("hydration finished");
+            //     }
+            //   };
+            // },
         }
-    )
-);
+    ) // Closing parenthesis for persist
+); // Closing parenthesis for create
 
-export default usePlanetStore; 
+export default usePlanetStore;

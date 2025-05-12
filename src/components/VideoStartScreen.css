@@ -1,0 +1,65 @@
+.video-start-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #000; /* Black background */
+  z-index: 2000; /* Ensure it's on top initially */
+}
+
+.intro-video {
+  /* Display video at its original size, centered by parent */
+  /* width: 70vmin; */ /* Remove fixed width */
+  /* height: 70vmin; */ /* Remove fixed height */
+  /* object-fit: cover; */ /* No longer needed when using natural size */
+  max-width: 100%; /* Ensure video doesn't overflow screen horizontally */
+  max-height: 100%; /* Ensure video doesn't overflow screen vertically */
+  /* Centering is handled by the parent .video-start-screen flex container */
+}
+
+.start-button {
+  position: absolute; /* Position over the video */
+  bottom: 10%; /* Adjust vertical position */
+  z-index: 2001; /* Ensure button is above video */
+  /* Inherit pixel style from .pixel-button */
+}
+
+/* Basic pixel button style */
+.pixel-button {
+  background-color: #9d4edd; /* A purple color */
+  border: 2px solid #000;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px; /* Slightly larger */
+  font-family: 'Press Start 2P', monospace; /* Requires importing this font - see note below */
+  font-weight: bold; /* Make the font bold */
+  /* Fallback font if Press Start 2P is not available */
+  /* font-family: monospace; */
+  cursor: pointer;
+  image-rendering: pixelated; /* Helps keep edges sharp if using background images */
+  box-shadow: 4px 4px 0px #000; /* Simple pixel shadow */
+  border-radius: 0; /* Sharp corners */
+  transition: background-color 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pixel-button:hover {
+  background-color: #c77dff;
+}
+
+.pixel-button:active {
+  background-color: #7b2cbf;
+  box-shadow: 1px 1px 0px #000;
+  transform: translate(3px, 3px);
+}
+
+/* Note: To use 'Press Start 2P', you'd typically import it via Google Fonts */
+/* in your index.html or main CSS file. Example: */
+/* @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap'); */ 

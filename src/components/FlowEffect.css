@@ -1,0 +1,73 @@
+@keyframes flowAnimation {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    20%, 80% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 5px 2px rgba(0, 150, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 15px 5px rgba(0, 150, 255, 1);
+    }
+}
+
+.flow-effect-container {
+    position: absolute; /* Or fixed, depending on where it's placed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through */
+    overflow: hidden; /* Hide parts of lines outside the container */
+    z-index: 100; /* Ensure it's above other content if needed */
+}
+
+.flow-line-wrapper {
+    position: absolute;
+    width: 2px; /* Width of the light ray */
+    height: 100%; /* Full height of the container */
+    /* Distribute lines across the width - this is a simple approach */
+    left: calc(var(--i) * (100% / var(--total-lines))); 
+}
+
+.flow-line {
+    position: absolute;
+    width: 100%;
+    height: 50%; /* Length of the light ray - adjust as needed */
+    background: linear-gradient(
+        transparent,
+        rgba(0, 150, 255, 0.8),
+        transparent
+    );
+    border-radius: 1px;
+    animation-name: flowAnimation, pulseGlow;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+    /* animation-delay and animation-duration are set inline for randomness */
+    /* Example of fixed duration if not set inline:
+    animation-duration: 3s, 1.5s; 
+    */
+}
+
+/* Optional: Text to indicate the effect is active */
+.flow-overlay-text {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background-color: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1em;
+} 

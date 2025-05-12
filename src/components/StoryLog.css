@@ -50,4 +50,31 @@
 .log-entry {
     margin: 0 0 5px 0;
     line-height: 1.4;
+}
+
+.restore-event-container { /* Style the container for centering */
+    text-align: center; /* Center the inline-block button */
+    margin-bottom: 8px; /* Add some space below the button */
+}
+
+.restore-event-btn {
+    background-color: #4f4f81; /* Use a button background color */
+    border: 1px solid #6a6aaf; /* Add a border */
+    color: white; /* Button text color */
+    padding: 6px 12px; /* Button padding */
+    margin: 0 0 5px 0; /* Match log-entry margin */
+    font-family: inherit; /* Inherit font from container */
+    font-size: inherit; /* Inherit font size from container (now normal size) */
+    text-align: center; /* Center text within the button */
+    cursor: pointer; /* Keep pointer cursor */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Allow centering via text-align on parent */
+    line-height: 1.4; /* Match log-entry line height */
+    border-radius: 5px; /* Add border radius */
+    transition: background-color 0.2s ease; /* Add transition */
+}
+
+.restore-event-btn:hover {
+    background-color: #6a6aaf; /* Darker hover background */
+    color: white; /* Keep text color */
 } 
