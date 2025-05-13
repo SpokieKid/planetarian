@@ -30,6 +30,7 @@ const initialGameState = {
     hasSeenBaseEventTriggerDialogEver: false, // <-- New state for one-time dialog
     hasEarnedBaseCompletionBadge: false, // <-- New state for badge earned
     showBaseCompletionPopup: false, // <-- New state for showing badge popup
+    dataWaveTriggerCount: 0, // Counter for data wave triggers
 };
 
 // Function to apply effects based on chosen option and its outcome (Success/Fail)
@@ -541,6 +542,8 @@ const usePlanetStore = create(
             }),
             // --- End action ---
 
+            // New action to trigger data wave
+            triggerDataWave: () => set(state => ({ dataWaveTriggerCount: state.dataWaveTriggerCount + 1 })),
         }), // Closing parenthesis for the main state object
         { // Persist configuration
             name: 'planetary-pet-storage-v3', // Consider changing name if schema changed significantly

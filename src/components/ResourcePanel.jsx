@@ -24,6 +24,7 @@ const ResourcePanel = () => {
         // addResource, // REMOVED
         hasEarnedBaseCompletionBadge,
         incrementResolvedEventCount,
+        triggerDataWave, // Select the new action
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
@@ -39,6 +40,7 @@ const ResourcePanel = () => {
             // addResource: state.addResource, // REMOVED
             hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
             incrementResolvedEventCount: state.incrementResolvedEventCount,
+            triggerDataWave: state.triggerDataWave, // Add to selector
         }))
     );
 
@@ -118,7 +120,7 @@ const ResourcePanel = () => {
 
         // --- Log connectedWallet right before the check --- 
         console.log("[handlePublish] Checking connectedWallet:", walletAddress);
-        console.log("[handlePublish] typeof connectedWallet.getProvider:", typeof walletAddress?.getProvider);
+        console.log("[handlePublish] typeof connectedWallet?.getProvider:", typeof walletAddress?.getProvider);
         // ---
 
         // Initial Checks
@@ -263,6 +265,13 @@ const ResourcePanel = () => {
                       {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
                   </button>
                 </div>
+                <button 
+                    onClick={triggerDataWave} 
+                    className="test-effect-btn" // Add a class for potential styling
+                    style={{ marginTop: '10px' }} // Add some space
+                >
+                    Trigger Data Wave (Test)
+                </button>
                 <button 
                     onClick={incrementResolvedEventCount} 
                     className="test-effect-btn" // Add a class for potential styling

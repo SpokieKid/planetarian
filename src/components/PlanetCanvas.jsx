@@ -8,6 +8,7 @@ import CollectibleSuns from './CollectibleSuns'; // Import the new suns componen
 // import usePlanetStore from '../hooks/usePlanetState'; // Removed as unused
 // import { getVisualStyle } from '../utils/resourceMapping'; // To get background color - Removed
 import EmojiParticles from './EmojiParticles'; // Import the new EmojiParticles component
+import DataWave from './DataWave'; // Import the DataWave component
 import './PlanetCanvas.css'; // Basic styling for canvas container
 
 const PlanetCanvas = () => {
@@ -33,6 +34,7 @@ const PlanetCanvas = () => {
                     <OrbitingObjects count={8} /> {/* Add orbiting objects */} 
                     <BackgroundShips count={5} /> {/* Add background ships */} 
                     <EmojiParticles />
+                    <DataWave planetScale={1.5} /> {/* Pass initial planetScale */}
                     <Preload all /> {/* Preload assets */} 
                 </Suspense>
                 
