@@ -5,13 +5,14 @@ import Planet from './Planet'; // Import the new Planet component
 import OrbitingObjects from './OrbitingObjects'; // Import orbiting objects
 import BackgroundShips from './BackgroundShips'; // Import background ships
 import CollectibleSuns from './CollectibleSuns'; // Import the new suns component
-import usePlanetStore from '../hooks/usePlanetState';
-import { getVisualStyle } from '../utils/resourceMapping'; // To get background color
+// import usePlanetStore from '../hooks/usePlanetState'; // Removed as unused
+// import { getVisualStyle } from '../utils/resourceMapping'; // To get background color - Removed
+import EmojiParticles from './EmojiParticles'; // Import the new EmojiParticles component
 import './PlanetCanvas.css'; // Basic styling for canvas container
 
 const PlanetCanvas = () => {
-    const mode = usePlanetStore(state => state.mode);
-    const visualStyle = getVisualStyle(mode);
+    // const mode = usePlanetStore(state => state.mode); // Removed as it's unused
+    // const visualStyle = getVisualStyle(mode); // Remove or uncomment this line
 
     return (
         <div className="planet-canvas-container">
@@ -31,6 +32,7 @@ const PlanetCanvas = () => {
                     <Planet />
                     <OrbitingObjects count={8} /> {/* Add orbiting objects */} 
                     <BackgroundShips count={5} /> {/* Add background ships */} 
+                    <EmojiParticles />
                     <Preload all /> {/* Preload assets */} 
                 </Suspense>
                 

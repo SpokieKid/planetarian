@@ -532,8 +532,14 @@ const usePlanetStore = create(
             minimizeEventPopup: () => {
                 set({ isEventPopupOpen: false });
                 console.log("Event popup closed/minimized.");
-            }
-            // --- End Popup State Actions ---
+            },
+
+            // --- Add action to manually increment resolvedEventCount for testing --- 
+            incrementResolvedEventCount: () => set(state => {
+                console.log("[usePlanetStore] Incrementing resolvedEventCount");
+                return { resolvedEventCount: state.resolvedEventCount + 1 };
+            }),
+            // --- End action ---
 
         }), // Closing parenthesis for the main state object
         { // Persist configuration

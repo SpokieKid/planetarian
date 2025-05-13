@@ -23,6 +23,7 @@ const ResourcePanel = () => {
         coinbaseProvider, // Get Coinbase provider
         // addResource, // REMOVED
         hasEarnedBaseCompletionBadge,
+        incrementResolvedEventCount,
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
@@ -37,6 +38,7 @@ const ResourcePanel = () => {
             coinbaseProvider: state.coinbaseProvider, // Add provider
             // addResource: state.addResource, // REMOVED
             hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
+            incrementResolvedEventCount: state.incrementResolvedEventCount,
         }))
     );
 
@@ -261,6 +263,13 @@ const ResourcePanel = () => {
                       {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
                   </button>
                 </div>
+                <button 
+                    onClick={incrementResolvedEventCount} 
+                    className="test-effect-btn" // Add a class for potential styling
+                    style={{ marginTop: '10px' }} // Add some space
+                >
+                    Trigger Emoji Effect (Test)
+                </button>
             </div>
             {/* --- Display Publish Status --- */}
             {publishStatus && <p className="publish-status">{publishStatus}</p>}
