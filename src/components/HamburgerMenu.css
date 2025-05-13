@@ -1,0 +1,74 @@
+/* src/components/HamburgerMenu.css */
+
+.hamburger-menu-container {
+    position: fixed;
+    top: 15px; /* Position from top */
+    right: 15px; /* Position from right */
+    z-index: 2000; /* Ensure it's above everything */
+}
+
+.hamburger-icon {
+    background: none;
+    border: none;
+    font-size: 24px; /* Adjust size */
+    color: white; /* Icon color */
+    cursor: pointer;
+    padding: 5px;
+    z-index: 2001; /* Ensure icon is clickable */
+    position: relative; /* Needed for z-index to work relative to container */
+}
+
+.menu-content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 80%; /* Adjust width as needed for mobile */
+    max-width: 350px; /* Max width for larger screens */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Semi-transparent dark background */
+    color: white;
+    padding: 20px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.5); /* Add shadow */
+    overflow-y: auto; /* Enable scrolling if content is tall */
+    transition: transform 0.3s ease-out; /* Smooth transition */
+    transform: translateX(0); /* Start visible (adjust if you want off-screen initially) */
+    z-index: 2000; /* Below the icon but above game content */
+
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+}
+
+/* Optional: Style for closed state if you want it to slide in */
+/* .hamburger-menu-container .menu-content {
+     transform: translateX(100%);
+}
+.hamburger-menu-container.open .menu-content {
+     transform: translateX(0);
+}
+*/
+
+.wallet-status {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Separator */
+    font-size: 0.9em;
+}
+
+.story-log-in-menu {
+    flex-grow: 0; /* Don't grow to fill space */
+    max-height: 50px; /* Set a max height - adjust this value as needed */
+    /* Ensure StoryLog component itself has appropriate height/overflow if needed */
+}
+
+/* Adjust StoryLog styles within the menu if necessary */
+.story-log-in-menu .story-log-container {
+    position: static; /* Override fixed/absolute positioning if StoryLog has it */
+    height: 300px; /* Allow height to be determined by content/max-height */
+    display: flex;
+    flex-direction: column;
+}
+
+.story-log-in-menu .story-log-entries {
+    flex-grow: 1; /* Allow entries to scroll */
+    overflow-y: auto; /* Make story log content scrollable */
+} 

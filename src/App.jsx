@@ -20,6 +20,8 @@ import BaseCompletionPopup from './components/BaseCompletionPopup';
 import { createCoinbaseWalletSDK } from '@coinbase/wallet-sdk';
 import './App.css';
 import { useTranslation } from 'react-i18next';
+import CollapsibleResourcePanel from './components/CollapsibleResourcePanel';
+import HamburgerMenu from './components/HamburgerMenu';
 
 // --- Add Nounii System Prompt Logic ---
 const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的数字生命体。
@@ -378,8 +380,7 @@ function App() {
     mainContent = (
       <>
         <PlanetCanvas />
-        <ResourcePanel />
-        <StoryLog />
+        <CollapsibleResourcePanel />
         {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />} {/* Check isEventPopupOpen? */}
         {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>} {/* Placeholder for FlowEffect */}
         {currentView === 'main_planet' && <WormholeIcon />}
@@ -403,14 +404,7 @@ function App() {
       {/* --- Coinbase Wallet Auth Controls --- */}
       <div className="auth-controls">
           {!isSdkInitialized && <div className="loading-indicator">{t('initializingWalletSDK')}</div>}
-          {isSdkInitialized && coinbaseAccount && (
-              <>
-                {/* Shorten displayed address */}
-                <span>{t('connected')} {`${coinbaseAccount.substring(0, 6)}...${coinbaseAccount.substring(coinbaseAccount.length - 4)}`}</span>
-                <button onClick={disconnectCoinbaseWallet}>{t('disconnect')}</button>
-              </>
-          )}
-          {isSdkInitialized && !coinbaseAccount && (
+          {isSdkInitialized && !coinbaseAccount && ( // Only show connect button if not connected
               <button onClick={connectCoinbaseWallet} disabled={isCoinbaseConnecting || !coinbaseProvider}>
                   {isCoinbaseConnecting ? t('connecting') : t('connectWallet')}
               </button>
@@ -422,6 +416,9 @@ function App() {
 
       {/* --- Main Rendering Logic --- */}
       {mainContent}
+
+      {/* Hamburger Menu (contains StoryLog and Wallet Status) */}
+      <HamburgerMenu coinbaseAccount={coinbaseAccount} t={t} disconnectWallet={disconnectCoinbaseWallet} />
 
       {/* Base Planet Specific Modals/Popups */}
       {showBaseEventTriggerDialog && currentView === 'base_planet' && (
