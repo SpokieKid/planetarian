@@ -63,7 +63,7 @@ import { getVisualStyle } from '../utils/resourceMapping'; // Use for colors/tex
 const Planet = () => {
     const planetMeshRef = useRef();
     // Select state individually to prevent infinite loops
-    const mode = usePlanetStore(state => state.mode);
+    const game_mode = usePlanetStore(state => state.game_mode);
     const growthPoints = usePlanetStore(state => state.growthPoints);
     const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
     // const currentView = usePlanetStore(state => state.currentView);
@@ -83,10 +83,10 @@ const Planet = () => {
 
     // --- Effect to clear buildings on planet re-initialization (via createdAt or mode change) ---
     useEffect(() => {
-        console.log("[Planet.jsx] Mode or createdAt changed, resetting buildings. New mode:", mode);
+        console.log("[Planet.jsx] Mode or createdAt changed, resetting buildings. New mode:", game_mode);
         // setBuildings([]); // Comment out or remove if not needed anymore without buildings
         prevEventCountRef.current = 0;
-    }, [createdAt, mode]); // Depend on createdAt AND mode
+    }, [createdAt, game_mode]); // Depend on createdAt AND mode
 
     // --- Effect to add buildings when event count increases (COMMENTED OUT) ---
     // useEffect(() => {
@@ -133,10 +133,13 @@ const Planet = () => {
     });
 
     // Memoize style calculation to avoid re-running on every render
-    const visualStyle = useMemo(() => getVisualStyle(mode), [mode]);
+    const visualStyle = useMemo(() => getVisualStyle(game_mode), [game_mode]);
 
     // Load the texture based on the current mode
-    const texture = useLoader(THREE.TextureLoader, visualStyle.planetTextureUrl);
+    const texture = useLoader(THREE.TextureLoader, visualStyle.planetTextureUrl, 
+        (loader) => { console.log(`[Planet.jsx] Texture loading started for: ${visualStyle.planetTextureUrl}`); },
+        (progress) => { console.log(`[Planet.jsx] Texture loading progress: ${(progress.loaded / progress.total * 100).toFixed(2)}%`); },
+        (error) => { console.error(`[Planet.jsx] Texture loading failed for: ${visualStyle.planetTextureUrl}`, error); });
 
     // Ensure pixelated look for 8-bit style
     texture.magFilter = THREE.NearestFilter;

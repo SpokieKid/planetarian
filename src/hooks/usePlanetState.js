@@ -200,13 +200,22 @@ const usePlanetStore = create(
                             isPlanetDataLoaded: true, // Data loaded successfully
                             // currentView will be reset or handled by navigation logic, not loaded from DB for now
                         });
+                        console.log("Supabase state loaded and Zustand state updated:", { game_mode: get().game_mode, isPlanetDataLoaded: true }); // Add confirmation log
+
+                        // --- IMPORTANT: Add this line ---
+                        // Only switch view after data is loaded and state is set
+                        set({ currentView: 'main_planet' });
+                        console.log("Setting currentView to 'main_planet' after state load.");
+                        // ---------------------------------
+
                     } else {
                         console.log("No saved state found in Supabase for this address. Generating new planet and saving initial state.");
                         // No data found, initialize with a NEW random name and initial state, then save.
                         const newPlanetName = `Planet-${Math.random().toString(36).substring(2, 7)}`;
                         const now = Date.now();
                         set({
-                            ...initialGameState, // Start with initial state defaults
+                            ...initialGameState, // Keep spreading for other defaults
+                            game_mode: initialGameState.game_mode, // <-- Explicitly set game_mode here
                             planetName: newPlanetName, // Assign the new random name
                             walletAddress: walletAddress, // Ensure wallet address is set in state
                             createdAt: now,
@@ -216,6 +225,11 @@ const usePlanetStore = create(
                         });
                         // Immediately save this newly initialized state
                         get().savePlanetState();
+
+                        // --- IMPORTANT: Add this line ---
+                        set({ currentView: 'main_planet' });
+                        console.log("Setting currentView to 'main_planet' after new state initialization.");
+                        // ---------------------------------
                     }
                 } catch (error) {
                      console.error("Caught error during state loading, resetting state:", error);

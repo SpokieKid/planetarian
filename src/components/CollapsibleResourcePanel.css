@@ -28,8 +28,8 @@
 }
 
 .resource-panel-toggle-button img {
-    width: 40px; /* Adjust icon size */
-    height: 40px;
+    width: 50px; /* Adjust icon size */
+    height: auto;
     /* Add more styling for icon if needed */
     display: block; /* Prevent extra space below image */
 }
@@ -42,10 +42,10 @@
 
 .resource-panel-content {
     /* Styling for the container holding ResourcePanel */
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0); /* Semi-transparent background */
     padding: 15px;
     border-radius: 8px;
-    max-width: 300px; /* Adjust as needed */
+    max-width: auto; /* Adjust as needed */
     /* Add transition for smooth open/close effect */
     width: 0; /* Start with 0 width when collapsed */
     opacity: 0; /* Start with 0 opacity when collapsed */

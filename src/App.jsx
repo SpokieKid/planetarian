@@ -80,10 +80,18 @@ function App() {
     hasSeenBaseEventTriggerDialogEver, setHasSeenBaseEventTriggerDialogEver,
     showBaseCompletionPopup,
     setWalletAddress,
-    mode,
+    game_mode,
     isPlanetDataLoaded
   } = usePlanetStore(
     useShallow(state => ({
+      // Log when these key states change as seen by App component
+      // console.log("[App] Zustand state selector observed change:", {
+      //   mode: state.mode,
+      //   isPlanetDataLoaded: state.isPlanetDataLoaded,
+      //   activeEvent: !!state.activeEvent, // Use boolean to avoid logging large object
+      //   isEventPopupOpen: state.isEventPopupOpen,
+      //   hasPendingEvent: state.hasPendingEvent,
+      // });
       initializePlanet: state.initializePlanet,
       tick: state.tick,
       resolvedEventCount: state.resolvedEventCount,
@@ -105,7 +113,7 @@ function App() {
       setHasSeenBaseEventTriggerDialogEver: state.setHasSeenBaseEventTriggerDialogEver,
       showBaseCompletionPopup: state.showBaseCompletionPopup,
       setWalletAddress: state.setWalletAddress,
-      mode: state.mode,
+      game_mode: state.game_mode,
       isPlanetDataLoaded: state.isPlanetDataLoaded,
     }))
   );
@@ -116,7 +124,7 @@ function App() {
   const { switchChain } = useSwitchChain();
   // --- End wagmi hooks ---
 
-  // Local UI and SDK State
+  // Local UI State
   const [showIntro, setShowIntro] = useState(true);
   const [showVideoScreen, setShowVideoScreen] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
@@ -131,15 +139,26 @@ function App() {
       isConnected,
       walletAddress: walletAddressWagmi,
       currentChainId: chain?.id,
-      mode,
+      game_mode: game_mode,
       currentView,
       isPlanetDataLoaded,
       showIntro,
       showGuide,
       showVideoScreen,
     });
-  }, [isConnected, walletAddressWagmi, chain, mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
+  }, [isConnected, walletAddressWagmi, chain, game_mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
   // --- End Sentry Context Logging ---
+
+  // --- Effect to log changes in critical rendering states ---
+  useEffect(() => {
+      console.log("[App Effect] Critical rendering state changed:", {
+          game_mode: game_mode,
+          isPlanetDataLoaded,
+          activeEvent: !!activeEvent, // Log boolean
+          isEventPopupOpen,
+          currentView,
+      });
+  }, [game_mode, isPlanetDataLoaded, activeEvent, isEventPopupOpen, currentView]);
 
   // --- Effect to Load User State using wagmi Account ---
   useEffect(() => {
@@ -232,7 +251,11 @@ function App() {
   const handleGuideClose = () => {
     console.log('[App] handleGuideClose called.');
     setShowGuide(false);
-    console.log("Guide closed manually or because user was already logged in."); // Keep standard log too
+    console.log("Guide closed.");
+    // After closing guide, if wallet is connected, go to main_planet view
+    if (!isConnected) {
+        // If not connected after guide, stay on a state that prompts connection (handled by mainContent logic)
+    }
   };
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
@@ -297,8 +320,14 @@ function App() {
   }, [currentView, isGameFinished, hasBaseIntroBeenCompleted, hasSeenBaseEventTriggerDialogEver, showBaseEventTriggerDialog, setHasSeenBaseEventTriggerDialogEver]);
 
   // Main Content Rendering Logic (Adjusted for wagmi)
+  // --- Add logging before mainContent render logic ---
+  console.log('[App Render Logic Check] States for rendering:', {
+      // Directly access state from hook selector here
+      // This ensures we log the state values used *for this specific render pass*
+      currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded
+  });
   let mainContent = null;
-  console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, mode, isPlanetDataLoaded });
+  console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded });
   if (currentView === 'base_intro') {
     console.log('[App] Rendering BaseIntroScroller.');
     mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
@@ -309,16 +338,20 @@ function App() {
     console.log('[App] Rendering IntroScroller.');
     mainContent = <IntroScroller onFinished={handleIntroFinished} onTypingFinished={handleIntroTypingFinished} />;
   } else if (showGuide) {
-     console.log('[App] Rendering GuideOverlay.', { isConnected });
+     console.log('[App] Rendering GuideOverlay.', { isConnected, game_mode });
     mainContent = <GuideOverlay isConnected={isConnected} disconnect={disconnect} onClose={handleGuideClose} />;
   } else if (!isConnected && currentView !== 'base_intro' && currentView !== 'base_planet') {
       console.log('[App] Rendering Please Connect message.');
       mainContent = <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>{t('pleaseConnectWallet')}</div>;
-  } else if (isConnected && walletAddressWagmi && mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet')) {
-     console.log('[App] Rendering Main/Base Planet view.', { mode, isPlanetDataLoaded });
+  } else if (isConnected && walletAddressWagmi && game_mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet')) {
+     console.log('[App] Rendering Main/Base Planet view.', { game_mode: game_mode, isPlanetDataLoaded });
     mainContent = (
       <>
+        {/* Log right before rendering PlanetCanvas */}
+        {console.log("[App] About to render PlanetCanvas and CollapsibleResourcePanel")}
         <PlanetCanvas />
+        {/* Log right before rendering CollapsibleResourcePanel */}
+        {console.log("[App] About to render CollapsibleResourcePanel")}
         <CollapsibleResourcePanel />
         {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />}
         {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>}
@@ -335,7 +368,10 @@ function App() {
       <audio ref={doubleMusicAudioRef} src="/assets/audio/double_music.mp3" loop preload="auto" />
       <audio ref={basemusicAudioRef} src="/assets/audio/basemusic.mp3" loop preload="auto" />
 
-      {console.log('[App Render] States:', { currentView, isConnected, walletAddress: walletAddressWagmi, isConnecting, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })} {/* Keep standard log for development */}
+      {/* Log the states used for the overall App render, including game_mode */}
+      {console.log('[App Render] States:', {
+          currentView, isConnected, walletAddress: walletAddressWagmi, isConnecting, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen, game_mode: game_mode, isPlanetDataLoaded
+      })}
 
       {/* --- OnchainKit Wallet Components --- */}
       {/* Wallet connection UI is now primarily handled within GuideOverlay or main game view auth controls */}
@@ -349,7 +385,7 @@ function App() {
                ) : (
                  <Wallet>
                      <ConnectWallet>
-                         <Avatar className="h-6 w-6" />
+                         {/* <Avatar className="h-6 w-6" /> */}
                          <Name />
                      </ConnectWallet>
                       <WalletDropdown>
@@ -382,7 +418,7 @@ function App() {
         <BaseCompletionPopup />
       )}
 
-      {isConnected && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && !showGuide && (
+      {isConnected && walletAddressWagmi && game_mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && !showGuide && (
          <div className="action-icon-area">
             <ActionIcon onClick={handleOpenDialog} />
             <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title={t('planetInfoTitle')}>

@@ -12,7 +12,7 @@ const ResourcePanel = () => {
     // Use useShallow for state selection involving objects or multiple primitives
     const {
         // resources, // REMOVED
-        mode,
+        game_mode,
         planetName,
         growthPoints,
         era, // Select new state
@@ -28,7 +28,7 @@ const ResourcePanel = () => {
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
-            mode: state.mode,
+            game_mode: state.game_mode,
             planetName: state.planetName,
             growthPoints: state.growthPoints,
             era: state.era, // Add to selector
@@ -156,7 +156,7 @@ const ResourcePanel = () => {
                 { trait_type: "Final Karma", value: karma },
                 { trait_type: "Era Reached", value: era },
                 { trait_type: "Turns Survived", value: turn },
-                { trait_type: "Mode", value: mode },
+                { trait_type: "Mode", value: game_mode },
             ],
             planet_log: narrativeLog, 
         };
@@ -235,7 +235,7 @@ const ResourcePanel = () => {
 
     return (
         <div className="resource-panel">
-            <h2>{planetName} <span className={`mode-badge mode-${mode.toLowerCase()}`}>{mode}</span></h2>
+            <h2>{planetName} <span className={`mode-badge mode-${game_mode.toLowerCase()}`}>{game_mode}</span></h2>
             <div className="planet-stats">
                 <span>Era: {era}</span>
                 <span>Turn: {turn}</span>

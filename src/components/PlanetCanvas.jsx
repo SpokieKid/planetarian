@@ -12,6 +12,7 @@ import DataWave from './DataWave'; // Import the DataWave component
 import './PlanetCanvas.css'; // Basic styling for canvas container
 
 const PlanetCanvas = () => {
+    console.log("[PlanetCanvas] Component rendering."); // Add this log
     // const mode = usePlanetStore(state => state.mode); // Removed as it's unused
     // const visualStyle = getVisualStyle(mode); // Remove or uncomment this line
 
@@ -46,7 +47,7 @@ const PlanetCanvas = () => {
             </Canvas>
             {/* Style background color via CSS as hex is tricky in r3f color attach */}
             <style>{`
-                .planet-canvas-container {
+                .planet-canvas-container { /* Add a temporary background to see if the div is there */
                     background-color: transparent; /* Allow underlying CSS background to show */
                 }
             `}</style>
