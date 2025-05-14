@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './GuideOverlay.css'; // Create this CSS file
 
+// Import OnchainKit Wallet components
+import { ConnectWallet, Wallet } from '@coinbase/onchainkit/wallet';
+
 // Key array for guide steps, makes it easier to manage and use with t()
 const guideStepKeys = [
     'guide_step_0',
@@ -13,7 +16,8 @@ const guideStepKeys = [
     'guide_step_6',
 ];
 
-const GuideOverlay = ({ login, authenticated, onClose }) => {
+// Modify props to use isConnected and disconnect from wagmi, remove authenticated and login
+const GuideOverlay = ({ isConnected, disconnect, onClose }) => {
     const { t, i18n } = useTranslation();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [planetNumber, setPlanetNumber] = useState('xxx'); // Default to xxx
@@ -21,7 +25,7 @@ const GuideOverlay = ({ login, authenticated, onClose }) => {
     const [languageSelected, setLanguageSelected] = useState(false);
 
     useEffect(() => {
-        setIsVisible(true);
+        setIsVisible(true); // For fade-in effect
     }, []);
 
     const handleLanguageSelect = (lang) => {
@@ -104,18 +108,24 @@ const GuideOverlay = ({ login, authenticated, onClose }) => {
                     )}
 
                     {currentStepIndex === guideStepKeys.length - 1 && (
-                        <button
-                           className="guide-final-step-btn pixel-button"
-                           onClick={() => {
-                                if (authenticated) {
-                                    onClose();
-                                } else {
-                                    login();
-                                }
-                           }}
-                        >
-                            {t('guide_button_connect_wallet')}
-                        </button>
+                        // Conditionally render ConnectWallet or Close Guide button
+                        <div className="guide-final-step-action"> {/* Wrapper div for layout */}
+                            {isConnected ? (
+                                <button
+                                   className="guide-final-step-btn pixel-button"
+                                   onClick={onClose} // Close the guide if already connected
+                                >
+                                    {t('guide_button_continue')} {/* New translation key for continuation */}
+                                </button>
+                            ) : (
+                                // Use OnchainKit ConnectWallet component when not connected
+                                // It will trigger the modal/native connection flow
+                                <Wallet> {/* Wallet wrapper provides context and basic styling */}
+                                    <ConnectWallet label={t('guide_button_connect_wallet')} /> {/* Use translation key for label */}
+                                    {/* No need for WalletDropdown here within the Guide */}
+                                </Wallet>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>

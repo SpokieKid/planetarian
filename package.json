@@ -14,8 +14,11 @@
     "@coinbase/wallet-sdk": "^4.3.2",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",
+    "@sentry/react": "^9.18.0",
+    "@sentry/vite-plugin": "^3.4.0",
     "@supabase/supabase-js": "^2.49.4",
     "@tanstack/react-query": "^5.75.4",
+    "@thirdweb-dev/react": "^4.9.4",
     "@zoralabs/coins-sdk": "^0.1.0",
     "@zoralabs/protocol-sdk": "^0.13.5",
     "buffer": "^6.0.3",
@@ -28,8 +31,8 @@
     "react-i18next": "^15.5.1",
     "thirdweb": "^5.97.1",
     "three": "^0.176.0",
-    "viem": "^2.29.0",
-    "wagmi": "^2.15.2",
+    "viem": "^2.29.2",
+    "wagmi": "^2.15.3",
     "zustand": "^5.0.4"
   },
   "devDependencies": {

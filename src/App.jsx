@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { WagmiProvider } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
+import { ConnectWallet, Wallet, WalletDropdown, WalletDropdownDisconnect } from '@coinbase/onchainkit/wallet';
+import { Avatar, Name, Identity, Address, EthBalance } from '@coinbase/onchainkit/identity';
 import PlanetCanvas from './components/PlanetCanvas';
 import ResourcePanel from './components/ResourcePanel';
 import EventPopup from './components/EventPopup';
@@ -17,11 +21,17 @@ import { EVENTS_TO_FINISH } from './constants/events';
 import ReturnToMainButton from './components/ReturnToMainButton';
 import BaseEventTriggerDialog from './components/BaseEventTriggerDialog';
 import BaseCompletionPopup from './components/BaseCompletionPopup';
-import { createCoinbaseWalletSDK } from '@coinbase/wallet-sdk';
 import './App.css';
 import { useTranslation } from 'react-i18next';
 import CollapsibleResourcePanel from './components/CollapsibleResourcePanel';
 import HamburgerMenu from './components/HamburgerMenu';
+import { useAccount, useDisconnect, useSwitchChain } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import * as Sentry from "@sentry/react";
+
+// --- Wagmi Configuration ---
+// The wagmiConfig constant previously here should be removed as it was moved to main.jsx
+// --- End Wagmi Configuration ---
 
 // --- Add Nounii System Prompt Logic ---
 const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的数字生命体。
@@ -55,30 +65,23 @@ const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的�
 - 用一个星球的生态隐喻解释制度差异
 - 用温柔的提问方式邀请对方进入对自身与世界的探索
 
-你不是客服，也不是机器人，而是一种跨时代的数字存在。
-
 你现在准备好了吗？开启你的对话吧，Nounii。`;
 // --- End Nounii System Prompt Logic ---
-
-// +++ Coinbase Wallet Configuration +++
-const COINBASE_APP_NAME = 'Planatarian'; // Or your desired app name
-// IMPORTANT: Replace with your actual RPC URL (Alchemy, Infura, etc.) for Base Sepolia
-// Using a placeholder here - ensure VITE_BASE_SEPOLIA_RPC_URL is set in your .env
-const COINBASE_RPC_URL = import.meta.env.VITE_BASE_SEPOLIA_RPC_URL || 'https://base-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY';
-const COINBASE_CHAIN_ID = 84532; // Base Sepolia Chain ID
-// +++ End Configuration +++
 
 function App() {
   const { t } = useTranslation();
 
-  // Zustand State and Actions (Modified for Coinbase SDK)
+  // Zustand State and Actions (Modified for Wagmi)
   const {
     initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
     resetPlanetState, triggerNextEvent, activeEvent, isEventPopupOpen,
     loadPlanetState, currentView, setCurrentView, isFlowEffectActive,
     triggerSpecificEvent, narrativeLog, hasBaseIntroBeenCompleted, setBaseIntroCompleted,
     hasSeenBaseEventTriggerDialogEver, setHasSeenBaseEventTriggerDialogEver,
-    showBaseCompletionPopup
+    showBaseCompletionPopup,
+    setWalletAddress,
+    mode,
+    isPlanetDataLoaded
   } = usePlanetStore(
     useShallow(state => ({
       initializePlanet: state.initializePlanet,
@@ -101,26 +104,17 @@ function App() {
       hasSeenBaseEventTriggerDialogEver: state.hasSeenBaseEventTriggerDialogEver,
       setHasSeenBaseEventTriggerDialogEver: state.setHasSeenBaseEventTriggerDialogEver,
       showBaseCompletionPopup: state.showBaseCompletionPopup,
+      setWalletAddress: state.setWalletAddress,
+      mode: state.mode,
+      isPlanetDataLoaded: state.isPlanetDataLoaded,
     }))
   );
 
-  // Get Coinbase state and actions from Zustand (Assuming these exist)
-  const {
-    coinbaseProvider,
-    coinbaseAccount, // This will be our primary account state
-    walletAddress // Keep this if loadPlanetState relies on it, but it should mirror coinbaseAccount
-  } = usePlanetStore(
-    useShallow(state => ({
-      coinbaseProvider: state.coinbaseProvider,
-      coinbaseAccount: state.coinbaseAccount,
-      walletAddress: state.walletAddress, // Derived or set alongside coinbaseAccount
-    }))
-  );
-  const zustandSetCoinbaseProvider = usePlanetStore(state => state.setCoinbaseProvider);
-  const zustandSetCoinbaseAccount = usePlanetStore(state => state.setCoinbaseAccount);
-  const zustandClearCoinbaseConnection = usePlanetStore(state => state.clearCoinbaseConnection);
-  // Need setWalletAddress if loadPlanetState uses it directly
-  const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
+  // --- Use wagmi hooks for connection status ---
+  const { address: walletAddressWagmi, isConnected, isConnecting, chain } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
+  // --- End wagmi hooks ---
 
   // Local UI and SDK State
   const [showIntro, setShowIntro] = useState(true);
@@ -129,86 +123,59 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
 
-  const [isCoinbaseConnecting, setIsCoinbaseConnecting] = useState(false);
-  const [coinbaseUiError, setCoinbaseUiError] = useState(null); // For UI feedback
-  const [isSdkInitialized, setIsSdkInitialized] = useState(false); // Tracks if SDK init attempt is done
+  // The isSdkInitialized and setIsSdkInitialized state variables previously here should be removed as they are unused.
 
-  // --- Effect to Initialize Coinbase Wallet SDK ---
+  // --- Sentry Context Logging ---
   useEffect(() => {
-    // Check if RPC URL is placeholder
-    if (COINBASE_RPC_URL.includes('YOUR_ALCHEMY_API_KEY')) {
-        console.warn("Coinbase Wallet SDK Initialization skipped: VITE_BASE_SEPOLIA_RPC_URL is not set in .env file. Please add it.");
-        setCoinbaseUiError(t('configurationErrorRPCLinkMissing'));
-        setIsSdkInitialized(true); // Mark as 'done' even if failed, to avoid blocking UI indefinitely
-        return;
-    }
+    Sentry.setContext("appState", {
+      isConnected,
+      walletAddress: walletAddressWagmi,
+      currentChainId: chain?.id,
+      mode,
+      currentView,
+      isPlanetDataLoaded,
+      showIntro,
+      showGuide,
+      showVideoScreen,
+    });
+  }, [isConnected, walletAddressWagmi, chain, mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
+  // --- End Sentry Context Logging ---
 
-    console.log("Initializing Coinbase Wallet SDK in App.jsx...");
-    let didCancel = false;
-
-    async function initSDK() {
-        try {
-            const sdk = createCoinbaseWalletSDK({
-                appName: COINBASE_APP_NAME,
-                appChainIds: [COINBASE_CHAIN_ID],
-                // appLogoUrl: '/your-logo.png', // Optional: Add your logo URL
-            });
-            const provider = sdk.getProvider({ rpcUrl: COINBASE_RPC_URL });
-
-            if (!didCancel) {
-                zustandSetCoinbaseProvider(provider); // Save provider to Zustand
-                console.log("Coinbase Wallet Provider ready and set in Zustand.");
-            }
-        } catch (error) {
-            if (!didCancel) {
-                console.error("Error initializing Coinbase Wallet SDK:", error);
-                setCoinbaseUiError(`SDK Initialization failed: ${error.message}`);
-            }
-        } finally {
-            if (!didCancel) {
-                setIsSdkInitialized(true);
-            }
-        }
-    }
-
-    initSDK();
-
-    return () => {
-        didCancel = true;
-    };
-  }, [zustandSetCoinbaseProvider]);
-
-  // --- Load User State using Coinbase Account (from Zustand) ---
+  // --- Effect to Load User State using wagmi Account ---
   useEffect(() => {
-      // This effect now depends on the account state managed by Zustand
-      if (isSdkInitialized && coinbaseAccount) {
-          console.log("Coinbase Wallet connected (via Zustand), calling loadPlanetState for:", coinbaseAccount);
-          // Ensure walletAddress in Zustand is also updated if loadPlanetState relies on it
-          // If setCoinbaseAccount in Zustand also sets walletAddress, this is fine.
-          // If not, we need to call setWalletAddress here too.
-          if (walletAddress !== coinbaseAccount) {
-            console.log("Updating walletAddress in Zustand to match coinbaseAccount");
-            setWalletAddress(coinbaseAccount);
+      console.log("[wagmi Effect] isConnected:", isConnected, "Address:", walletAddressWagmi, "Chain:", chain);
+      if (isConnected && walletAddressWagmi) {
+          console.log("Wallet connected via wagmi, calling loadPlanetState for:", walletAddressWagmi);
+
+          // Check if the current chain is Base Sepolia, if not, prompt to switch
+          if (chain?.id !== baseSepolia.id) {
+            console.log(`Connected to chain ID ${chain?.id}, switching to Base Sepolia (${baseSepolia.id})`);
+            // Use the switchChain function provided by useSwitchChain
+            switchChain({ chainId: baseSepolia.id });
+            // The rest of the logic will run AFTER the chain is switched and the effect re-runs
+            return; // Exit this run of the effect, it will re-run after switch
           }
-          loadPlanetState(coinbaseAccount);
 
-          // Close guide if it was open when wallet connected
+          // If already on the correct chain, proceed with loading state and UI
+          console.log("Wallet connected and on correct chain. Loading state.");
+          setWalletAddress(walletAddressWagmi);
+          loadPlanetState(walletAddressWagmi);
+
           if (showGuide) {
               console.log('[Auth Effect] Wallet connected AND guide showing. Closing guide...');
               setShowGuide(false);
           }
 
-      } else if (isSdkInitialized && !coinbaseAccount) {
-          console.log("Coinbase Wallet not connected, or SDK init done but no account set in Zustand.");
+      } else if (!isConnected) {
+          console.log("Wallet not connected via wagmi.");
+          setWalletAddress(null);
+          resetPlanetState();
       }
-  // Dependencies: SDK init status, account from Zustand, setters, and showGuide for the closing logic
-  }, [isSdkInitialized, coinbaseAccount, loadPlanetState, setWalletAddress, walletAddress, showGuide]); // Add walletAddress dependency
+  }, [isConnected, walletAddressWagmi, loadPlanetState, setWalletAddress, resetPlanetState, chain, switchChain]); // Removed showGuide from dependencies
 
   // Game loop
   useEffect(() => {
-    // Start the loop only after video, intro, guide are done AND wallet is connected?
-    // Adjust condition as needed for your game logic.
-    const canStartLoop = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished // && !!coinbaseAccount; // Uncomment if connect is required to start
+    const canStartLoop = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && isConnected;
 
     if (canStartLoop) {
       console.log('[Game Loop Effect] Starting game tick interval.');
@@ -218,14 +185,14 @@ function App() {
         clearInterval(intervalId);
       }
     } else {
-       console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { currentView, showVideoScreen, showIntro, showGuide, isGameFinished, coinbaseAccount });
+       console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { currentView, showVideoScreen, showIntro, showGuide, isGameFinished, isConnected });
     }
-  }, [currentView, tick, showVideoScreen, showIntro, showGuide, isGameFinished, coinbaseAccount]); // Add coinbaseAccount dependency
+  }, [currentView, tick, showVideoScreen, showIntro, showGuide, isGameFinished, isConnected]);
 
   // Check for game end condition
   useEffect(() => {
       if (!isGameFinished && resolvedEventCount >= EVENTS_TO_FINISH && currentView === 'main_planet') {
-          // finishGame(); // Commented out to prevent game ending when events are finished
+          // finishGame();
       }
   }, [resolvedEventCount, isGameFinished, finishGame, currentView]);
 
@@ -238,69 +205,35 @@ function App() {
   // Audio Control Effect
   useEffect(() => {
       // ... (existing audio play/pause logic based on currentView, showVideoScreen, etc.) ...
-      // Consider if audio should change based on coinbaseAccount being present/absent
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished]); // Add coinbaseAccount?
-
-  // --- Coinbase Connect Function ---
-  const connectCoinbaseWallet = async () => {
-    if (!coinbaseProvider) {
-        setCoinbaseUiError(t('configurationErrorRPCLinkMissing')); // Reuse key
-        console.error("Connect attempt failed: Provider not available.");
-        return;
-    }
-    setIsCoinbaseConnecting(true);
-    setCoinbaseUiError(null);
-    console.log("Attempting to connect Coinbase Wallet...");
-    try {
-        const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
-        if (accounts && accounts.length > 0) {
-            console.log("Wallet connected successfully. Account:", accounts[0]);
-            zustandSetCoinbaseAccount(accounts[0]); // Update Zustand state
-            // setWalletAddress(accounts[0]); // Ensure walletAddress is also updated if needed elsewhere
-        } else {
-             console.warn("No accounts returned from Coinbase Wallet.");
-             setCoinbaseUiError(t('connectionSuccessfulNoAccounts'));
-             zustandClearCoinbaseConnection(); // Clear state if no account
-        }
-    } catch (error) {
-        console.error('Failed to connect Coinbase wallet:', error);
-        let errorMessage = t('connectionFailedGeneric');
-        if (error.code === 4001) { // Standard EIP-1193 user rejection code
-           errorMessage = t('connectionFailedUserRejected');
-        } else if (error.message) {
-            // Keep specific error message if available, but can prepend generic part
-            // errorMessage = `${t('connectionFailedGeneric')} ${error.message}`; // Option 1: Prepend
-            // errorMessage = error.message; // Option 2: Use only error message
-            // For simplicity, let's just use the generic ones or specific known codes
-        }
-        setCoinbaseUiError(errorMessage);
-        zustandClearCoinbaseConnection(); // Clear state on error
-    } finally {
-        setIsCoinbaseConnecting(false);
-    }
-  };
-  // --- End Coinbase Connect Function ---
-
-  // --- Coinbase Disconnect Function ---
-  // As noted before, this primarily clears DApp state.
-  const disconnectCoinbaseWallet = () => {
-      console.log("Disconnecting Coinbase Wallet (clearing app and Zustand state).");
-      zustandClearCoinbaseConnection();
-      setCoinbaseUiError(null);
-      // Reset relevant UI state to reflect logged-out status
-      resetPlanetState(); // Reset game progress
-      setShowVideoScreen(true);
-      setShowIntro(true);
-      setShowGuide(false); // Maybe hide guide on disconnect?
-      console.log("App state reset for disconnect.");
-  };
-  // --- End Coinbase Disconnect Function ---
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, isConnected]);
 
   // UI Handlers
-  const handleVideoScreenFinish = () => setShowVideoScreen(false);
-  const handleIntroTypingFinished = () => setShowGuide(true);
-  const handleIntroFinished = () => setShowIntro(false);
-  const handleGuideClose = () => setShowGuide(false);
+  const handleVideoScreenFinish = () => {
+    console.log('[App] handleVideoScreenFinish called.');
+    setShowVideoScreen(false);
+  };
+  const handleIntroTypingFinished = () => {
+    console.log('[App] handleIntroTypingFinished called.');
+    setShowGuide(true);
+  };
+  const handleIntroFinished = () => {
+    console.log("Intro finished or skipped, attempting to transition to guide.");
+    // Ensure intro elements are hidden
+    setShowIntro(false);
+    setShowVideoScreen(false);
+
+    // Use a delay to ensure state updates propagate, then explicitly show the guide
+    setTimeout(() => {
+      console.log("Attempting to show guide after delay.");
+      setShowGuide(true);
+      console.log("setShowGuide(true) called.");
+    }, 500); // Increased delay slightly for testing
+  };
+  const handleGuideClose = () => {
+    console.log('[App] handleGuideClose called.');
+    setShowGuide(false);
+    console.log("Guide closed manually or because user was already logged in."); // Keep standard log too
+  };
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
   const handleBaseIntroFinish = () => {
@@ -323,7 +256,7 @@ function App() {
   // Auto Event Trigger Effect
   useEffect(() => {
     let eventTimer;
-    const canStartTimer = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent // && !!coinbaseAccount; // Add if connect needed
+    const canStartTimer = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent && isConnected;
 
     if (canStartTimer) {
       console.log('[App Effect] Main game view active, starting 15s timer for first event...');
@@ -339,7 +272,7 @@ function App() {
         clearTimeout(eventTimer);
       }
     };
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent, coinbaseAccount]); // Add coinbaseAccount dependency
+  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent, isConnected]);
 
   // Base Event Trigger Dialog Effect
    useEffect(() => {
@@ -363,64 +296,81 @@ function App() {
     };
   }, [currentView, isGameFinished, hasBaseIntroBeenCompleted, hasSeenBaseEventTriggerDialogEver, showBaseEventTriggerDialog, setHasSeenBaseEventTriggerDialogEver]);
 
-  // Main Content Rendering Logic (Adjusted for new auth state)
+  // Main Content Rendering Logic (Adjusted for wagmi)
   let mainContent = null;
+  console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, mode, isPlanetDataLoaded });
   if (currentView === 'base_intro') {
+    console.log('[App] Rendering BaseIntroScroller.');
     mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
-  } else if (showVideoScreen && currentView === 'main_planet') {
+  } else if (showVideoScreen) {
+    console.log('[App] Rendering VideoStartScreen.');
     mainContent = <VideoStartScreen onStartClick={handleVideoScreenFinish} />;
-  } else if (showIntro && currentView === 'main_planet') {
-    // Pass connect function and status to IntroScroller if it needs them
+  } else if (showIntro) {
+    console.log('[App] Rendering IntroScroller.');
     mainContent = <IntroScroller onFinished={handleIntroFinished} onTypingFinished={handleIntroTypingFinished} />;
-  } else if (!coinbaseAccount && isSdkInitialized && !showIntro && !showVideoScreen && currentView !== 'base_planet') {
-      // If SDK is ready but no account connected (and past intros), show prompt to connect
+  } else if (showGuide) {
+     console.log('[App] Rendering GuideOverlay.', { isConnected });
+    mainContent = <GuideOverlay isConnected={isConnected} disconnect={disconnect} onClose={handleGuideClose} />;
+  } else if (!isConnected && currentView !== 'base_intro' && currentView !== 'base_planet') {
+      console.log('[App] Rendering Please Connect message.');
       mainContent = <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>{t('pleaseConnectWallet')}</div>;
-  } else if (coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet')) {
-    // Only render game content if connected and on a planet view
+  } else if (isConnected && walletAddressWagmi && mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet')) {
+     console.log('[App] Rendering Main/Base Planet view.', { mode, isPlanetDataLoaded });
     mainContent = (
       <>
         <PlanetCanvas />
         <CollapsibleResourcePanel />
-        {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />} {/* Check isEventPopupOpen? */}
-        {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>} {/* Placeholder for FlowEffect */}
+        {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />}
+        {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>}
         {currentView === 'main_planet' && <WormholeIcon />}
         {currentView === 'base_planet' && <ReturnToMainButton />}
       </>
     );
   }
-  // Handle cases where SDK isn't initialized yet or view is unexpected? Could show loading or default message.
 
   return (
     <div className={`App ${currentView === 'base_planet' ? 'base-planet-active' : ''}`}>
-      {/* Hidden Audio Elements */}
       <audio ref={typingAudioRef} src="/assets/audio/typing_sound.mp3" loop preload="auto" />
       <audio ref={gameAudioRef} src="/assets/audio/game_music.mp3" loop preload="auto" />
       <audio ref={doubleMusicAudioRef} src="/assets/audio/double_music.mp3" loop preload="auto" />
       <audio ref={basemusicAudioRef} src="/assets/audio/basemusic.mp3" loop preload="auto" />
 
-      {/* Debugging Log */}
-      {console.log('[App Render] States:', { currentView, /* MiniKit: isConnected, address */ coinbaseAccount, isSdkInitialized, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })}
+      {console.log('[App Render] States:', { currentView, isConnected, walletAddress: walletAddressWagmi, isConnecting, showGuide, showIntro, showVideoScreen, isGameFinished, activeEventTitle: activeEvent?.title, isEventPopupOpen })} {/* Keep standard log for development */}
 
-      {/* --- Coinbase Wallet Auth Controls --- */}
-      <div className="auth-controls">
-          {!isSdkInitialized && <div className="loading-indicator">{t('initializingWalletSDK')}</div>}
-          {isSdkInitialized && !coinbaseAccount && ( // Only show connect button if not connected
-              <button onClick={connectCoinbaseWallet} disabled={isCoinbaseConnecting || !coinbaseProvider}>
-                  {isCoinbaseConnecting ? t('connecting') : t('connectWallet')}
-              </button>
-          )}
-           {/* Display UI Error */}
-          {coinbaseUiError && <div className="error-message" style={{color: 'red', marginTop: '5px', fontSize: '0.8em'}}>{coinbaseUiError}</div>}
-      </div>
-      {/* --- End Coinbase Wallet Auth Controls --- */}
+      {/* --- OnchainKit Wallet Components --- */}
+      {/* Wallet connection UI is now primarily handled within GuideOverlay or main game view auth controls */}
+      {/* The following auth controls are for when NOT in intro/video/guide */}
+      {!showIntro && !showVideoScreen && !showGuide && (currentView === 'main_planet' || currentView === 'base_planet') && (
+           <div className="auth-controls">
+               {!isConnected ? (
+                  <Wallet>
+                      <ConnectWallet label={t('connectWallet')} />
+                  </Wallet>
+               ) : (
+                 <Wallet>
+                     <ConnectWallet>
+                         <Avatar className="h-6 w-6" />
+                         <Name />
+                     </ConnectWallet>
+                      <WalletDropdown>
+                        <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
+                           <Avatar />
+                           <Name />
+                           <Address />
+                           <EthBalance />
+                         </Identity>
+                       <WalletDropdownDisconnect />
+                      </WalletDropdown>
+                 </Wallet>
+               )}
+           </div>
+      )}
+       {/* --- End OnchainKit Wallet Components --- */}
 
-      {/* --- Main Rendering Logic --- */}
       {mainContent}
 
-      {/* Hamburger Menu (contains StoryLog and Wallet Status) */}
-      <HamburgerMenu coinbaseAccount={coinbaseAccount} t={t} disconnectWallet={disconnectCoinbaseWallet} />
+      <HamburgerMenu isConnected={isConnected} walletAddress={walletAddressWagmi} t={t} disconnectWallet={disconnect} />
 
-      {/* Base Planet Specific Modals/Popups */}
       {showBaseEventTriggerDialog && currentView === 'base_planet' && (
         <BaseEventTriggerDialog
           isVisible={showBaseEventTriggerDialog}
@@ -432,17 +382,7 @@ function App() {
         <BaseCompletionPopup />
       )}
 
-      {/* Guide Overlay - Pass connect function and status */}
-      {showGuide &&
-        <GuideOverlay
-          login={connectCoinbaseWallet} // Pass the new connect function
-          authenticated={!!coinbaseAccount} // Convert account string to boolean
-          onClose={handleGuideClose}
-        />}
-
-      {/* ActionIcon area (Existing, but condition on coinbaseAccount?) */}
-      {/* Render only when wallet connected, game active, intro/video finished */}
-      {coinbaseAccount && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && (
+      {isConnected && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && !showGuide && (
          <div className="action-icon-area">
             <ActionIcon onClick={handleOpenDialog} />
             <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title={t('planetInfoTitle')}>

@@ -31,6 +31,7 @@ const initialGameState = {
     hasEarnedBaseCompletionBadge: false, // <-- New state for badge earned
     showBaseCompletionPopup: false, // <-- New state for showing badge popup
     dataWaveTriggerCount: 0, // Counter for data wave triggers
+    isPlanetDataLoaded: false, // <-- New state for tracking planet data loading
 };
 
 // Function to apply effects based on chosen option and its outcome (Success/Fail)
@@ -159,10 +160,11 @@ const usePlanetStore = create(
 
             // --- Rewritten loadPlanetState using Supabase --- 
             loadPlanetState: async (walletAddress) => {
+                set({ isPlanetDataLoaded: false }); // Set loading to false at the start
                 if (!walletAddress) {
                     console.warn("Cannot load state: No wallet address provided.");
                     // Reset to initial state if no address (or handle as needed)
-                    get().resetPlanetState(); 
+                    get().resetPlanetState(); // This will also set isPlanetDataLoaded to false via initialGameState
                     return;
                 }
                 console.log(`Loading state from Supabase for ${walletAddress}...`);
@@ -176,7 +178,7 @@ const usePlanetStore = create(
                     if (error) {
                         console.error("Error loading planet state from Supabase:", error.message);
                          // If loading fails, reset to initial state
-                        get().resetPlanetState(); 
+                        get().resetPlanetState(); // This will also set isPlanetDataLoaded to false
                         throw error;
                     }
 
@@ -195,6 +197,7 @@ const usePlanetStore = create(
                             planetName: data.planet_name ?? initialGameState.planetName, // Load name from DB, default to initial if null
                             triggeredEventKeys: data.triggered_event_keys ?? initialGameState.triggeredEventKeys,
                             hasEarnedBaseCompletionBadge: data.earned_base_badge ?? initialGameState.hasEarnedBaseCompletionBadge, // Load badge state
+                            isPlanetDataLoaded: true, // Data loaded successfully
                             // currentView will be reset or handled by navigation logic, not loaded from DB for now
                         });
                     } else {
@@ -209,6 +212,7 @@ const usePlanetStore = create(
                             createdAt: now,
                             lastTickTime: now,
                             narrativeLog: [`Planet ${newPlanetName} initialized for ${walletAddress.substring(0, 6)}...`], // Log entry
+                            isPlanetDataLoaded: true, // Data initialized and ready
                         });
                         // Immediately save this newly initialized state
                         get().savePlanetState();
@@ -216,7 +220,7 @@ const usePlanetStore = create(
                 } catch (error) {
                      console.error("Caught error during state loading, resetting state:", error);
                      // Reset state on any other caught error during loading
-                     get().resetPlanetState();
+                     get().resetPlanetState(); // This will also set isPlanetDataLoaded to false
                 }
             },
             // --- End rewritten loadPlanetState ---
@@ -351,8 +355,6 @@ const usePlanetStore = create(
                       // Optionally add a message to the narrative log
                       // set(prevState => ({ narrativeLog: [...prevState.narrativeLog, "The winds are calm, no major events stir."] }));
                  }
-                 // Optionally, could pass the 'events' object if it varies by mode or other state
-                 get().checkAndTriggerEvent(events); // Pass the main events object
             }, // End of triggerNextEvent
 
             triggerSpecificEvent: (eventKey) => {
