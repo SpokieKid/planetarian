@@ -80,6 +80,15 @@
   "event_Era1_Discovery_Prosperity01_option_B_success_narrative": "保守的选择规避了未知风险，保持了现有秩序和发展轨迹。",
   "event_Era1_Discovery_Prosperity01_option_B_failed_narrative": "对星空信号的研究被限制在极小范围内，信息遭到压制。低维度文明将注意力重新投向地表内部的发展和竞争。星球上的各文明错失了与更广阔宇宙连接的潜在机遇。",
 
+  "event_Era1_Empire_Transcendence01_title": "不坚固的堡垒",
+  "event_Era1_Empire_Transcendence01_narrative_1": "在国际化时代的尽头，一个巨大的、井然有序的文明体系看起来无懈可击。他们的宣传机器日夜轰鸣，讲述着辉煌的成就和光明的未来。你感知星球文明上越来越多 “不该存在”的信息或现象 —— 被掩盖的困苦记录、事故细节。这些真实点滴如同细小裂纹，在坚固的体系墙壁上蔓延。",
+  "event_Era1_Empire_Transcendence01_conflict": "是迅速清除的污点，还是揭示真相的入口？多数人相信官方，视而不见或举报传播者；少数人不安，试图了解。作为星球史学家，是 帮助裂纹扩散暴露真相，还是让裂纹弥合，维持和谐？",
+  "event_Era1_Empire_Transcendence01_option_A_mainText": "放大不和谐信息和现象的影响力，使其更容易被注意到和传播，引起更多民众关注。",
+  "event_Era1_Empire_Transcendence01_option_A_success_narrative": "真实信息广泛传播，民众对官方叙事信任动摇。体系内部的矛盾暴露，效率虽短期内降低，但并未全面失控。当局意识到完全的信息压制不再可能且得不偿失，开始 软化姿态，以更 开放的方式面对和解决问题，为文明的变革打开了空间。",
+  "event_Era1_Empire_Transcendence01_option_B_mainText": "帮助体系弥合裂纹，压制不和谐信息。使人们更难注意到异常，或更容易遗忘。",
+  "event_Era1_Empire_Transcendence01_option_B_success_narrative": "不和谐信息被成功压制。体系宣传机器继续有效运转，民众普遍相信官方。 体系表面维持稳定和统一，避免眼前动荡。",
+  "event_Era1_Empire_Transcendence01_option_B_failed_narrative": "问题未能根本解决。真实情况持续恶化， 不满和潜在危机暗中积累。体系在封闭中僵化脆弱。",
+
   "guide_select_language": "请选择语言",
   "guide_step_0": "您好，Planetarian 星球史学家，欢迎来到星球模拟器。",
   "guide_step_1": "我是 Nounii，你的智能星球助理。这是一个平行宇宙模拟器，是一个经过审查的安全的环境。",

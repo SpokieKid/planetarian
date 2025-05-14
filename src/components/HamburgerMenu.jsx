@@ -10,26 +10,24 @@ const HamburgerMenu = ({ coinbaseAccount, t, disconnectWallet }) => {
     };
 
     return (
-        <div className="hamburger-menu-container">
+        <div className={`hamburger-menu-container ${isOpen ? 'open' : ''}`}>
             <button className="hamburger-icon" onClick={toggleMenu}>
                 {/* You can use a hamburger icon here, e.g., three lines */}
                 ☰ {/* Placeholder for hamburger icon */}
             </button>
-            {isOpen && (
-                <div className="menu-content">
-                    {/* Connected Status */}
-                    {coinbaseAccount && (
-                        <div className="wallet-status">
-                            <span>{t('connected')} {`${coinbaseAccount.substring(0, 6)}...${coinbaseAccount.substring(coinbaseAccount.length - 4)}`}</span>
-                            <button onClick={disconnectWallet}>{t('disconnect')}</button>
-                        </div>
-                    )}
-                    {/* Story Log */}
-                    <div className="story-log-in-menu">
-                       <StoryLog />
+            <div className="menu-content">
+                {/* Connected Status */}
+                {coinbaseAccount && (
+                    <div className="wallet-status">
+                        <span>{t('connected')} {`${coinbaseAccount.substring(0, 6)}...${coinbaseAccount.substring(coinbaseAccount.length - 4)}`}</span>
+                        <button onClick={disconnectWallet}>{t('disconnect')}</button>
                     </div>
+                )}
+                {/* Story Log */}
+                <div className="story-log-in-menu">
+                   <StoryLog />
                 </div>
-            )}
+            </div>
         </div>
     );
 };

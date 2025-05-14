@@ -67,6 +67,59 @@ export const events = {
     ],
     // Note: The 'Result' section from your prompt is incorporated into the Success/Failed outcomes within each option.
   },
+  // Add new event Era1_Empire_Transcendence01 here
+  Era1_Empire_Transcendence01: {
+    eventKey: "Era1_Empire_Transcendence01",
+    title: "event_Era1_Empire_Transcendence01_title", // Assuming title is handled via i18n
+    era: 1,
+    karmaLevel: [91, 100], // Range (91, 100)
+    turns: [30, 49], // Range 30-49
+    narrative: [
+      "event_Era1_Empire_Transcendence01_narrative_1",
+      // If the narrative has multiple paragraphs in i18n, add more keys here
+    ],
+    conflict: "event_Era1_Empire_Transcendence01_conflict",
+    image: '/assets/events/UnstableFortress.png', // Placeholder image name, confirm actual file path
+    options: [
+      {
+        id: "A",
+        mainText: "event_Era1_Empire_Transcendence01_option_A_mainText",
+        subText: "", // HTML did not provide subText
+        hashtag: "#真实 #暴露 #反抗 #高风险 #代价 #牺牲", // Using zh hashtags
+        success: {
+          probability: 60,
+          narrative: "event_Era1_Empire_Transcendence01_option_A_success_narrative",
+          stateChanges: {},
+          karmaChange: 10,
+          hashtag: "#突破 #宇宙沟通 #观念冲击", // Using zh hashtags
+          vfx: "Discussion",
+        },
+        failed: null, // Option A in HTML only listed a Success outcome
+      },
+      {
+        id: "B",
+        mainText: "event_Era1_Empire_Transcendence01_option_B_mainText",
+        subText: "", // HTML did not provide subText
+        hashtag: "#压制 #稳定 #僵化 #隐患 #表面和平 #未来风险", // Using zh hashtags
+        success: {
+          probability: 60, // HTML says 60% success for B, but also lists a Failed outcome. Assuming 60% success, 40% failed is implied.
+          narrative: "event_Era1_Empire_Transcendence01_option_B_success_narrative",
+          stateChanges: {},
+          karmaChange: 0,
+          hashtag: "#风险规避 #维持现状", // Using zh hashtags
+          vfx: "DataWave",
+        },
+        failed: {
+           probability: 40, // Assuming 40% failed based on 60% success
+           narrative: "event_Era1_Empire_Transcendence01_option_B_failed_narrative",
+           stateChanges: {},
+           karmaChange: -7,
+           hashtag: "", // HTML did not list hashtags for failed outcome
+           vfx: "Discussion", // HTML listed Discussion VFX for failed
+        },
+      },
+    ],
+  },
   // ... add more events here following the same structure
 };
 
