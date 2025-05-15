@@ -83,7 +83,7 @@
   "guide_step_6": "Please connect your wallet to log into your planet",
   "guide_input_placeholder": "Enter planet number",
   "guide_button_next": "Next",
-  "guide_button_connect_wallet": "Connect Wallet",
+  "guide_button_continue": "Connect Wallet",
   "guide_alert_enter_planet_number": "Please enter the planet number!",
 
   "intro_skip": "Skip Intro",

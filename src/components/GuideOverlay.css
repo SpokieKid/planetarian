@@ -50,6 +50,7 @@
   display: flex; /* Make it a flex container */
   flex-direction: column; /* Stack children vertically */
   align-items: stretch; /* Stretch items to fill width (default) */
+  gap: 18px;
 }
 
 .guide-text {
@@ -112,15 +113,16 @@
   transform: translate(2px, 2px); /* Adjusted transform */
 }
 
-.language-buttons-container { /* Style for the new wrapper */
-  display: flex;
-  justify-content: center; /* Center buttons horizontally */
-  gap: 15px; /* Add space between buttons */
-  margin-top: 15px; /* Space below the h2 */
+.language-buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+    /* Add some spacing if needed */
+    gap: 18px; 
 }
 
 .language-select-btn { /* Style for the buttons */
   flex-grow: 1; /* Make buttons share width equally */
-  max-width: 150px; /* Optional: Prevent buttons from getting too wide */
+  width: 150px; /* Optional: Prevent buttons from getting too wide */
   text-align: center; /* Ensure text is centered */
 } 

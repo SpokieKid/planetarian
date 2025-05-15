@@ -99,7 +99,7 @@
   "guide_step_6": "请连接钱包并登入你的星球",
   "guide_input_placeholder": "输入星球编号",
   "guide_button_next": "下一步",
-  "guide_button_connect_wallet": "连接钱包",
+  "guide_button_continue": "连接钱包",
   "guide_alert_enter_planet_number": "请输入星球编号！",
 
   "intro_skip": "跳过介绍",
