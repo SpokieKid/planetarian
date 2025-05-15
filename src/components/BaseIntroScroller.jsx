@@ -65,7 +65,7 @@ const BaseIntroScroller = ({ onFinished }) => {
                     {currentIndex < BASE_INTRO_TEXT.length - 1 ? (
                         <button onClick={handleNext} className="pixel-button next-button">NEXT</button>
                     ) : (
-                        <button onClick={onFinished} className="pixel-button finish-button">FINISH</button>
+                        <button onClick={onFinished} className="pixel-button finish-button">START JOURNEY</button>
                     )}
                 </div>
             </div>

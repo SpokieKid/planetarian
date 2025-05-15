@@ -180,3 +180,13 @@
 
 /* Ensure App background image covers everything if needed */
 /* ... rest of App.css ... */
+
+.restore-event-button {
+    position: fixed; /* Absolute positioning relative to the viewport */
+    bottom: calc(60px + 20px + 10px); /* WormholeIcon height + bottom padding + 10px space */
+    right: 20px; /* Align with WormholeIcon's right padding */
+    z-index: 998; /* Slightly below WormholeIcon but above most content */
+    /* Add any desired button styling here, e.g., padding, background, color */
+    padding: 10px 15px;
+    /* You might want to reuse .pixel-button styles if applicable */
+}

@@ -9,7 +9,11 @@ import CollectibleSuns from './CollectibleSuns'; // Import the new suns componen
 // import { getVisualStyle } from '../utils/resourceMapping'; // To get background color - Removed
 import EmojiParticles from './EmojiParticles'; // Import the new EmojiParticles component
 import DataWave from './DataWave'; // Import the DataWave component
+import AlienParticles from './AlienParticles'; // Import AlienParticles
 import './PlanetCanvas.css'; // Basic styling for canvas container
+import AmbientLight from './DataWave/AmbientLight';
+import PointLight from './DataWave/PointLight';
+import Camera from './DataWave/Camera'; // Import Camera component
 
 const PlanetCanvas = ({ isZoomEnabled }) => {
     console.log("[PlanetCanvas] Component rendering."); // Add this log
@@ -19,23 +23,20 @@ const PlanetCanvas = ({ isZoomEnabled }) => {
     return (
         <div className="planet-canvas-container">
             <Canvas
-                camera={{ position: [0, 0, 5], fov: 50 }} // Adjust camera position and field of view
-                gl={{ preserveDrawingBuffer: true }} // Needed for potential screenshots
+                camera={{ position: [0, 0, 5], fov: 75 }}
+                style={{ height: '100vh', width: '100vw', background: 'black' }} // Basic styling
+                shadows // Enable shadows if needed (requires light and object setup)
             >
-                {/* Optional: Set background color via CSS or a scene background */}
-                {/* <color attach="background" args={[visualStyle.backgroundColor]} /> Doesn't work well with hex numbers */}
-                
-                {/* Add lighting */}
-                <ambientLight intensity={0.5} />
-                <directionalLight position={[5, 5, 5]} intensity={1} />
-
-                {/* Use Suspense for potential async loading (like textures) */}
-                <Suspense fallback={null}> 
-                    <Planet />
+                <Suspense fallback={null}> {/* Use Suspense for loading models/textures */}
+                    <AmbientLight intensity={0.5} /> {/* Basic ambient light */}
+                    <PointLight position={[10, 10, 10]} intensity={0.8} /> {/* Basic point light */}
+                    <Planet /> {/* Your existing planet */}
+                    <Camera isZoomEnabled={isZoomEnabled} /> {/* Add the Camera component */}
                     <OrbitingObjects count={8} /> {/* Add orbiting objects */} 
                     <BackgroundShips count={5} /> {/* Add background ships */} 
                     <EmojiParticles />
                     <DataWave planetScale={1.5} /> {/* Pass initial planetScale */}
+                    <AlienParticles /> {/* Add AlienParticles component */}
                     <Preload all /> {/* Preload assets */} 
                 </Suspense>
                 

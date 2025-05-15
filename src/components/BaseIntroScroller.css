@@ -98,12 +98,14 @@
     /* Specific styles if needed, e.g., different color */
     background-color: #fca311; /* Example: Orange */
     color: #16213e;
+    width: 100px;
 }
 
 .next-button {
     /* Specific styles if needed */
     background-color: #50c878; /* Example: Green */
     color: black;
+    width: 100px;
 }
 
 .finish-button {

@@ -29,6 +29,8 @@
   "planetInfoDescription": "更多星球信息或操作。",
   "baseSimulationUserChoseNo": "[基础模拟] 用户选择暂时不开始历史模拟。",
 
+  "event_popup_options_header_plan_to": "你计划要...",
+
   "event_evt_001_info_freedom_title": "信息自由法案提案",
   "event_evt_001_info_freedom_text": "一项提案建议免费开放所有非关键的星球数据。这可能刺激创新，但也可能削弱中心化控制。",
   "event_evt_001_info_freedom_option_1_text": "批准 (+2 思维, +5 发展)",
@@ -118,5 +120,9 @@
   "intro_16": " ",
   "intro_17": "我们要留下一些东西 …",
   "intro_18": " ",
-  "intro_19": "任何东西 … "
+  "intro_19": "任何东西 … ",
+
+  "event_popup_options_header_plan_to": "你计划要...",
+  "restoreEventButton": "展示事件",
+  "planetLogTitle": "星球日志"
 } 

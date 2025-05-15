@@ -25,6 +25,7 @@ const ResourcePanel = () => {
         hasEarnedBaseCompletionBadge,
         incrementResolvedEventCount,
         triggerDataWave, // Select the new action
+        triggerVfx, // Import the new triggerVfx action
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
@@ -41,6 +42,7 @@ const ResourcePanel = () => {
             hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
             incrementResolvedEventCount: state.incrementResolvedEventCount,
             triggerDataWave: state.triggerDataWave, // Add to selector
+            triggerVfx: state.triggerVfx, // Add to selector
         }))
     );
 
@@ -278,6 +280,13 @@ const ResourcePanel = () => {
                     style={{ marginTop: '10px' }} // Add some space
                 >
                     Trigger Emoji Effect (Test)
+                </button>
+                <button 
+                    onClick={() => triggerVfx('Aliens')} 
+                    className="test-effect-btn" // Use the same class for consistency
+                    style={{ marginTop: '10px' }} // Add some space
+                >
+                    Trigger Alien VFX (Test)
                 </button>
             </div>
             {/* --- Display Publish Status --- */}

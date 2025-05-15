@@ -85,7 +85,9 @@ function App() {
     isPlanetDataLoaded,
     turn,
     era,
-    karma
+    karma,
+    isEventPopupMinimized,
+    restoreEventPopup,
   } = usePlanetStore(
     useShallow(state => ({
       // Log when these key states change as seen by App component
@@ -120,7 +122,9 @@ function App() {
       isPlanetDataLoaded: state.isPlanetDataLoaded,
       turn: state.turn,
       era: state.era,
-      karma: state.karma
+      karma: state.karma,
+      isEventPopupMinimized: state.isEventPopupMinimized,
+      restoreEventPopup: state.restoreEventPopup,
     }))
   );
 
@@ -137,6 +141,9 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
   const [isZoomEnabled, setIsZoomEnabled] = useState(true);
+
+  const [isEffectDelayActive, setIsEffectDelayActive] = useState(false);
+  const prevActiveEventRef = useRef();
 
   // The isSdkInitialized and setIsSdkInitialized state variables previously here should be removed as they are unused.
 
@@ -324,11 +331,31 @@ function App() {
     // };
   }, [/* Removed dependencies related to the timer */]);
 
+  // Effect to manage delay after an event finishes for visual effects
+  useEffect(() => {
+    const previousEvent = prevActiveEventRef.current;
+    prevActiveEventRef.current = activeEvent; // Update ref after checking
+
+    if (previousEvent && !activeEvent) {
+      // An event just finished
+      console.log("[App Effect - Event Resolved] Event finished, starting effect delay.");
+      setIsEffectDelayActive(true);
+      const timerId = setTimeout(() => {
+        console.log("[App Effect - Event Resolved] Effect delay finished.");
+        setIsEffectDelayActive(false);
+      }, 5000); // 5-second delay for effects to play out, adjust as needed
+
+      return () => {
+        clearTimeout(timerId);
+      };
+    }
+  }, [activeEvent]);
+
   // New Effect to trigger events based on turn
   useEffect(() => {
-      console.log("[App Effect - Turn Trigger] Checking for event trigger on turn change.", { turn, era, karma, game_mode, currentView, isGameFinished, activeEvent: !!activeEvent });
-      // Only trigger if in main_planet view, game is not finished, there's no active event, and planet data is loaded
-      if (currentView === 'main_planet' && !isGameFinished && !activeEvent && isPlanetDataLoaded) {
+      console.log("[App Effect - Turn Trigger] Checking for event trigger on turn change.", { turn, era, karma, game_mode, currentView, isGameFinished, activeEvent: !!activeEvent, isEffectDelayActive });
+      // Only trigger if in main_planet view, game is not finished, there's no active event, planet data is loaded, AND effect delay is not active
+      if (currentView === 'main_planet' && !isGameFinished && !activeEvent && isPlanetDataLoaded && !isEffectDelayActive) {
           console.log("[App Effect - Turn Trigger] Conditions met, getting eligible event...");
           // Call the imported getEligibleEvent with current game state
           const eligibleEvent = getEligibleEvent(era, karma, turn, game_mode);
@@ -341,20 +368,31 @@ function App() {
               console.log("[App Effect - Turn Trigger] No eligible event found for current turn.");
           }
       }
-  }, [turn, era, karma, game_mode, currentView, isGameFinished, activeEvent, isPlanetDataLoaded]); // Depend on turn, era, karma, game_mode, currentView, isGameFinished, activeEvent, and isPlanetDataLoaded
+  }, [turn, era, karma, game_mode, currentView, isGameFinished, activeEvent, isPlanetDataLoaded, isEffectDelayActive]); // Depend on turn, era, karma, game_mode, currentView, isGameFinished, activeEvent, isPlanetDataLoaded, and isEffectDelayActive
 
   // Base Event Trigger Dialog Effect
    useEffect(() => {
     let baseEventTimer;
-    if (currentView === 'base_planet' && !isGameFinished && hasBaseIntroBeenCompleted && !hasSeenBaseEventTriggerDialogEver && !showBaseEventTriggerDialog) {
-      console.log('[App Effect] Base planet view active, starting 5s timer for BaseEventTriggerDialog...');
-      baseEventTimer = setTimeout(() => {
-        console.log('[App Effect] 5s timer elapsed, showing BaseEventTriggerDialog.');
-        setShowBaseEventTriggerDialog(true);
-        setHasSeenBaseEventTriggerDialogEver(true);
-      }, 5000);
-    } else if (currentView !== 'base_planet') {
-      setShowBaseEventTriggerDialog(false);
+    if (currentView === 'base_planet' && !isGameFinished && hasBaseIntroBeenCompleted && !hasSeenBaseEventTriggerDialogEver && !activeEvent) {
+        console.log('[App Effect] Base planet view active and intro completed, attempting to auto-trigger BASESTONE_01.');
+        // Clear any existing timer if the conditions become false unexpectedly
+        if (baseEventTimer) {
+            clearTimeout(baseEventTimer);
+        }
+        // Use a small delay to ensure state updates from intro completion are processed
+        baseEventTimer = setTimeout(() => {
+             console.log('[App Effect] Delay finished, triggering BASESTONE_01.');
+             triggerSpecificEvent('BASESTONE_01');
+             setHasSeenBaseEventTriggerDialogEver(true); // Mark as seen after triggering
+        }, 1000); // 1 second delay
+    } else if (currentView !== 'base_planet' || isGameFinished || activeEvent) {
+         // If conditions are no longer met, clear the timer
+         if (baseEventTimer) {
+             console.log('[App Effect] Conditions for BASESTONE_01 auto-trigger not met, clearing timer.');
+             clearTimeout(baseEventTimer);
+         }
+         // Optional: if you still want to hide the dialog if view changes, keep this line
+         // setShowBaseEventTriggerDialog(false);
     }
 
     return () => {
@@ -363,7 +401,7 @@ function App() {
         clearTimeout(baseEventTimer);
       }
     };
-  }, [currentView, isGameFinished, hasBaseIntroBeenCompleted, hasSeenBaseEventTriggerDialogEver, showBaseEventTriggerDialog, setHasSeenBaseEventTriggerDialogEver]);
+  }, [currentView, isGameFinished, hasBaseIntroBeenCompleted, hasSeenBaseEventTriggerDialogEver, activeEvent, triggerSpecificEvent, setHasSeenBaseEventTriggerDialogEver]); // Added activeEvent and triggerSpecificEvent to dependencies
 
   // Main Content Rendering Logic (Adjusted for wagmi)
   // --- Add logging before mainContent render logic ---
@@ -400,6 +438,11 @@ function App() {
         {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />}
         {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>}
         {currentView === 'main_planet' && <WormholeIcon />}
+        {isEventPopupMinimized && (currentView === 'main_planet' || currentView === 'base_planet') && (
+             <button className="restore-event-button pixel-button" onClick={restoreEventPopup}>
+                 {t('restoreEventButton')}
+             </button>
+        )}
         {currentView === 'base_planet' && <ReturnToMainButton />}
       </>
     );

@@ -8,6 +8,7 @@ const EventPopup = () => {
     const resolveEvent = usePlanetStore(state => state.resolveEvent);
     const minimizeEventPopup = usePlanetStore(state => state.minimizeEventPopup); // Import minimize action
     const isEventPopupOpen = usePlanetStore(state => state.isEventPopupOpen);
+    const isEventPopupMinimized = usePlanetStore(state => state.isEventPopupMinimized); // Import isEventPopupMinimized
     const [narrativeIndex, setNarrativeIndex] = useState(0);
     const [showConflictAndOptions, setShowConflictAndOptions] = useState(false);
 
@@ -18,8 +19,8 @@ const EventPopup = () => {
         setShowConflictAndOptions(false);
     }, [activeEvent]);
 
-    if (!activeEvent || !isEventPopupOpen) {
-        console.log("[EventPopup] Not rendering: activeEvent", !!activeEvent, "isEventPopupOpen", isEventPopupOpen);
+    if (!activeEvent || !isEventPopupOpen || isEventPopupMinimized) {
+        console.log("[EventPopup] Not rendering: activeEvent", !!activeEvent, "isEventPopupOpen", isEventPopupOpen, "isEventPopupMinimized", isEventPopupMinimized);
         return null;
     }
 
@@ -157,7 +158,7 @@ const EventPopup = () => {
                         {/* Display Options */}
                         <div className="story-event-options">
                             {/* Translate header */}
-                            <h3>{t('event_popup_options_header', 'You plan to...')}</h3>
+                            <h3>{t('event_popup_options_header_plan_to')}</h3>
                             {activeEvent.options && activeEvent.options.map((option, index) => {
                                 let emoji = '';
                                 if (index === 0) emoji = '🤝';

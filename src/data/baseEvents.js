@@ -4,6 +4,7 @@ export const baseEvents = {
         title: '基石',
         image: '/assets/events/Basestone.jpg', 
         nextEventKey: 'BASE_LADDER_02',
+        turns: [1],
         narrativePages: [
             "在金融危机后的余波中，一种全新的数字曙光开始在地平线闪耀 —— 比特币开启了去中心化账本的纪元。",
             "少数富有远见的人们开始关注其底层技术，构思一个更强大、更灵活的底层技术平台，一个能够承载未来无数去中心化应用的\"基石\"。",
@@ -81,6 +82,7 @@ export const baseEvents = {
         eventKey: 'BASE_LADDER_02',
         title: '阶梯',
         image: '/assets/events/ladder.jpg',
+        turns: [2],
         nextEventKey: 'BASE_GIANT_03',
         narrativePages: [
             "在早期技术探索和概念萌芽之后，区块链技术生态迎来了一个快速的膨胀期，随之而来的是链上活动边界以前所未有的速度扩张。",
@@ -164,7 +166,7 @@ export const baseEvents = {
         title: '巨头的彷徨',
         image: '/assets/events/event3.jpg',
         era: 2,
-        turns: 9,
+        turns: [3],
         nextEventKey: 'BASE_SPRING_04',
         narrativePages: [
             "CoinDock 已然成为连接传统金融世界与新兴加密宇宙的标志性桥梁。",
@@ -209,7 +211,7 @@ export const baseEvents = {
         title: '石上之春',
         image: '/assets/events/event4.jpg',
         era: 3,
-        turns: 21,
+        turns: [4],
         nextEventKey: null,
         narrativePages: [
             "Base 沐浴着 Layer 2 技术的滋养，在全球链上经济迈向\"星球化\"之际 ，迎来了应用的爆发期，链上活力如野草般在石上蔓延。",

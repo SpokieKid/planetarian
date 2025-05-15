@@ -33,6 +33,7 @@ const initialGameState = {
     showBaseCompletionPopup: false, // <-- New state for showing badge popup
     dataWaveTriggerCount: 0, // Counter for data wave triggers
     isPlanetDataLoaded: false, // <-- New state for tracking planet data loading
+    lastResolvedEventVfx: null, // <-- New state for last resolved event VFX
 };
 
 // Function to apply effects based on chosen option and its outcome (Success/Fail)
@@ -130,7 +131,7 @@ const usePlanetStore = create(
                 set((state) => ({
                     hasEarnedBaseCompletionBadge: true,
                     showBaseCompletionPopup: true,
-                    narrativeLog: [...state.narrativeLog, "[历史模拟] 恭喜！已完成基地历史模拟并获得成就徽章！"], // Add log entry
+                    narrativeLog: [...state.narrativeLog, { type: 'badge_earned', text: "[历史模拟] 恭喜！已完成基地历史模拟并获得成就徽章！" }], // Add structured log entry
                 }));
                 get().savePlanetState(); // Immediately save the updated state
             },
@@ -145,7 +146,7 @@ const usePlanetStore = create(
                     planetName: `Planet-${Math.random().toString(36).substring(2, 7)}`, // Always give a new random name on full reset
                     createdAt: now,
                     lastTickTime: now,
-                    narrativeLog: [`Planet state reset. Welcome back.`], // Add an initial log entry (simplified name for reset log)
+                    narrativeLog: [{ type: 'reset', text: 'Planet state reset. Welcome back.' }], // Add an initial structured log entry
                     isEventPopupOpen: false, 
                     hasPendingEvent: false, 
                     isFlowEffectActive: false, 
@@ -185,10 +186,12 @@ const usePlanetStore = create(
 
                     if (data) {
                         console.log("Supabase state loaded:", data);
+                        // Ensure narrative_log loaded from DB is treated as an array, default to empty if null
+                        const loadedNarrativeLog = Array.isArray(data.narrative_log) ? data.narrative_log : initialGameState.narrativeLog;
                         set({
                             // Set state from loaded data, providing defaults if null/undefined
                             karma: data.karma ?? initialGameState.karma,
-                            narrativeLog: data.narrative_log ?? initialGameState.narrativeLog,
+                            narrativeLog: loadedNarrativeLog, // Use the checked array
                             resolvedEventCount: data.resolved_event_count ?? initialGameState.resolvedEventCount,
                             isGameFinished: data.is_game_finished ?? initialGameState.isGameFinished,
                             game_mode: data.game_mode ?? initialGameState.game_mode,
@@ -221,7 +224,7 @@ const usePlanetStore = create(
                             walletAddress: walletAddress, // Ensure wallet address is set in state
                             createdAt: now,
                             lastTickTime: now,
-                            narrativeLog: [`Planet ${newPlanetName} initialized for ${walletAddress.substring(0, 6)}...`], // Log entry
+                            narrativeLog: [{ type: 'initialization', text: `Planet ${newPlanetName} initialized for ${walletAddress.substring(0, 6)}...` }], // Log entry
                             isPlanetDataLoaded: true, // Data initialized and ready
                         });
                         // Immediately save this newly initialized state
@@ -402,16 +405,16 @@ const usePlanetStore = create(
                     }
                 }
 
-
                 if (eventToTrigger) {
                     console.log(`Triggering specific event: ${eventKey}`);
-                    set({
+                    set(prevState => ({
                         activeEvent: { ...eventToTrigger, eventKey: eventKey }, // Ensure eventKey is part of activeEvent
                         isEventPopupOpen: true,
                         isEventPopupMinimized: false,
                         hasPendingEvent: false, // Clear any pending event flag
-                        narrativeLog: [...state.narrativeLog, `Event triggered: ${eventToTrigger.title || eventKey}`],
-                    });
+                        narrativeLog: [...prevState.narrativeLog, { type: 'event_triggered', eventKey: eventKey }], // Add structured log for triggered event
+                        lastResolvedEventVfx: null, // Clear previous VFX trigger
+                    }));
                 } else {
                     console.warn(`Specific event not found in any source: ${eventKey}`);
                 }
@@ -422,10 +425,10 @@ const usePlanetStore = create(
                 const state = get();
                 if (!state.activeEvent || state.isGameFinished) return;
 
-                // --- DETAILED LOGGING --- 
+                // --- DETAILED LOGGING ---
                 console.log("[resolveEvent] Called. Current activeEvent:", state.activeEvent?.title);
                 console.log("[resolveEvent] Chosen Option:", chosenOption);
-                // --- END LOGGING --- 
+                // --- END LOGGING ---
 
                  // If no option chosen (e.g., auto-resolve event), treat as default success/no specific outcome
                  let outcome;
@@ -452,51 +455,66 @@ const usePlanetStore = create(
                 const newKarma = state.karma + stateChanges.karma;
                 const newNarrativeLog = [...state.narrativeLog];
 
-                if (chosenOption && stateChanges.narrative) {
-                    // More detailed log for chosen option and its outcome
-                    const chosenOptionText = chosenOption.description_zh || chosenOption.id;
-                    const outcomeNarrative = stateChanges.narrative;
-                    const outcomeHashtag = stateChanges.hashtag ? ` ${stateChanges.hashtag}` : "";
-                    const karmaChangeText = stateChanges.karma !== 0 ? ` (Karma ${stateChanges.karma > 0 ? '+' : ''}${stateChanges.karma})` : "";
-                    newNarrativeLog.push(`[${state.activeEvent.title}] Chose: "${chosenOptionText}". Result: "${outcomeNarrative}"${outcomeHashtag}${karmaChangeText}`);
-                } else if (stateChanges.narrative) {
-                    // Log for events that might auto-resolve or have a narrative without distinct options shown to user before resolving
-                    const outcomeNarrative = stateChanges.narrative;
-                    const outcomeHashtag = stateChanges.hashtag ? ` ${stateChanges.hashtag}` : "";
-                    const karmaChangeText = stateChanges.karma !== 0 ? ` (Karma ${stateChanges.karma > 0 ? '+' : ''}${stateChanges.karma})` : "";
-                    newNarrativeLog.push(`[${state.activeEvent.title}] Outcome: "${outcomeNarrative}"${outcomeHashtag}${karmaChangeText}`);
-                } else if (!chosenOption) {
-                     newNarrativeLog.push(`[${state.activeEvent.title}] Event period concluded.`);
-                }
-                
+                // --- Modified: Add structured log entry ---
+                const logEntry = {
+                    type: 'event_result',
+                    eventKey: state.activeEvent.eventKey,
+                    chosenOptionId: chosenOption ? chosenOption.id : null, // Store option ID
+                    outcomeResultKey: stateChanges.narrative, // Store the key for the result narrative
+                    hashtags: stateChanges.hashtag || null,
+                    karmaChange: stateChanges.karma || 0,
+                };
+                newNarrativeLog.push(logEntry);
+                // --- End Modified ---
+
                 const newResolvedEventCount = state.resolvedEventCount + 1;
-                const resolvedEventKey = state.activeEvent.eventKey; 
-                const nextEventKeyFromCurrent = state.activeEvent.nextEventKey; 
-                
+                const resolvedEventKey = state.activeEvent.eventKey;
+                const nextEventKeyFromCurrent = state.activeEvent.nextEventKey;
+
                 let activateFlowEffect = false;
-                // IMPORTANT: Replace 'option1' with the actual ID or a distinguishing property 
+                // IMPORTANT: Replace 'option1' with the actual ID or a distinguishing property
                 // of the choice that should trigger the FlowEffect.
                 // For example, if your chosenOption object has a specific `effectType` or `name`:
                 // if (chosenOption && chosenOption.id === 'option1_id_from_event_data') {
-                if (chosenOption && chosenOption.id === 'option1') { 
-                    console.log("[resolveEvent] Option 1 chosen, activating FlowEffect.");
-                    activateFlowEffect = true;
-                }
+                // if (chosenOption && chosenOption.id === 'option1') { // This logic needs refinement based on event data structure
+                //     console.log("[resolveEvent] Option 1 chosen, activating FlowEffect.");
+                //     activateFlowEffect = true;
+                // }
+
+                // --- Added: Get VFX from the resolved outcome ---
+                const resolvedEventVfx = outcome.vfx || (state.activeEvent.vfx && !chosenOption ? state.activeEvent.vfx : null); // Get from outcome first, fallback to event vfx if no option chosen
+                console.log("[resolveEvent] Resolved Event VFX:", resolvedEventVfx);
+                // --- End Added ---
 
                 set(prevState => ({
-                    activeEvent: null, 
+                    activeEvent: null,
                     growthPoints: newGrowthPoints,
                     karma: newKarma,
                     narrativeLog: newNarrativeLog,
                     resolvedEventCount: newResolvedEventCount,
-                    triggeredEventKeys: resolvedEventKey ? [...prevState.triggeredEventKeys, resolvedEventKey] : prevState.triggeredEventKeys, 
-                    isEventPopupOpen: false, 
-                    hasPendingEvent: false, 
-                    isFlowEffectActive: activateFlowEffect,
+                    triggeredEventKeys: resolvedEventKey ? [...prevState.triggeredEventKeys, resolvedEventKey] : prevState.triggeredEventKeys,
+                    isEventPopupOpen: false,
+                    hasPendingEvent: false,
+                    isFlowEffectActive: activateFlowEffect, // FlowEffect activation logic needs review based on actual requirements
+                    lastResolvedEventVfx: resolvedEventVfx, // <-- Store the resolved VFX type
                 }));
 
-                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount, era: get().era, turn: get().turn });
-                get().savePlanetState(); 
+                console.log("Event resolved. New State:", { karma: newKarma, resolvedCount: newResolvedEventCount, era: get().era, turn: get().turn, lastResolvedVfx: resolvedEventVfx });
+
+                // --- Added: Clear lastResolvedEventVfx after a delay ---
+                if (resolvedEventVfx) {
+                    setTimeout(() => {
+                        set({ lastResolvedEventVfx: null });
+                        console.log(`[resolveEvent] Cleared lastResolvedEventVfx (${resolvedEventVfx}) after 3 seconds.`);
+                    }, 3000); // Clear VFX trigger after 3 seconds (adjust as needed)
+                }
+                // --- End Added ---
+
+                // --- Modified: Increment turn after resolving the event ---
+                get().incrementTurn();
+                // --- End Modified ---
+
+                get().savePlanetState();
 
                 // After current event is resolved and state updated, check for next event OR badge
                 if (resolvedEventKey === 'BASE_SPRING_04') { // Check if the resolved event was the last in sequence
@@ -508,13 +526,15 @@ const usePlanetStore = create(
                         console.log(`Auto-triggering next event in sequence: ${nextEventKeyFromCurrent}`);
                         // Use a brief timeout to allow UI to settle before showing the next event
                         setTimeout(() => {
-                            set({
+                            // When auto-triggering next event, also add a log entry indicating the event started
+                            set(prevState => ({
                                 activeEvent: { ...nextEventToTrigger, eventKey: nextEventKeyFromCurrent },
                                 isEventPopupOpen: true,
                                 isEventPopupMinimized: false,
                                 hasPendingEvent: false,
-                                narrativeLog: [...get().narrativeLog, `Event triggered: ${nextEventToTrigger.title || nextEventKeyFromCurrent}`],
-                            });
+                                narrativeLog: [...prevState.narrativeLog, { type: 'event_triggered', eventKey: nextEventKeyFromCurrent }], // Add structured log for triggered event
+                                lastResolvedEventVfx: null, // Clear any pending VFX before triggering next event
+                            }));
                         }, 500); // 0.5 second delay
                     } else {
                         console.warn(`Next event key "${nextEventKeyFromCurrent}" not found in baseEvents.`);
@@ -564,7 +584,7 @@ const usePlanetStore = create(
                 // --- Check for event trigger on tick ---
                 // Decide if events should trigger on tick or only on turn increment.
                 // If on tick, uncomment below:
-                // get().triggerNextEvent(); 
+                // get().incrementTurn(); // <-- Uncomment this line to make ticks advance turns
 
                 // Optional: console.log("Tick:", timeElapsed);
             }, // Closing brace for tick action ---
@@ -592,6 +612,23 @@ const usePlanetStore = create(
 
             // New action to trigger data wave
             triggerDataWave: () => set(state => ({ dataWaveTriggerCount: state.dataWaveTriggerCount + 1 })),
+
+            // --- New action to trigger specific VFX --- 
+            triggerVfx: (vfxType) => {
+                console.log(`[usePlanetStore] Triggering VFX: ${vfxType}`);
+                set({ lastResolvedEventVfx: vfxType });
+                // The timeout to clear lastResolvedEventVfx is already in resolveEvent, 
+                // but for a direct test trigger, we might want a separate timeout here 
+                // or rely on the next event resolution/trigger to clear it. 
+                // For now, let's rely on event resolution/trigger to clear.
+                // If a standalone clear is needed for testing, add a setTimeout here.
+                setTimeout(() => {
+                     set({ lastResolvedEventVfx: null });
+                     console.log(`[usePlanetStore] Cleared lastResolvedEventVfx (${vfxType}) after 3 seconds (test trigger).`);
+                 }, 3000); // Clear after 3 seconds (adjust as needed)
+            },
+            // --- End New action ---
+
         }), // Closing parenthesis for the main state object
         { // Persist configuration
             name: 'planetary-pet-storage-v3', // Consider changing name if schema changed significantly
@@ -599,8 +636,8 @@ const usePlanetStore = create(
             partialize: (state) => {
                 // Return only the state that should be persisted
                 // eslint-disable-next-line no-unused-vars
-                const { coinbaseProvider, coinbaseAccount, ...rest } = state;
-                return rest; // Exclude coinbaseProvider and coinbaseAccount
+                const { coinbaseProvider, coinbaseAccount, lastResolvedEventVfx, ...rest } = state; // Exclude lastResolvedEventVfx
+                return rest; // Exclude coinbaseProvider, coinbaseAccount, and lastResolvedEventVfx
             },
             // onRehydrateStorage: (state) => {
             //   console.log("hydration starts");

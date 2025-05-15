@@ -102,5 +102,9 @@
   "intro_16": " ",
   "intro_17": "We must leave something behind …",
   "intro_18": " ",
-  "intro_19": "Anything … "
+  "intro_19": "Anything … ",
+
+  "event_popup_options_header_plan_to": "You Plan to...",
+  "restoreEventButton": "Restore Event",
+  "planetLogTitle": "Planet Log"
 } 
