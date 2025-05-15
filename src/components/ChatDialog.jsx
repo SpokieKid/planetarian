@@ -7,7 +7,7 @@ import './ChatDialog.css';
 const ChatDialog = ({ onClose }) => {
     // Keep existing state
     const [messages, setMessages] = useState([
-        { id: 1, text: 'Hello! How can I help you today?', sender: 'bot' }
+        { id: 1, text: 'Hello Planetarian! How can I help you today?', sender: 'bot' }
     ]);
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef(null);
@@ -146,7 +146,7 @@ const ChatDialog = ({ onClose }) => {
         <div className="chat-dialog-container">
             <div className="chat-dialog">
                 <div className="chat-dialog-header">
-                    <span>Chat with Support</span> 
+                    <span>Chat with Nounii</span> 
                     <button onClick={onClose} className="chat-dialog-close-btn" disabled={isSending}>&times;</button>
                 </div>
                 <div className="chat-dialog-messages">

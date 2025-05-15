@@ -13,6 +13,7 @@
     align-items: center;
     z-index: 1999; /* High z-index to cover other game elements */
     font-family: 'Press Start 2P', monospace; /* Pixel font */
+    overflow-y: auto; /* Allow scrolling on the container if content overflows */
 }
 
 .ai-assistant-avatar-container {
@@ -26,30 +27,36 @@
     border-radius: 50%;
     border: 3px solid #a9def9; /* Light blue border, similar to strong text */
     box-shadow: 0 0 15px rgba(169, 222, 249, 0.7);
+    margin-top: 20px; /* Add some margin at the top for scroll spacing */
 }
 
 .base-intro-content {
     background-color: rgba(0, 0, 0, 0.8); /* Slightly more opaque for better readability */
-    padding: 25px 30px; /* Adjusted padding */
+    padding: 20px; /* Unified padding */
     border-radius: 10px;
     border: 3px solid #50c878; /* Pixel-style border - adjust color */
     color: #fff; /* White text */
-    max-width: 600px; /* Reduced max-width to approx 2/3 (was 800px) */
-    width: 70%;       /* Reduced width to approx 2/3 (was 80%) */
+    max-width: 600px; 
+    width: 90%; /* More responsive width */
     text-align: center; /* Center text within the content box */
     box-shadow: 0 0 20px rgba(80, 200, 120, 0.5); /* Optional glow for the box */
     display: flex; /* Use flex to manage internal layout */
     flex-direction: column;
     align-items: center; /* Center content like paragraph and nav */
+    margin: 20px 0; /* Add vertical margin for spacing when scrolling */
+    max-height: calc(100vh - 40px); /* Max height to prevent overflow, with some spacing */
+    overflow-y: auto; /* Allow scrolling within the content box if needed */
 }
 
 .base-intro-paragraph {
-    min-height: 150px; /* Adjusted min-height */
+    min-height: 100px; /* Adjusted min-height for smaller screens */
     margin-bottom: 20px;
-    line-height: 1.7;
-    font-size: 1em; /* Slightly smaller font for smaller box */
+    line-height: 1.6; /* Slightly adjusted line-height */
+    font-size: 0.9em; /* Adjusted font size for better fit */
     width: 100%; /* Ensure paragraph takes full width of the content box for centering */
-    text-align: center; /* Explicitly center text in paragraph */
+    text-align: left; /* Align text to left for readability on mobile */
+    overflow-wrap: break-word; /* Ensure long words break and don't overflow */
+    word-break: break-word; /* Additional safety for word breaking */
 }
 
 .base-intro-paragraph strong {
@@ -58,10 +65,12 @@
 
 .base-intro-navigation {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Default for two buttons */
     align-items: center;
     margin-top: 15px; /* Adjusted margin */
     width: 100%; /* Navigation takes full width of content box */
+    flex-wrap: wrap; /* Allow buttons to wrap on very small screens */
+    gap: 10px; /* Add gap between buttons if they wrap */
 }
 
 /* Reusing pixel-button style, ensure it's available globally or copy it here */
@@ -70,11 +79,11 @@
   background-color: #3B82F6; /* A purple color (example from existing styles) */
   border: 2px solid #000;
   color: white;
-  padding: 10px 20px; /* Slightly smaller padding for smaller box context */
+  padding: 10px 15px; /* Adjusted padding for smaller buttons */
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 0.9em; /* Slightly smaller font for buttons */
+  font-size: 0.8em; /* Adjusted font size for buttons */
   font-family: inherit; /* Inherit from .base-intro-scroller-container */
   font-weight: bold;
   cursor: pointer;
@@ -98,30 +107,110 @@
     /* Specific styles if needed, e.g., different color */
     background-color: #fca311; /* Example: Orange */
     color: #16213e;
-    width: 100px;
+    width: auto; /* Allow button to size to content */
+    min-width: 80px; /* Minimum width */
+    flex-grow: 1; /* Allow buttons to grow if space is available */
 }
 
 .next-button {
     /* Specific styles if needed */
     background-color: #50c878; /* Example: Green */
     color: black;
-    width: 100px;
+    width: auto; /* Allow button to size to content */
+    min-width: 80px; /* Minimum width */
+    flex-grow: 1; /* Allow buttons to grow if space is available */
 }
 
 .finish-button {
     background-color: #e94560; /* Example: Reddish */
     color: white;
-    width: auto; /* Allow button to size to content, or set a specific width if preferred */
-    padding: 12px 25px; /* Restore padding for finish button if desired */
-    font-size: 1.1em; /* Restore font size for finish button */
-    /* If you want the finish button to be full width of the nav area: */
-    /* flex-grow: 1; text-align: center; */ 
+    width: auto; /* Allow button to size to content */
+    min-width: 120px; /* Min width for finish button */
+    padding: 12px 20px; /* Adjusted padding */
+    font-size: 1em; /* Adjusted font size for finish button */
     /* If only finish button is present, center it */
     margin: 0 auto; /* This will center it if it's the only button */
+    flex-grow: 2; /* Allow finish button to take more space if needed */
 }
 
 /* Adjust navigation when only one button (like FINISH or initial NEXT) is present to center it */
 .base-intro-navigation > .pixel-button:only-child {
     margin-left: auto;
     margin-right: auto;
+    flex-grow: 0; /* Prevent single button from taking full width if not desired */
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+    .base-intro-content {
+        width: 90%;
+        padding: 15px;
+        max-height: calc(100vh - 80px); /* Adjust max-height for mobile, considering avatar and margins */
+    }
+
+    .ai-assistant-avatar {
+        width: 60px;
+        height: 60px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .base-intro-paragraph {
+        font-size: 0.85em; /* Slightly smaller font on mobile */
+        min-height: 80px; /* Further adjust min-height for mobile */
+        line-height: 1.5;
+    }
+
+    .pixel-button {
+        font-size: 0.75em;
+        padding: 8px 12px;
+    }
+
+    .prev-button, .next-button {
+        min-width: 70px;
+    }
+
+    .finish-button {
+        font-size: 0.9em;
+        padding: 10px 15px;
+        min-width: 100px;
+    }
+
+    .base-intro-navigation {
+        flex-direction: column; /* Stack buttons vertically on very small screens if needed */
+        gap: 10px; /* Space between stacked buttons */
+    }
+    .base-intro-navigation > .pixel-button {
+      width: 100%; /* Make buttons full width when stacked */
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .base-intro-navigation > .pixel-button:only-child {
+      width: auto; /* Allow single button to not be full width */
+      min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .base-intro-paragraph {
+        font-size: 0.8em;
+        text-align: left; /* Ensure text is readable */
+    }
+
+    .pixel-button {
+        font-size: 0.7em;
+    }
+    
+    .base-intro-navigation {
+        flex-direction: column; 
+        gap: 10px;
+    }
+
+    .base-intro-navigation > .pixel-button {
+      width: 100%; /* Full width buttons in column layout */
+    }
+     .base-intro-navigation > .pixel-button:only-child {
+       width: 80%; /* Center the single button but not full width */
+       margin: 0 auto;
+    }
 } 

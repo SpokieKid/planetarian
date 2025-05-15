@@ -50,6 +50,16 @@ const ResourcePanel = () => {
     console.log("Zustand walletAddress:", walletAddress);
     // ---
 
+    // Add this useEffect for debugging Coinbase Provider status
+    useEffect(() => {
+        console.log("[ResourcePanel Debug] Coinbase Provider from store:", coinbaseProvider);
+        if (coinbaseProvider) {
+            console.log("[ResourcePanel Debug] Coinbase Provider is available.");
+        } else {
+            console.log("[ResourcePanel Debug] Coinbase Provider is currently NOT available from store. Ensure wallet is connected and SDK initialized.");
+        }
+    }, [coinbaseProvider]);
+
     // --- Component State for Publishing --- 
     const [isPublishing, setIsPublishing] = useState(false);
     const [publishStatus, setPublishStatus] = useState(''); // To show messages
