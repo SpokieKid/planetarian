@@ -255,9 +255,16 @@
 /* Styling for the narrative pagination buttons */
 .narrative-navigation {
     display: flex; /* Arrange buttons in a row */
-    justify-content: center; /* Center buttons */
-    gap: 15px; /* Add space between buttons */
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center; /* Center buttons horizontally in the column */
+    gap: 10px; /* Adjust space between buttons vertically */
     margin-top: 15px; /* Space above buttons */
+}
+
+/* Ensure buttons within narrative-navigation have a consistent width */
+.narrative-navigation .pixel-button {
+    width: 180px; /* Example width, adjust as needed */
+    /* You can also use min-width or max-width if you prefer */
 }
 
 /* --- End Updated Narrative Section --- */

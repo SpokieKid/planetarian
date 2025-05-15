@@ -12,7 +12,7 @@ const EventPopup = () => {
     const [narrativeIndex, setNarrativeIndex] = useState(0);
     const [showConflictAndOptions, setShowConflictAndOptions] = useState(false);
 
-    const { t, i18n } = useTranslation(); // Get t and i18n
+    const { t } = useTranslation(); // Get t function, i18n object removed as it's not used
 
     useEffect(() => {
         setNarrativeIndex(0);
@@ -59,41 +59,35 @@ const EventPopup = () => {
 
     // Function to get translated option description
     const getTranslatedOptionDescription = (option) => {
-        // Prioritize description based on current language if available, fallback to mainText as a key
-        // Check if the option object has language-specific description keys like description_zh/en
-        const lang = i18n.language; // Get current language
-        const descriptionKey = option[`description_${lang}`] || option.description_zh || option.description_en; // Use lang specific, fallback to zh/en
+        // Get the translation key from the option object
+        const translationKey = option.description_key;
+
+        if (translationKey) {
+            const translated = t(translationKey);
+            // If translation is different from the key, it means translation was successful
+            if (translated !== translationKey) {
+                return translated;
+            }
+            // If translation is the same as the key, it means key was not found in translation files.
+            // Log a warning and return the key itself as a fallback, or a generic message.
+            console.warn(`Translation not found for key: ${translationKey}. Displaying key as fallback.`);
+            // Optionally, return a more user-friendly message if the key itself is not suitable for display
+            // return t('noOptionDescriptionAvailable', 'No description available'); 
+            return translationKey; // Or return the key itself if that's preferred when a translation is missing
+        }
+
+        // Fallback for options that might not use description_key (e.g., older event structures or dynamic content)
+        // This part can be adjusted based on how other event types (if any) store their descriptions.
+        if (option.mainText) { // Check for a generic mainText field
+            const mainTextTranslated = t(option.mainText);
+            if (mainTextTranslated !== option.mainText) {
+                return mainTextTranslated;
+            }
+            return option.mainText; // Fallback to raw mainText
+        }
         
-        // If a specific description key is found, translate it
-        if (descriptionKey) {
-            const translated = t(descriptionKey);
-            // Check if the translation result is the same as the key (i.e., key not found)
-            if (translated !== descriptionKey) {
-                return translated; // Return translated text if translation found
-            }
-             // If translation not found for lang-specific key, try mainText as a key
-            if (option.mainText) {
-                 const mainTextTranslated = t(option.mainText);
-                 if (mainTextTranslated !== option.mainText) {
-                     return mainTextTranslated; // Return mainText translation if found
-                 }
-                 return option.mainText; // Fallback to raw mainText if no translation found
-            }
-             return descriptionKey; // Fallback to raw descriptionKey if no mainText
-        }
-
-        // If no description key in expected format, try mainText as a key
-         if (option.mainText) {
-             const mainTextTranslated = t(option.mainText);
-             if (mainTextTranslated !== option.mainText) {
-                 return mainTextTranslated; // Return mainText translation if found
-             }
-             return option.mainText; // Fallback to raw mainText if no translation found
-        }
-
-        // If no relevant keys, return an empty string or a fallback message
-        console.warn("No suitable key found for option description translation:", option);
-        return t('noOptionDescriptionAvailable', 'No description available'); // Fallback key
+        console.warn("No suitable key (description_key or mainText) found for option description translation:", option);
+        return t('noOptionDescriptionAvailable', 'No description available'); // Default fallback
     };
 
 
