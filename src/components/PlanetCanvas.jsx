@@ -11,9 +11,9 @@ import EmojiParticles from './EmojiParticles'; // Import the new EmojiParticles 
 import DataWave from './DataWave'; // Import the DataWave component
 import AlienParticles from './AlienParticles'; // Import AlienParticles
 import './PlanetCanvas.css'; // Basic styling for canvas container
-import AmbientLight from './DataWave/AmbientLight';
-import PointLight from './DataWave/PointLight';
-import Camera from './DataWave/Camera'; // Import Camera component
+// import AmbientLight from './DataWave/AmbientLight';
+// import PointLight from './DataWave/PointLight';
+// import Camera from './DataWave/Camera'; // Import Camera component
 
 const PlanetCanvas = ({ isZoomEnabled }) => {
     console.log("[PlanetCanvas] Component rendering."); // Add this log
@@ -28,10 +28,10 @@ const PlanetCanvas = ({ isZoomEnabled }) => {
                 shadows // Enable shadows if needed (requires light and object setup)
             >
                 <Suspense fallback={null}> {/* Use Suspense for loading models/textures */}
-                    <AmbientLight intensity={0.5} /> {/* Basic ambient light */}
-                    <PointLight position={[10, 10, 10]} intensity={0.8} /> {/* Basic point light */}
+                    {/* <AmbientLight intensity={0.5} /> Basic ambient light */}
+                    {/* <PointLight position={[10, 10, 10]} intensity={0.8} /> {/* Basic point light */}
                     <Planet /> {/* Your existing planet */}
-                    <Camera isZoomEnabled={isZoomEnabled} /> {/* Add the Camera component */}
+                    {/* <Camera isZoomEnabled={isZoomEnabled} /> {/* Add the Camera component */}
                     <OrbitingObjects count={8} /> {/* Add orbiting objects */} 
                     <BackgroundShips count={5} /> {/* Add background ships */} 
                     <EmojiParticles />
