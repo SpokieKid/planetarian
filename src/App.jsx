@@ -28,6 +28,7 @@ import HamburgerMenu from './components/HamburgerMenu';
 import { useAccount, useDisconnect, useSwitchChain } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Sentry from "@sentry/react";
+import { getEligibleEvent } from './data/events';
 
 // --- Wagmi Configuration ---
 // The wagmiConfig constant previously here should be removed as it was moved to main.jsx
@@ -74,14 +75,17 @@ function App() {
   // Zustand State and Actions (Modified for Wagmi)
   const {
     initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
-    resetPlanetState, triggerNextEvent, activeEvent, isEventPopupOpen,
+    resetPlanetState, activeEvent, isEventPopupOpen,
     loadPlanetState, currentView, setCurrentView, isFlowEffectActive,
     triggerSpecificEvent, narrativeLog, hasBaseIntroBeenCompleted, setBaseIntroCompleted,
     hasSeenBaseEventTriggerDialogEver, setHasSeenBaseEventTriggerDialogEver,
     showBaseCompletionPopup,
     setWalletAddress,
     game_mode,
-    isPlanetDataLoaded
+    isPlanetDataLoaded,
+    turn,
+    era,
+    karma
   } = usePlanetStore(
     useShallow(state => ({
       // Log when these key states change as seen by App component
@@ -98,7 +102,6 @@ function App() {
       isGameFinished: state.isGameFinished,
       finishGame: state.finishGame,
       resetPlanetState: state.resetPlanetState,
-      triggerNextEvent: state.triggerNextEvent,
       activeEvent: state.activeEvent,
       isEventPopupOpen: state.isEventPopupOpen,
       loadPlanetState: state.loadPlanetState,
@@ -115,6 +118,9 @@ function App() {
       setWalletAddress: state.setWalletAddress,
       game_mode: state.game_mode,
       isPlanetDataLoaded: state.isPlanetDataLoaded,
+      turn: state.turn,
+      era: state.era,
+      karma: state.karma
     }))
   );
 
@@ -130,6 +136,7 @@ function App() {
   const [showGuide, setShowGuide] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
+  const [isZoomEnabled, setIsZoomEnabled] = useState(true);
 
   // The isSdkInitialized and setIsSdkInitialized state variables previously here should be removed as they are unused.
 
@@ -148,6 +155,25 @@ function App() {
     });
   }, [isConnected, walletAddressWagmi, chain, game_mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
   // --- End Sentry Context Logging ---
+
+  // Effect to detect mobile devices and control zoom
+  useEffect(() => {
+    const handleResize = () => {
+      // Disable zoom if window width is less than a certain threshold (e.g., 768px)
+      setIsZoomEnabled(window.innerWidth >= 768);
+    };
+
+    // Initial check
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // Empty dependency array means this effect runs only once on mount and cleans up on unmount
 
   // --- Effect to log changes in critical rendering states ---
   useEffect(() => {
@@ -278,24 +304,44 @@ function App() {
 
   // Auto Event Trigger Effect
   useEffect(() => {
-    let eventTimer;
-    const canStartTimer = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent && isConnected;
+    // Removed the 15-second timer logic
+    // let eventTimer;
+    // const canStartTimer = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && !activeEvent && isConnected;
 
-    if (canStartTimer) {
-      console.log('[App Effect] Main game view active, starting 15s timer for first event...');
-      eventTimer = setTimeout(() => {
-        console.log('[App Effect] 15s timer elapsed, attempting to trigger next event.');
-        triggerNextEvent();
-      }, 15000);
-    }
+    // if (canStartTimer) {
+    //   console.log('[App Effect] Main game view active, starting 15s timer for first event...');
+    //   eventTimer = setTimeout(() => {
+    //     console.log('[App Effect] 15s timer elapsed, attempting to trigger next event.');
+    //     triggerNextEvent();
+    //   }, 15000);
+    // }
 
-    return () => {
-      if (eventTimer) {
-        console.log('[App Effect] Clearing event timer.');
-        clearTimeout(eventTimer);
+    // return () => {
+    //   if (eventTimer) {
+    //     console.log('[App Effect] Clearing event timer.');
+    //     clearTimeout(eventTimer);
+    //   }
+    // };
+  }, [/* Removed dependencies related to the timer */]);
+
+  // New Effect to trigger events based on turn
+  useEffect(() => {
+      console.log("[App Effect - Turn Trigger] Checking for event trigger on turn change.", { turn, era, karma, game_mode, currentView, isGameFinished, activeEvent: !!activeEvent });
+      // Only trigger if in main_planet view, game is not finished, there's no active event, and planet data is loaded
+      if (currentView === 'main_planet' && !isGameFinished && !activeEvent && isPlanetDataLoaded) {
+          console.log("[App Effect - Turn Trigger] Conditions met, getting eligible event...");
+          // Call the imported getEligibleEvent with current game state
+          const eligibleEvent = getEligibleEvent(era, karma, turn, game_mode);
+
+          if (eligibleEvent) {
+              console.log("[App Effect - Turn Trigger] Eligible event found:", eligibleEvent.eventKey, "Triggering event...");
+              // Assuming triggerSpecificEvent can handle an event object or key
+              usePlanetStore.getState().triggerSpecificEvent(eligibleEvent.eventKey);
+          } else {
+              console.log("[App Effect - Turn Trigger] No eligible event found for current turn.");
+          }
       }
-    };
-  }, [currentView, showVideoScreen, showIntro, showGuide, isGameFinished, activeEvent, triggerNextEvent, isConnected]);
+  }, [turn, era, karma, game_mode, currentView, isGameFinished, activeEvent, isPlanetDataLoaded]); // Depend on turn, era, karma, game_mode, currentView, isGameFinished, activeEvent, and isPlanetDataLoaded
 
   // Base Event Trigger Dialog Effect
    useEffect(() => {
@@ -321,13 +367,13 @@ function App() {
 
   // Main Content Rendering Logic (Adjusted for wagmi)
   // --- Add logging before mainContent render logic ---
-  console.log('[App Render Logic Check] States for rendering:', {
+  console.log("[App Render Logic Check] States for rendering:", {
       // Directly access state from hook selector here
       // This ensures we log the state values used *for this specific render pass*
       currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded
   });
   let mainContent = null;
-  console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded });
+  console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded, isZoomEnabled });
   if (currentView === 'base_intro') {
     console.log('[App] Rendering BaseIntroScroller.');
     mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
@@ -348,10 +394,8 @@ function App() {
     mainContent = (
       <>
         {/* Log right before rendering PlanetCanvas */}
-        {console.log("[App] About to render PlanetCanvas and CollapsibleResourcePanel")}
-        <PlanetCanvas />
-        {/* Log right before rendering CollapsibleResourcePanel */}
-        {console.log("[App] About to render CollapsibleResourcePanel")}
+        {console.log("[App] About to render PlanetCanvas and CollapsibleResourcePanel", { isZoomEnabled: isZoomEnabled })}
+        <PlanetCanvas isZoomEnabled={isZoomEnabled} />
         <CollapsibleResourcePanel />
         {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />}
         {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>}
@@ -390,7 +434,7 @@ function App() {
                      </ConnectWallet>
                       <WalletDropdown>
                         <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
-                           <Avatar />
+                           {/* <Avatar /> */}
                            <Name />
                            <Address />
                            <EthBalance />

@@ -4,7 +4,7 @@ export const events = {
     title: "event_Era1_Discovery_Prosperity01_title",
     era: 1,
     karmaLevel: [1, 200], // Representing the range (71, 90)
-    turns: [1, 49], // Representing the range 1-49
+    turns: 1, // Representing the range 1-49
     narrative: [
       "event_Era1_Discovery_Prosperity01_narrative_1",
       "event_Era1_Discovery_Prosperity01_narrative_2",
@@ -73,7 +73,7 @@ export const events = {
     title: "event_Era1_Empire_Transcendence01_title", // Assuming title is handled via i18n
     era: 1,
     karmaLevel: [91, 100], // Range (91, 100)
-    turns: [30, 49], // Range 30-49
+    turns: 2, // Range 30-49
     narrative: [
       "event_Era1_Empire_Transcendence01_narrative_1",
       // If the narrative has multiple paragraphs in i18n, add more keys here
@@ -125,18 +125,38 @@ export const events = {
 
 // Function to potentially get an event based on game state (Era, Karma, Turn)
 // This is a placeholder for now, the actual logic will be more complex
-export const getEligibleEvent = (era, karma, turn) => {
-    // Simple example: return the first event if conditions match (partially)
-    const event = events.Era1_Discovery_Prosperity01;
-    if (
-        event.era === era &&
-        karma >= event.karmaLevel[0] && karma <= event.karmaLevel[1] &&
-        turn >= event.turns[0] && turn <= event.turns[1]
-    ) {
-        return event;
+export const getEligibleEvent = (era, karma, turn, game_mode) => {
+    console.log("[getEligibleEvent] Checking for eligible event with state:", { era, karma, turn, game_mode });
+    const eligibleEvents = Object.values(events).filter(event => {
+        // Check if era matches (Temporarily disabled)
+        // if (event.era !== era) {
+        //     return false;
+        // }
+        // Check if karma level is within range (Temporarily disabled)
+        // if (karma < event.karmaLevel[0] || karma > event.karmaLevel[1]) {
+        //     return false;
+        // }
+        // Check if turn is within range
+        // Assuming event.turns is [start_turn, end_turn]
+        if (turn < event.turns[0] || turn > event.turns[1]) {
+             return false;
+         }
+        // Add check for game_mode if events are mode-specific (optional, based on game design)
+        // if (event.gameModes && !event.gameModes.includes(game_mode)) {
+        //    return false;
+        // }
+
+        console.log("[getEligibleEvent] Found eligible event candidate:", event.eventKey);
+        return true;
+    });
+
+    // For now, if multiple events are eligible, just return the first one found.
+    // In a real scenario, you might add logic for weighted random selection or priority.
+    if (eligibleEvents.length > 0) {
+        console.log("[getEligibleEvent] Returning eligible event:", eligibleEvents[0].eventKey);
+        return eligibleEvents[0];
+    } else {
+        console.log("[getEligibleEvent] No eligible events found.");
+        return null; // Or return a default/fallback event
     }
-    // In a real scenario, you would filter through all events in the `events` object
-    // and potentially select one randomly from the eligible ones.
-    console.warn("No eligible event found for current state:", { era, karma, turn });
-    return null; // Or return a default/fallback event
 }; 
