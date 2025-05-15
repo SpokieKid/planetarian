@@ -2,66 +2,76 @@ export const events = {
   Era1_Discovery_Prosperity01: {
     eventKey: "Era1_Discovery_Prosperity01",
     title: "event_Era1_Discovery_Prosperity01_title",
-    era: 1,
-    karmaLevel: [1, 200], // Representing the range (71, 90)
-    turns: 1, // Representing the range 1-49
-    narrative: [
-      "event_Era1_Discovery_Prosperity01_narrative_1",
-      "event_Era1_Discovery_Prosperity01_narrative_2",
-      "event_Era1_Discovery_Prosperity01_narrative_3"
-    ],
+    era: 2,
+    karmaLevel: [71, 90],
+    turns: [30, 49],
+    narrative: "event_Era1_Discovery_Prosperity01_narrative",
     conflict:
       "event_Era1_Discovery_Prosperity01_conflict",
     image: '/assets/events/Prosperity01.png',
     options: [
       {
         id: "A",
-        mainText: "event_Era1_Discovery_Prosperity01_option_A_mainText",
-        subText: "event_Era1_Discovery_Prosperity01_option_A_subText",
-        hashtag: "#宇宙 #接触 #科技 #高风险 #观念转变",
+        description_zh: "event_Era1_Discovery_Prosperity01_option_A_description_zh",
+        description_en: "event_Era1_Discovery_Prosperity01_option_A_description_en",
+        hashtag_zh: "#宇宙 #接触 #科技 #高风险 #观念转变",
+        hashtag_en: "#Cosmos #Contact #Technology #HighRisk #MindsetShift",
         success: {
           probability: 60,
-          narrative: "event_Era1_Discovery_Prosperity01_option_A_success_narrative",
+          result_zh: "event_Era1_Discovery_Prosperity01_option_A_success_result_zh",
+          result_en: "event_Era1_Discovery_Prosperity01_option_A_success_result_en",
           stateChanges: {
             // Define specific state changes later if needed
             // e.g., technology: +10
           },
           karmaChange: 15,
-          hashtag: "#突破 #宇宙沟通 #观念冲击",
+          hashtag_zh: "#突破 #宇宙沟通 #观念冲击",
+          hashtag_en: "#突破 #宇宙沟通 #观念冲击",
+          vfx: "Flow",
         },
         failed: {
           probability: 40,
-          narrative: "event_Era1_Discovery_Prosperity01_option_A_failed_narrative",
+          result_zh: "event_Era1_Discovery_Prosperity01_option_A_failed_result_zh",
+          result_en: "event_Era1_Discovery_Prosperity01_option_A_failed_result_en",
           stateChanges: {
             // Define specific state changes later if needed
             // e.g., stability: -5
           },
           karmaChange: -15,
-          hashtag: "#误解 #资源浪费 #探索停滞",
+          hashtag_zh: "#误解 #资源浪费 #探索停滞",
+          hashtag_en: "#误解 #资源浪费 #探索停滞",
+          vfx: "Discussion",
         },
       },
       {
         id: "B",
-        mainText: "event_Era1_Discovery_Prosperity01_option_B_mainText",
-        subText: "event_Era1_Discovery_Prosperity01_option_B_subText",
-        hashtag: "#谨慎 #隔离 #保守 #规避风险 #错过机遇",
+        description_zh: "event_Era1_Discovery_Prosperity01_option_B_description_zh",
+        description_en: "event_Era1_Discovery_Prosperity01_option_B_description_en",
+        hashtag_zh: "#谨慎 #隔离 #保守 #规避风险 #错过机遇",
+        hashtag_en: "#Caution #Isolation #Conservative #RiskAversion #MissedOpportunity",
         success: {
           probability: 60,
-          narrative: "event_Era1_Discovery_Prosperity01_option_B_success_narrative",
+          result_zh: "event_Era1_Discovery_Prosperity01_option_B_success_result_zh",
+          result_en: "event_Era1_Discovery_Prosperity01_option_B_success_result_en",
           stateChanges: {
              // Define specific state changes later if needed
           },
           karmaChange: 0,
-          hashtag: "#风险规避 #维持现状",
+          hashtag_zh: "#风险规避 #维持现状",
+          hashtag_en: "#风险规避 #维持现状",
+          vfx: "n.a",
         },
         failed: {
-          probability: 40,
-          narrative: "event_Era1_Discovery_Prosperity01_option_B_failed_narrative",
-          stateChanges: {
-             // Define specific state changes later if needed
-          },
-          karmaChange: -3,
-          hashtag: "#信息压制 #机遇错失 #内部竞争",
+           probability: 40,
+           result_zh: "event_Era1_Discovery_Prosperity01_option_B_failed_result_zh",
+           result_en: "event_Era1_Discovery_Prosperity01_option_B_failed_result_en",
+           stateChanges: {
+              // Define specific state changes later if needed
+           },
+           karmaChange: 0,
+           hashtag_zh: "#信息压制 #机遇错失 #内部竞争",
+           hashtag_en: "#信息压制 #机遇错失 #内部竞争",
+           vfx: "n.a",
         },
       },
     ],

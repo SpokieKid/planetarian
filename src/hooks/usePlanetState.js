@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient'; // Import Supabase client
 import { PLANET_MODES } from '../utils/resourceMapping'; // Removed getResourceModifiers import as it's not used directly here anymore
 import { events } from '../data/events.js'; // Import the new events structure
 import { baseEvents } from '../data/baseEvents.js'; // Import base events
+import { EVENTS_TO_FINISH } from '../constants/events'; // Import EVENTS_TO_FINISH
 // Line below was causing syntax error, removed. Event triggering is refactored.
 // import { checkAndTriggerEvent } from '../utils/eventTrigger'; as it's being replaced 
 
@@ -339,15 +340,20 @@ const usePlanetStore = create(
                  console.log(`Checking for eligible events for Era ${state.era}, Turn ${state.turn}, Karma ${state.karma}`);
 
                  let eligibleEvent = null;
-                 const availableEvents = Object.values(events); // Get all events as an array
+                 // Use the correct event source based on game_mode
+                 const sourceEvents = state.game_mode === PLANET_MODES.BASE ? baseEvents : events; // Choose source based on mode
+                 const availableEvents = Object.values(sourceEvents); // Get all events as an array from the selected source
 
                  // Find the first eligible event that hasn't been triggered yet
                  for (const event of availableEvents) {
+                     // Ensure event has necessary properties before checking conditions
+                     if (!event || !event.eventKey) continue; // Skip if event object is invalid
+
                      const isEraMatch = !event.era || event.era === state.era; // Allow events without era constraint
                      const isKarmaMatch = !event.karmaLevel || (state.karma >= event.karmaLevel[0] && state.karma <= event.karmaLevel[1]);
-                     const isTurnMatch = !event.turns || (state.turn >= event.turns[0] && state.turn <= event.turns[1]);
+                     const isTurnMatch = !event.turns || (state.turn >= event.turns[0] && state.turns <= event.turns[1]); // Corrected to use state.turns
                      // Ensure eventKey exists before checking triggered list
-                     const isAlreadyTriggered = event.eventKey && state.triggeredEventKeys.includes(event.eventKey); 
+                     const isAlreadyTriggered = state.triggeredEventKeys.includes(event.eventKey); 
 
                      // Trigger if matches AND not already triggered
                      if (isEraMatch && isKarmaMatch && isTurnMatch && !isAlreadyTriggered) {
@@ -378,9 +384,24 @@ const usePlanetStore = create(
                     return;
                 }
 
-                // For now, assume eventKey is for baseEvents.
-                // This could be expanded to check main events or other event sources if needed.
-                const eventToTrigger = baseEvents[eventKey];
+                let eventToTrigger = null;
+
+                // Check main events first if not in BASE mode
+                if (state.game_mode !== PLANET_MODES.BASE) {
+                     eventToTrigger = events[eventKey]; // Check in imported 'events' object
+                     if (eventToTrigger) {
+                         console.log(`Specific event found in main events: ${eventKey}`);
+                     }
+                }
+
+                // If not found in main events or in BASE mode, check base events
+                if (!eventToTrigger) {
+                    eventToTrigger = baseEvents[eventKey]; // Check in imported 'baseEvents' object
+                    if (eventToTrigger) {
+                        console.log(`Specific event found in base events: ${eventKey}`);
+                    }
+                }
+
 
                 if (eventToTrigger) {
                     console.log(`Triggering specific event: ${eventKey}`);
@@ -392,7 +413,7 @@ const usePlanetStore = create(
                         narrativeLog: [...state.narrativeLog, `Event triggered: ${eventToTrigger.title || eventKey}`],
                     });
                 } else {
-                    console.warn(`Specific event not found: ${eventKey}`);
+                    console.warn(`Specific event not found in any source: ${eventKey}`);
                 }
             },
 
@@ -498,6 +519,17 @@ const usePlanetStore = create(
                     } else {
                         console.warn(`Next event key "${nextEventKeyFromCurrent}" not found in baseEvents.`);
                     }
+                } else if (resolvedEventKey && state.game_mode !== PLANET_MODES.BASE) { // Check for next event in main mode after resolving a main event
+                    // In main mode, the next event is not necessarily linked in sequence like base events.
+                    // The system relies on the turn-based check in the useEffect in App.jsx
+                    console.log("Resolved main event. App.jsx turn effect will check for next event.");
+                    // No explicit trigger here, the App.jsx effect handles it on the next turn tick if conditions are met.
+                }
+
+                // Check for game completion after resolving any event in main mode
+                if (state.game_mode !== PLANET_MODES.BASE && get().resolvedEventCount >= EVENTS_TO_FINISH && !get().isGameFinished) {
+                   console.log(`Game finished condition met: ${get().resolvedEventCount} resolved events >= ${EVENTS_TO_FINISH}`);
+                   get().finishGame();
                 }
 
                 if (activateFlowEffect) {
@@ -546,10 +578,10 @@ const usePlanetStore = create(
                     console.log("Tried to open event popup, but no active event.");
                 }
             },
-            minimizeEventPopup: () => {
-                set({ isEventPopupOpen: false });
-                console.log("Event popup closed/minimized.");
-            },
+            minimizeEventPopup: () => set({ isEventPopupMinimized: true }),
+
+            // Action to restore the event popup UI
+            restoreEventPopup: () => set({ isEventPopupMinimized: false }),
 
             // --- Add action to manually increment resolvedEventCount for testing --- 
             incrementResolvedEventCount: () => set(state => {
