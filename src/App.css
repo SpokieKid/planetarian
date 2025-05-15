@@ -136,8 +136,8 @@
 
 .auth-controls {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 15px; /* Align vertically with hamburger menu */
+  right: 65px; /* Position to the left of the hamburger menu */
   background-color: rgba(0, 0, 0, 0.7);
   padding: 10px 15px;
   border-radius: 8px;
@@ -150,13 +150,13 @@
 
 .auth-controls button {
   /* Inherits some button styles, but can be customized */
-  background-color: #4A4A4A; /* Darker button */
+  background-color: #4C8FE1; /* Darker button */
   color: #fff;
-  border: 1px solid #666;
+  border: 1px solid #EAF1FF  ;
 }
 
 .auth-controls button:hover {
-  background-color: #5A5A5A;
+  background-color: #1E3A8A  ;
   border-color: #777;
 }
 
@@ -180,3 +180,13 @@
 
 /* Ensure App background image covers everything if needed */
 /* ... rest of App.css ... */
+
+.restore-event-button {
+    position: fixed; /* Absolute positioning relative to the viewport */
+    bottom: calc(60px + 20px + 10px); /* WormholeIcon height + bottom padding + 10px space */
+    right: 20px; /* Align with WormholeIcon's right padding */
+    z-index: 998; /* Slightly below WormholeIcon but above most content */
+    /* Add any desired button styling here, e.g., padding, background, color */
+    padding: 10px 15px;
+    /* You might want to reuse .pixel-button styles if applicable */
+}

@@ -1,0 +1,699 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>巨头的彷徨 / Giant&#x27;s Hesitation</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1e9add39-0a4a-80fc-9126-dd15b65da870" class="page sans"><header><h1 class="page-title"><strong>巨头的彷徨 / Giant&#x27;s Hesitation</strong></h1><p class="page-description"></p><table class="properties"><tbody><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(71, 70, 68, 0.6);flex-shrink:0" class="typesMultipleSelect"><path d="M1.91602 4.83789C2.44238 4.83789 2.87305 4.40723 2.87305 3.87402C2.87305 3.34766 2.44238 2.91699 1.91602 2.91699C1.38281 2.91699 0.952148 3.34766 0.952148 3.87402C0.952148 4.40723 1.38281 4.83789 1.91602 4.83789ZM5.1084 4.52344H14.3984C14.7607 4.52344 15.0479 4.23633 15.0479 3.87402C15.0479 3.51172 14.7607 3.22461 14.3984 3.22461H5.1084C4.74609 3.22461 4.45898 3.51172 4.45898 3.87402C4.45898 4.23633 4.74609 4.52344 5.1084 4.52344ZM1.91602 9.03516C2.44238 9.03516 2.87305 8.60449 2.87305 8.07129C2.87305 7.54492 2.44238 7.11426 1.91602 7.11426C1.38281 7.11426 0.952148 7.54492 0.952148 8.07129C0.952148 8.60449 1.38281 9.03516 1.91602 9.03516ZM5.1084 8.7207H14.3984C14.7607 8.7207 15.0479 8.43359 15.0479 8.07129C15.0479 7.70898 14.7607 7.42188 14.3984 7.42188H5.1084C4.74609 7.42188 4.45898 7.70898 4.45898 8.07129C4.45898 8.43359 4.74609 8.7207 5.1084 8.7207ZM1.91602 13.2324C2.44238 13.2324 2.87305 12.8018 2.87305 12.2686C2.87305 11.7422 2.44238 11.3115 1.91602 11.3115C1.38281 11.3115 0.952148 11.7422 0.952148 12.2686C0.952148 12.8018 1.38281 13.2324 1.91602 13.2324ZM5.1084 12.918H14.3984C14.7607 12.918 15.0479 12.6309 15.0479 12.2686C15.0479 11.9062 14.7607 11.6191 14.3984 11.6191H5.1084C4.74609 11.6191 4.45898 11.9062 4.45898 12.2686C4.45898 12.6309 4.74609 12.918 5.1084 12.918Z"></path></svg></span>状态</th><td><span class="selected-value select-value-color-purple">Demo</span><span class="selected-value select-value-color-blue">已翻译</span></td></tr><tr class="property-row property-row-select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(71, 70, 68, 0.6);flex-shrink:0" class="typesSelect"><path d="M8 15.126C11.8623 15.126 15.0615 11.9336 15.0615 8.06445C15.0615 4.20215 11.8623 1.00293 7.99316 1.00293C4.13086 1.00293 0.938477 4.20215 0.938477 8.06445C0.938477 11.9336 4.1377 15.126 8 15.126ZM8 13.7383C4.85547 13.7383 2.33301 11.209 2.33301 8.06445C2.33301 4.91992 4.84863 2.39746 7.99316 2.39746C11.1377 2.39746 13.6738 4.91992 13.6738 8.06445C13.6738 11.209 11.1445 13.7383 8 13.7383ZM7.62402 10.6348C7.79492 10.915 8.20508 10.9287 8.37598 10.6348L10.666 6.73145C10.8574 6.41016 10.7002 6.04102 10.3652 6.04102H5.62793C5.29297 6.04102 5.14941 6.43066 5.32031 6.73145L7.62402 10.6348Z"></path></svg></span>时代 Era</th><td><span class="selected-value select-value-color-pink">中期</span></td></tr><tr class="property-row property-row-select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(71, 70, 68, 0.6);flex-shrink:0" class="typesSelect"><path d="M8 15.126C11.8623 15.126 15.0615 11.9336 15.0615 8.06445C15.0615 4.20215 11.8623 1.00293 7.99316 1.00293C4.13086 1.00293 0.938477 4.20215 0.938477 8.06445C0.938477 11.9336 4.1377 15.126 8 15.126ZM8 13.7383C4.85547 13.7383 2.33301 11.209 2.33301 8.06445C2.33301 4.91992 4.84863 2.39746 7.99316 2.39746C11.1377 2.39746 13.6738 4.91992 13.6738 8.06445C13.6738 11.209 11.1445 13.7383 8 13.7383ZM7.62402 10.6348C7.79492 10.915 8.20508 10.9287 8.37598 10.6348L10.666 6.73145C10.8574 6.41016 10.7002 6.04102 10.3652 6.04102H5.62793C5.29297 6.04102 5.14941 6.43066 5.32031 6.73145L7.62402 10.6348Z"></path></svg></span>业力等级</th><td><span class="selected-value select-value-color-yellow">流转</span></td></tr><tr class="property-row property-row-number"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/123_gray.svg" style="width:14px;height:14px;display:block"/></span>Base 事件链编号</th><td>3</td></tr></tbody></table></header><div class="page-body"><h3 id="33da2773-d12e-4890-a99e-1c43480319e6" class=""><strong>巨头的彷徨 / Giant&#x27;s Hesitation</strong></h3><hr id="09c9f783-6a45-450e-9783-bbd260ea3433"/><p id="7e1143af-8a48-4a6f-b0fd-67937986e5b6" class="">EventKey: Base_Mid_History_Flow_01<br/>EventTitle_zh: 巨头的彷徨<br/>EventTitle_en: Giant&#x27;s Hesitation<br/></p><p id="1edadd39-0a4a-80bf-b290-ec52829ee3a0" class="">EventVersion: 1.0<br/>Era: 2<br/>Karma_Level: &quot;(50,70)&quot; (已根据您提供的旧版&quot;流转&quot;映射为数值范围，如需调整请告知)<br/>Turns: &quot;8-11&quot;<br/>EventImage:<br/></p><figure id="1ebadd39-0a4a-809a-aa94-cb6aa01e5002" class="image"><a href="%E5%B7%A8%E5%A4%B4%E7%9A%84%E5%BD%B7%E5%BE%A8%20Giant&#x27;s%20Hesitation%201e9add390a4a80fc9126dd15b65da870/image.png"><img style="width:1002.1749877929688px" src="%E5%B7%A8%E5%A4%B4%E7%9A%84%E5%BD%B7%E5%BE%A8%20Giant&#x27;s%20Hesitation%201e9add390a4a80fc9126dd15b65da870/image.png"/></a></figure><p id="b1571046-f753-4798-915c-71127f492c1f" class="">Narrative_zh:<br/><br/><strong>CoinDock</strong> 已然成为连接传统金融世界与新兴加密宇宙的标志性桥梁。然而，体量的庞大和中心化的结构也带来了成长的烦恼：日益严格的全球监管、与以太坊生态蓬勃发展的 DeFi、NFT 等去中心化趋势的理念碰撞。</p><p id="85432e54-91e6-42be-a5d6-f92be157e20d" class="">Narrative_en:<br/><br/><strong>CoinDock</strong> has become an iconic bridge connecting the traditional financial world and the emerging crypto universe. However, its sheer size and centralized structure also bring growing pains: increasingly strict global regulations, and ideological clashes with the burgeoning decentralized trends of the Ethereum ecosystem, such as DeFi and NFTs.</p><p id="0e9dd3df-71f3-4f5b-984b-073f1e5d0852" class="">Conflict_zh:<br/>在这个十字路口，<br/><strong>CoinDock</strong> 应更倾向于成为一个高效但受限的传统金融改良者，还是勇敢地投入资源，在以太坊和 Optimism 等基石之上，构建更具去中心化精神的 Layer 2 网络，从而深刻塑造未来星球化链上经济体的版图？</p><p id="ef78644c-1a70-466c-9147-ee309f297622" class="">Conflict_en:<br/>At this crossroads, should <br/><strong>CoinDock</strong> lean more towards being an efficient but restricted traditional finance improver, or bravely invest resources to build a Layer 2 network with a more decentralized spirit upon cornerstones like Ethereum and Optimism, thus profoundly shaping the future landscape of the planetary on-chain economy?</p><p id="daef9689-4f70-42ae-8b09-660612245228" class="">Options:</p><ul id="c9593a2e-3d18-42e1-a548-a9ecfd8393fc" class="bulleted-list"><li style="list-style-type:disc"><strong>Option A:</strong><br/>Description_zh: 汇聚并强化“中心化平台的局限性”和“链上原生潜力”叙事，引导星球文明关注以太坊生态（如 DeFi、NFT）的创新活力与 <br/><strong>CoinDock</strong> 现有模式的脱节，暗示 <strong>CoinDock</strong> 需要进行更深层的链上转型。<br/>Description_en: Concentrate and strengthen the narratives of &quot;limitations of centralized platforms&quot; and &quot;on-chain native potential&quot;, guiding planetary consciousness to focus on the innovation vitality of the Ethereum ecosystem (such as DeFi, NFTs) and the disconnect with <br/><strong>CoinDock</strong>&#x27;s current model, implying that <strong>CoinDock</strong> needs a deeper on-chain transformation.<br/>Success (80%):<br/>Result_zh: 受<br/><strong>CoinDock</strong> 加速对以太坊 L2 技术，尤其是与 Optimism 等的潜在合作进行研究和决策，Base 网络的构建计划获得更有利的土壤。<br/>Result_en: Influenced by this, <br/><strong>CoinDock</strong> accelerates research and decision-making on Ethereum L2 technology, especially potential collaborations with Optimism and others, providing more fertile ground for the Base network construction plan.<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ff566f56-b7d9-40be-b206-3ccf557ca2a3" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+7
+**VFX:** Flow
+</code></pre><p id="4185887e-e5e3-47cb-8282-603da5079484" class="">Hashtag_zh: #去中心化潜力 #以太坊生态 #转型必要 #打破壁垒 #链上未来 #Base萌芽<br/>Hashtag_en: #DecentralizationPotential #EthereumEcosystem #TransformationNeeded #BreakingBarriers #OnchainFuture #BaseEmergence<br/></p><p id="52814def-efa4-48d5-bd23-73260a903648" class="">Failed (20%):<br/>Result_zh: “链上原生潜力” 叙事未能有效穿透巨头的惯性壁垒。<br/><strong>CoinDock</strong> 更倾向于在现有框架内进行修补，而非战略性投入去中心化基础设施建设。<br/>Result_en: The &quot;on-chain native potential&quot; narrative fails to effectively penetrate the inertia barrier of the giant. <br/><strong>CoinDock</strong> leans more towards patching within the existing framework rather than strategically investing in decentralized infrastructure construction.</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="168a7734-a905-4242-8e29-23eb0f4bdaf0" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-5
+**VFX:** Twist
+</code></pre><p id="70414b0b-388e-4678-9ae8-83833ced62c2" class="">Hashtag_zh: #惯性 #转型困难 #修补主义 #去中心化停滞 #壁垒存在<br/>Hashtag_en: #Inertia #TransformationDifficulty #PatchworkApproach #DecentralizationStagnation #BarriersExist<br/></p></li></ul><ul id="f7bbacd4-3661-4d2b-8432-27451a7d1e0a" class="bulleted-list"><li style="list-style-type:disc"><strong>Option B:</strong><br/>Description_zh: 突出 <br/><strong>CoinDock</strong> 作为“可信中介”在简化用户体验、保障安全方面的优势，暗示其可以在现有模式下逐步整合部分链上功能。<br/>Description_en: Highlight <br/><strong>CoinDock</strong>&#x27;s advantages as a &quot;trusted intermediary&quot; in simplifying user experience and ensuring security, implying it can gradually integrate partial on-chain functionalities within the existing model.<br/>Success (75%):<br/>Result_zh: 公司专注于在现有平台内引入简单的链上功能或展示链上活动，虽然没有完全拥抱去中心化，但也稳定了用户群体，为链上活动提供了潜在用户池。<br/>Result_en: The company focuses on introducing simple on-chain functionalities or showcasing on-chain activity within the existing platform. While not fully embracing decentralization, this stabilizes the user base and provides a potential user pool for on-chain activities.<br/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="dd7e6f8d-1fb5-44c2-b835-e65f0e1244f5" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+2
+**VFX:** Flow
+</code></pre><p id="04754794-a26d-4399-ae6e-099cbd2360ed" class="">Hashtag_zh: #安全至上 #便捷性 #中心化中介 #逐步整合 #用户池<br/>Hashtag_en: #SecurityFirst #Convenience #CentralizedIntermediary #GradualIntegration #UserPool<br/></p><p id="b0489b27-5e9e-4c33-9290-61867c8525bd" class="">Failed (25%):<br/>Result_zh: 中心化平台的安全性受到用户质疑，用户对“不持有私钥就不拥有资产”的担忧加剧，更具风险意识的用户转向完全去中心化的替代方案。<br/>Result_en: The security of centralized platforms is questioned by users. Concerns about &quot;not holding private keys means not owning assets&quot; intensify, and more risk-aware users turn to fully decentralized alternatives.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c7a58619-4953-4144-a189-634a7a24e7dd" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-2
+**VFX:** DataWave
+</code></pre><p id="779a3e21-c30d-440a-b876-eb677c58a969" class="">Hashtag_zh: #信任危机 #安全担忧 #用户觉醒 #自托管需求 #去中心化替代<br/>Hashtag_en: #TrustCrisis #SecurityConcerns #UserAwakening #SelfCustodyDemand #DecentralizedAlternatives<br/></p></li></ul><ul id="ffbafe91-d6c4-43d9-841f-6fbfa54ad496" class="bulleted-list"><li style="list-style-type:disc"><strong>Option C:</strong><br/>Description_zh: 突出构建 Base 的战略必要性和潜在优势，导引集体意识理解 <br/><strong>CoinDock</strong> 在以太坊之上构建自主可控、同时服务海量用户的“全球链上经济体”的宏大愿景。<br/>Description_en: Highlight the strategic necessity and potential advantages of building Base, guiding collective consciousness to understand <br/><strong>CoinDock</strong>&#x27;s grand vision of constructing a self-controlled &quot;global on-chain economy&quot; on top of Ethereum, serving a massive user base simultaneously.<br/>Success (90%):<br/>Result_zh: <br/><strong>CoinDock</strong> 内部构建基于以太坊和 Optimism 技术栈的 Layer 2 网络 —— Base 的战略获得了强大支持。高层决策者坚定地推动资源投入，与以太坊和 Optimism 生态的合作关系得以深化。<br/>Result_en: <br/><strong>CoinDock</strong>&#x27;s strategy to build Base, a Layer 2 network based on Ethereum and Optimism tech stack, gains strong internal support. Top decision-makers firmly push for resource investment, and collaboration with the Ethereum and Optimism ecosystems is deepened.<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="764ca626-52e6-4313-8107-b2a6673d3d4e" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+20
+**VFX:** Harmony
+</code></pre><p id="f97fcb3a-66f2-4e53-a62b-a58510c9730c" class="">Hashtag_zh: #BaseNetwork #以太坊扩展 #Layer2 #战略自主 #构建新基石 #Optimism合作 #宏大愿景<br/>Hashtag_en: #BaseNetwork #EthereumScaling #Layer2 #StrategicAutonomy #BuildingNewFoundation #OptimismCollaboration #GrandVision<br/></p><p id="3d415299-613e-4461-86b5-6236604a6b8f" class="">Failed (10%):<br/>Result_zh: 由于一些声音的质疑，构建自身 L2 的 Narrative 未能完全克服内部的疑虑和外部的挑战。决策过程缓慢，资源投入不足，Base 网络的建设未能按预期推进。<br/>Result_en: Due to questioning voices, the Narrative of building its own L2 fails to fully overcome internal doubts and external challenges. Decision-making is slow, resource investment is insufficient, and the construction of the Base network does not proceed as expected.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="72c68a34-a328-4144-a40a-dc1b7d4e5f44" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-5
+**VFX:** Discussion
+</code></pre><p id="a63f68b9-cfbe-4a0f-9705-423418f603d2" class="">Hashtag_zh: #决策缓慢 #资源不足 #建设受阻 #疑虑重重 #L2竞争<br/>Hashtag_en: #SlowDecision #InsufficientResources #ConstructionBlocked #Hesitation #L2Competition<br/></p></li></ul><ul id="a9a83b35-ed8a-49d9-a6c8-c6dc5587e140" class="bulleted-list"><li style="list-style-type:disc"><strong>Option D:</strong><br/>Description_zh: 强调与以太坊生态中现有 Layer 2 方案（尤其是 Optimism）的“合作共赢”叙事，导引关注通过联盟和集成，而非独立构建，来拥抱 Layer 2 的可能性。<br/>Description_en: Emphasize the <br/><strong>&quot;win-win cooperation&quot;</strong> narrative with existing Layer 2 solutions in the Ethereum ecosystem (especially Optimism), guiding attention to embracing the possibilities of Layer 2 through alliances and integrations, rather than independent building.<br/>Success (65%):<br/>Result_zh: <br/><strong>CoinDock</strong> 更倾向于加强与以太坊生态中领先 Layer 2 方案的技术集成和生态合作。双方共享资源和技术，共同推动 Layer 2 的发展，形成更为紧密的生态联盟。<br/>Result_en: <br/><strong>CoinDock</strong> leans more towards strengthening technical integration and ecosystem collaboration with leading Layer 2 solutions in the Ethereum ecosystem. Both sides share resources and technology to jointly promote the development of Layer 2, forming a closer ecosystem alliance.<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="151f88e9-73d0-4df9-a4f0-fab244e05f42" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+15
+**VFX:** Harmony
+</code></pre><p id="12dcdca8-fd60-47d9-8e3f-536a548d9f13" class="">Hashtag_zh: #生态协作 #Optimism #联盟构建 #技术集成 #资源共享 #合作共赢<br/>Hashtag_en: #EcosystemCollaboration #Optimism #AllianceBuilding #TechIntegration #ResourceSharing #WinWinCooperation<br/></p><p id="fd516290-f149-4ceb-a100-1eefeaa7d91d" class="">Failed (35%):<br/>Result_zh: “合作共赢”的叙事未能完全阻止 <br/><strong>CoinDock</strong> 内部对独立构建的渴望或外部的竞争。合作进展缓慢或遇到阻碍，未能充分利用与现有 L2 的协同效应。<br/>Result_en: The &quot;win-win cooperation&quot; narrative fails to fully prevent <br/><strong>CoinDock</strong>&#x27;s internal desire for independent building or external competition. Cooperation progresses slowly or encounters obstacles, failing to fully utilize synergy with existing L2s.</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4cd3ad7c-9c2d-4207-8425-e2173da1727f" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-3
+**VFX:** DataWave
+</code></pre><p id="6dc2e281-5097-4ca4-87d2-62c41c404522" class="">Hashtag_zh: #合作受阻 #进展缓慢 #独立构建冲动 #竞争影响 #协同效应不足<br/>Hashtag_en: #CooperationBlocked #SlowProgress #IndependentBuildingUrge #CompetitionInfluence #InsufficientSynergy<br/></p></li></ul></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

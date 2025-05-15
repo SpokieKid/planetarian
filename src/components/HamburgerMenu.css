@@ -1,0 +1,83 @@
+/* src/components/HamburgerMenu.css */
+
+.hamburger-menu-container {
+    position: fixed;
+    top: 15px; /* Position from top */
+    right: 15px; /* Position from right */
+    z-index: 2000; /* Ensure it's above everything */
+    transition: transform 1s ease-in-out; /* Smooth transition */
+}
+
+.hamburger-icon {
+    background: none;
+    border: none;
+    font-size: 24px; /* Adjust size */
+    color: white; /* Icon color */
+    cursor: pointer;
+    padding: 5px;
+    z-index: 2001; /* Ensure icon is clickable */
+    position: relative; /* Needed for z-index to work relative to container */
+}
+
+.menu-content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 80%; /* Adjust width as needed for mobile */
+    max-width: 350px; /* Max width for larger screens */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Semi-transparent dark background */
+    color: white;
+    padding: 20px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.5); /* Add shadow */
+    overflow-y: auto; /* Enable scrolling if content is tall */
+    /* Transition for smooth open/close effect */
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.3s; /* Transition transform, opacity, and delay visibility on close */
+    transform: translateX(100%); /* Start off-screen */
+    opacity: 0; /* Start invisible */
+    visibility: hidden; /* Hide and prevent interaction when closed */
+    z-index: 2000; /* Below the icon but above game content */
+
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+}
+
+/* Style for closed state (already implicitly handled by the above .menu-content rules) */
+/* .hamburger-menu-container .menu-content { */
+/*      transform: translateX(100%); */
+/* } */
+
+/* Style for open state */
+.hamburger-menu-container.open .menu-content {
+     transform: translateX(0); /* Slide into view */
+     opacity: 1; /* Make visible */
+     visibility: visible; /* Make visible and interactive when open */
+     transition-delay: 0s; /* No delay on opening visibility */
+}
+
+.wallet-status {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Separator */
+    font-size: 0.9em;
+}
+
+.story-log-in-menu {
+    flex-grow: 0; /* Don't grow to fill space */
+    max-height: 50px; /* Set a max height - adjust this value as needed */
+    /* Ensure StoryLog component itself has appropriate height/overflow if needed */
+}
+
+/* Adjust StoryLog styles within the menu if necessary */
+.story-log-in-menu .story-log-container {
+    position: static; /* Override fixed/absolute positioning if StoryLog has it */
+    height: 300px; /* Allow height to be determined by content/max-height */
+    display: flex;
+    flex-direction: column;
+    transition: height 1s ease-out; /* Smooth transition */
+}
+
+.story-log-in-menu .story-log-entries {
+    flex-grow: 1; /* Allow entries to scroll */
+    overflow-y: auto; /* Make story log content scrollable */
+} 

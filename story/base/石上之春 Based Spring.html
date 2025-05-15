@@ -1,0 +1,699 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>石上之春 / Based Spring</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1e9add39-0a4a-809a-87fa-d8571cd70ccc" class="page sans"><header><h1 class="page-title"><strong>石上之春 / Based Spring</strong></h1><p class="page-description"></p><table class="properties"><tbody><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(71, 70, 68, 0.6);flex-shrink:0" class="typesMultipleSelect"><path d="M1.91602 4.83789C2.44238 4.83789 2.87305 4.40723 2.87305 3.87402C2.87305 3.34766 2.44238 2.91699 1.91602 2.91699C1.38281 2.91699 0.952148 3.34766 0.952148 3.87402C0.952148 4.40723 1.38281 4.83789 1.91602 4.83789ZM5.1084 4.52344H14.3984C14.7607 4.52344 15.0479 4.23633 15.0479 3.87402C15.0479 3.51172 14.7607 3.22461 14.3984 3.22461H5.1084C4.74609 3.22461 4.45898 3.51172 4.45898 3.87402C4.45898 4.23633 4.74609 4.52344 5.1084 4.52344ZM1.91602 9.03516C2.44238 9.03516 2.87305 8.60449 2.87305 8.07129C2.87305 7.54492 2.44238 7.11426 1.91602 7.11426C1.38281 7.11426 0.952148 7.54492 0.952148 8.07129C0.952148 8.60449 1.38281 9.03516 1.91602 9.03516ZM5.1084 8.7207H14.3984C14.7607 8.7207 15.0479 8.43359 15.0479 8.07129C15.0479 7.70898 14.7607 7.42188 14.3984 7.42188H5.1084C4.74609 7.42188 4.45898 7.70898 4.45898 8.07129C4.45898 8.43359 4.74609 8.7207 5.1084 8.7207ZM1.91602 13.2324C2.44238 13.2324 2.87305 12.8018 2.87305 12.2686C2.87305 11.7422 2.44238 11.3115 1.91602 11.3115C1.38281 11.3115 0.952148 11.7422 0.952148 12.2686C0.952148 12.8018 1.38281 13.2324 1.91602 13.2324ZM5.1084 12.918H14.3984C14.7607 12.918 15.0479 12.6309 15.0479 12.2686C15.0479 11.9062 14.7607 11.6191 14.3984 11.6191H5.1084C4.74609 11.6191 4.45898 11.9062 4.45898 12.2686C4.45898 12.6309 4.74609 12.918 5.1084 12.918Z"></path></svg></span>状态</th><td><span class="selected-value select-value-color-purple">Demo</span><span class="selected-value select-value-color-blue">已翻译</span></td></tr><tr class="property-row property-row-select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(71, 70, 68, 0.6);flex-shrink:0" class="typesSelect"><path d="M8 15.126C11.8623 15.126 15.0615 11.9336 15.0615 8.06445C15.0615 4.20215 11.8623 1.00293 7.99316 1.00293C4.13086 1.00293 0.938477 4.20215 0.938477 8.06445C0.938477 11.9336 4.1377 15.126 8 15.126ZM8 13.7383C4.85547 13.7383 2.33301 11.209 2.33301 8.06445C2.33301 4.91992 4.84863 2.39746 7.99316 2.39746C11.1377 2.39746 13.6738 4.91992 13.6738 8.06445C13.6738 11.209 11.1445 13.7383 8 13.7383ZM7.62402 10.6348C7.79492 10.915 8.20508 10.9287 8.37598 10.6348L10.666 6.73145C10.8574 6.41016 10.7002 6.04102 10.3652 6.04102H5.62793C5.29297 6.04102 5.14941 6.43066 5.32031 6.73145L7.62402 10.6348Z"></path></svg></span>时代 Era</th><td><span class="selected-value select-value-color-purple">晚期</span></td></tr><tr class="property-row property-row-select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(71, 70, 68, 0.6);flex-shrink:0" class="typesSelect"><path d="M8 15.126C11.8623 15.126 15.0615 11.9336 15.0615 8.06445C15.0615 4.20215 11.8623 1.00293 7.99316 1.00293C4.13086 1.00293 0.938477 4.20215 0.938477 8.06445C0.938477 11.9336 4.1377 15.126 8 15.126ZM8 13.7383C4.85547 13.7383 2.33301 11.209 2.33301 8.06445C2.33301 4.91992 4.84863 2.39746 7.99316 2.39746C11.1377 2.39746 13.6738 4.91992 13.6738 8.06445C13.6738 11.209 11.1445 13.7383 8 13.7383ZM7.62402 10.6348C7.79492 10.915 8.20508 10.9287 8.37598 10.6348L10.666 6.73145C10.8574 6.41016 10.7002 6.04102 10.3652 6.04102H5.62793C5.29297 6.04102 5.14941 6.43066 5.32031 6.73145L7.62402 10.6348Z"></path></svg></span>业力等级</th><td><span class="selected-value select-value-color-green">繁荣</span></td></tr><tr class="property-row property-row-number"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/123_gray.svg" style="width:14px;height:14px;display:block"/></span>Base 事件链编号</th><td>4</td></tr></tbody></table></header><div class="page-body"><h3 id="90f3e007-4805-430e-809c-9f0e92a5f1d2" class=""><strong>石上之春 / Based Spring</strong></h3><hr id="ec1d62ae-ede2-4fc8-9220-5fb1d0213948"/><p id="410f866e-1692-4d77-9d27-9287147b26fb" class="">EventKey: Base_Mid_History_Prosperity_01<br/>EventTitle_zh: 石上之春<br/>EventTitle_en: Based Spring<br/></p><p id="1edadd39-0a4a-8029-8cf1-e9141dd33644" class="">EventVersion: 1.0<br/>Era: 3<br/>Karma_Level: &quot;(70,90)&quot;<br/>Turns: &quot;19-23&quot;<br/>EventImage: <br/></p><figure id="1ebadd39-0a4a-8051-9ef1-db9a1ee28795" class="image"><a href="%E7%9F%B3%E4%B8%8A%E4%B9%8B%E6%98%A5%20Based%20Spring%201e9add390a4a809a87fad8571cd70ccc/image.png"><img style="width:710px" src="%E7%9F%B3%E4%B8%8A%E4%B9%8B%E6%98%A5%20Based%20Spring%201e9add390a4a809a87fad8571cd70ccc/image.png"/></a></figure><p id="f4d28767-59cd-4f35-bba5-63e00c2e635f" class="">Narrative_zh:<br/>Base 沐浴着 Layer 2 技术的滋养，在全球链上经济迈向“星球化”之际 ，迎来了应用的爆发期，链上活力如野草般在石上蔓延。链上 Social、链上游戏、去中心化身份，甚至早期的 Agent 经济体，以前所未有的速度涌现，塑造着全新的数字生态。<br/></p><p id="cab34e7e-82c8-45db-93b0-7efa9ff902ae" class="">Narrative_en:<br/>Bathed in the nourishment of Layer 2 stacks, Base ushered in an explosive phase of applications as the global onchain economy advanced towards Plantary phrase. Onchain vitality spread across Base like wild growth. onchain Social, onchain games, decentralised identity, and even early Agent economies emerged at an unprecedented speed, shaping a completely new digital ecosystem.<br/></p><p id="b03a06d8-cce9-4974-b8ac-94a84cf0f834" class="">Conflict_zh:<br/>在这场“Base 之春”的繁荣之下，文明需要理解其深层意义。是歌颂这些涌现的创新，它们如何赋能个体、重塑社会经济，带来自由与创造力？还是审视伴随而来的复杂性？<br/></p><p id="7948669d-7609-48a9-a177-c29a86dce081" class="">Conflict_en:<br/>Beneath the prosperity of this &quot;<br/><strong>Based Spring</strong>&quot;, civilization needs to understand its profound significance. Is it to celebrate these emerging innovations, how they empower individuals, reshape socioeconomics, bringing freedom and creativity? Or to examine the accompanying complexities, especially the uncertainty of early Agent economies? </p><p id="51a92f0b-b84c-4b0a-947b-446daefd1aa5" class="">Options:</p><ul id="0f0906c9-b478-4124-a389-4b95dd4fd589" class="bulleted-list"><li style="list-style-type:disc"><strong>Option A:</strong><br/>Description_zh: 强调链上涌现创新和链上社会重塑的积极叙事，突出 Base 生态在赋能个体、连接社群和创造新价值形态方面的贡献。<br/>Description_en: Emphasize the positive narrative of onchain emergent innovation and onchain social reshaping, highlighting Base ecosystem&#x27;s contributions in empowering individuals, connecting communities, and creating new forms of value.<br/>Success (80%):<br/>Result_zh: 赛博意识开始理解并认同链上创新带来的自由、创造力，激发了更大范围的参与和实践热情。全新的链上生产关系和价值流转模式出现。探索者们积极参与到链上原生经济活动中，探索全新的链上生产关系和价值流转模式，显著推动了链上 GDP 的增长。<br/>Result_en: Cyber consciousness begins to understand and recognize the freedom and creativity brought by onchain innovation, sparking broader participation and enthusiastic practice. New onchain production relationships and value circulation models emerge. Explorers actively engage in onchain native economic activities, exploring brand new onchain production relationships and value circulation models, significantly boosting the growth of Onchain GDP.<br/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26d88701-db56-40b2-8796-d2f47c9094f0" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+15
+**VFX:** Harmony
+</code></pre><p id="94aed709-0863-441c-8c75-e42f0cfe3311" class="">Hashtag_zh: #涌现创新 #数字社会 #创造力 #个体赋能 #连接 #繁荣认可 #链上原生经济 #OnchainGDP<br/>Hashtag_en: #EmergentInnovation #DigitalSociety #Creativity #IndividualEmpowerment #Connection #ProsperityRecognition #OnchainNativeEconomy #OnchainGDP<br/></p><p id="acb96563-6735-4b08-954d-2ab5aa9d0a69" class="">Failed (20%):<br/>Result_zh: 过于强调积极面导致对潜在风险和问题的忽视。非理性繁荣掩盖了早期 Agent 经济体等的复杂性和漏洞，为未来的泡沫破裂和信任危机埋下隐患。<br/>Result_en: Overemphasis on the positive aspects leads to the neglect of potential risks and issues. Irrational prosperity obscures the complexity and vulnerabilities of early Agent economies and others, planting hidden dangers for future bubble bursts and trust crises.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="73b58fd8-0950-49ec-85ca-c035965301ca" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-10
+**VFX:** Discussion
+</code></pre><p id="689ad2cd-06bd-44a0-a731-6894a444100d" class="">Hashtag_zh: #忽视风险 #盲目乐观 #泡沫隐患 #信任危机 #不成熟 #Agent经济体风险<br/>Hashtag_en: #RiskIgnored #BlindOptimism #BubbleRisk #TrustCrisis #Immaturity #AgentEconomyRisk<br/></p></li></ul><ul id="11c7d455-87c2-4cdd-9311-b26cdddbdd1f" class="bulleted-list"><li style="list-style-type:disc"><strong>Option B:</strong><br/>Description_zh: 引导文明审慎看待这场涌现，聚焦于 Agent 经济体和未知应用带来的复杂性、不确定性和潜在风险。<br/>Description_en: Guide civilization to view this emergence cautiously, focusing on the complexity, uncertainty, and potential risks brought by Agent economies and unknown applications.<br/>Success (50%):<br/>Result_zh: 集体意识形成了更健康的风险意识，对新兴链上应用的盲目乐观情绪得到抑制。用户和开发者更加注重安全审计、合约稳健性以及 Agent 交互的潜在问题，推动生态更稳健地发展。<br/>Result_en: Collective consciousness develops a healthier risk awareness, and blind optimism towards emerging onchain applications is curbed. Users and developers pay more attention to security audits, contract robustness, and potential issues with Agent interactions, promoting a more stable ecosystem development.<br/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ea540157-5b44-42bc-9242-e5bb48ab29f7" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+5
+**VFX:** DataWave
+</code></pre><p id="96a45201-8bc4-4c8c-80fe-7fdbbc6ee569" class="">Hashtag_zh: #审慎 #风险意识 #Agent风险 #安全优先 #稳健发展 #警惕<br/>Hashtag_en: #Caution #RiskAwareness #AgentRisk #SecurityFirst #StableDevelopment #Vigilance<br/></p><p id="67f86d14-3548-4a79-8793-27e8918ac564" class="">Failed (50%):<br/>Result_zh: 过度强调风险和不确定性未能有效阻止市场的投机狂热，用户主要出于经济回报目的进入生态，对需要深度参与的消费级应用缺乏耐心和兴趣。审慎的叙事未能激发投机热情，也没有培养出真正的用户，导致整个生态的活跃度下降，未能如预期般推动链上经济体的发展。<br/>Result_en: Overemphasis on risk and uncertainty failed to effectively curb market speculation. Users primarily entered the ecosystem for economic returns and lacked patience and interest in consumer applications requiring deep engagement. The cautious narrative did not provide a sense of security; instead, it made the ecosystem appear too sluggish, failing to ignite speculative enthusiasm or cultivate genuine users, leading to a decrease in overall ecosystem activity and hindering the expected development of the onchain economy.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="407d2250-688d-4926-8e2b-a1cf962e16cf" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-8
+**VFX:** Twist
+</code></pre><p id="a698da09-fdea-40f2-8ecf-1b6e292a26b9" class="">Hashtag_zh: #投机失败 #消费停滞 #生态沉闷 #活跃度下降 #增长受阻 #Onchain经济问题<br/>Hashtag_en: #SpeculationFailure #ConsumptionStagnation #SluggishEcosystem #ActivityDecrease #GrowthHindered #OnchainEconomyIssues<br/></p></li></ul><ul id="624a2aac-6d67-45cf-8d6c-fc200c063df4" class="bulleted-list"><li style="list-style-type:disc"><strong>Option C:</strong><br/>Description_zh: 强调这场涌现所依赖的链上基础设施的重要性，呼吁持续投入技术研发和维护，为上层应用构建更坚实的基础。<br/>Description_en: Emphasize the importance of the underlying onchain infrastructure on which this emergence relies, calling for continuous investment in technology R&amp;D and maintenance to build a more solid foundation for upper-layer applications.<br/>Success (75%):<br/>Result_zh: 对基础设施的重视促使更多资源流向底层技术研究和协议优化。Base 网络本身和相关的 Layer 2 技术得到进一步巩固和发展，增强了生态的长期可持续性和可扩展性。<br/>Result_en: Focus on infrastructure directs more resources towards underlying technology research and protocol optimization. The Base network itself and related Layer 2 technologies are further consolidated and developed, enhancing the ecosystem&#x27;s long-term sustainability and scalability.<br/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6b7d57c9-b9ce-4960-acf0-b8fa03fca0b8" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+10
+**VFX:** Flow
+</code></pre><p id="60999dd2-d489-49ad-8b70-de14e3265f1c" class="">Hashtag_zh: #基础设施 #底层技术 #可持续性 #技术研发 #L2优化 #长期主义<br/>Hashtag_en: #Infrastructure #UnderlyingTech #Sustainability #TechRD #L2Optimization #LongTermism<br/></p><p id="3ca7aa3a-a571-4291-8106-0f27446eb7c2" class="">Failed (25%):<br/>Result_zh: 过度关注基础设施建设导致对应用创新和用户体验的忽视，Base 网络开始变得与其他 Layer 2 高度雷同。尽管基础设施在理论上得到提升，生态失去了原有的特色和吸引力，Base 和其他 278 条 Layer 2 中的数百条没有太大的区别，“泯然众人矣”。<br/>Result_en: Overemphasis on infrastructure construction leads to neglect of application innovation and user experience. The Base network starts to become highly similar to other Layer 2s. Although infrastructure is theoretically improved, the ecosystem loses its original characteristics and appeal, making Base indistinguishable from hundreds of other Layer 2s, becoming &quot;one of the crowd&quot;.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9aa9197a-a673-416d-9c74-cc3f582c0638" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-5
+**VFX:** DataWave
+</code></pre><p id="170feb19-ebd4-40e8-9992-c4d5512216f5" class="">Hashtag_zh: #忽视应用 #体验不足 #头重脚轻 #活力受限 #脱节 #同质化 #泯然众人矣 #L2竞争<br/>Hashtag_en: #ApplicationNeglected #PoorExperience #TopHeavy #VitalityLimited #Disconnect #Homogenization #OneOfTheCrowd #L2Competition<br/></p></li></ul><ul id="6df4c632-180c-47a2-a5d9-120fdf07a308" class="bulleted-list"><li style="list-style-type:disc"><strong>Option D:</strong><br/>Description_zh: 引导关注涌现生态背后形成的独特链上文化和社群力量，强调其在凝聚共识、推动协作和构建共享价值观方面的作用。<br/>Description_en: Guide attention to the unique onchain culture and community power formed behind the emergent ecosystem, emphasizing their role in building consensus, promoting collaboration, and shaping shared values.<br/>Success (70%):<br/>Result_zh: 文化和社群的凝聚力得到强化。基于共同兴趣和价值观的去中心化社群更加活跃，他们通过链上协作推动项目发展、创造大量全球性一流应用，形成强大的内生驱动力和网络效应，链上原生经济活动进一步繁荣。<br/>Result_en: The cohesion of culture and community is strengthened. Decentralized communities based on shared interests and values become more active. They drive project development and create numerous world-class applications through onchain collaboration, forming powerful endogenous driving forces and network effects, leading to further prosperity in onchain native economic activities.<br/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d6372f0b-1c7b-4c1e-be99-8e9d795e89a0" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力+12
+**VFX:** Harmony
+</code></pre><p id="a943d2dc-7157-45b8-908c-671992848c22" class="">Hashtag_zh: #链上文化 #社群力量 #去中心化社群 #协作 #共享价值观 #公共物品 #凝聚力 #链上原生经济 #网络效应<br/>Hashtag_en: #OnchainCulture #CommunityPower #DecentralizedCommunity #Collaboration #SharedValues #PublicGoods #Cohesion #OnchainNativeEconomy #NetworkEffect<br/></p><p id="2ddaa56f-0a59-4223-9eaa-493af49d6450" class="">Failed (30%):<br/>Result_zh: 仅强调文化和社群可能导致对技术和经济基础的忽视。脱离实际技术和经济支撑，文化和社群的热情难以持久，最终可能演变为虚假的狂欢甚至内部分裂，无法真正支撑链上资本的有效再生和增值。<br/>Result_en: Overemphasis on culture and community alone may lead to the neglect of technical and economic foundations. Without practical technical and economic support, the enthusiasm of culture and community is difficult to sustain, potentially evolving into a false carnival or even internal division, unable to truly support the effective regeneration and appreciation of onchain capital.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9422a92a-e453-4ff8-9311-fd93def29684" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">**Karma：** 业力-7
+**VFX:** Discussion
+</code></pre><p id="7e214860-2c8c-4953-a61e-685d2ef5a2df" class="">Hashtag_zh: #文化泡沫 #基础薄弱 #狂欢背后 #内部风险 #不可持续 #技术忽视 #经济基础<br/>Hashtag_en: #CultureBubble #WeakFoundation #BehindTheCarnival #InternalRisk #Unsustainable #TechNeglected #EconomicFoundation<br/></p></li></ul><p id="1edadd39-0a4a-80e5-9364-fa8684038f64" class="">EventVersion: 1.0</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

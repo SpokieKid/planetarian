@@ -12,7 +12,7 @@ const ResourcePanel = () => {
     // Use useShallow for state selection involving objects or multiple primitives
     const {
         // resources, // REMOVED
-        mode,
+        game_mode,
         planetName,
         growthPoints,
         era, // Select new state
@@ -23,10 +23,13 @@ const ResourcePanel = () => {
         coinbaseProvider, // Get Coinbase provider
         // addResource, // REMOVED
         hasEarnedBaseCompletionBadge,
+        incrementResolvedEventCount,
+        triggerDataWave, // Select the new action
+        triggerVfx, // Import the new triggerVfx action
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
-            mode: state.mode,
+            game_mode: state.game_mode,
             planetName: state.planetName,
             growthPoints: state.growthPoints,
             era: state.era, // Add to selector
@@ -37,6 +40,9 @@ const ResourcePanel = () => {
             coinbaseProvider: state.coinbaseProvider, // Add provider
             // addResource: state.addResource, // REMOVED
             hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
+            incrementResolvedEventCount: state.incrementResolvedEventCount,
+            triggerDataWave: state.triggerDataWave, // Add to selector
+            triggerVfx: state.triggerVfx, // Add to selector
         }))
     );
 
@@ -116,7 +122,7 @@ const ResourcePanel = () => {
 
         // --- Log connectedWallet right before the check --- 
         console.log("[handlePublish] Checking connectedWallet:", walletAddress);
-        console.log("[handlePublish] typeof connectedWallet.getProvider:", typeof walletAddress?.getProvider);
+        console.log("[handlePublish] typeof connectedWallet?.getProvider:", typeof walletAddress?.getProvider);
         // ---
 
         // Initial Checks
@@ -152,7 +158,7 @@ const ResourcePanel = () => {
                 { trait_type: "Final Karma", value: karma },
                 { trait_type: "Era Reached", value: era },
                 { trait_type: "Turns Survived", value: turn },
-                { trait_type: "Mode", value: mode },
+                { trait_type: "Mode", value: game_mode },
             ],
             planet_log: narrativeLog, 
         };
@@ -231,7 +237,7 @@ const ResourcePanel = () => {
 
     return (
         <div className="resource-panel">
-            <h2>{planetName} <span className={`mode-badge mode-${mode.toLowerCase()}`}>{mode}</span></h2>
+            <h2>{planetName} <span className={`mode-badge mode-${game_mode.toLowerCase()}`}>{game_mode}</span></h2>
             <div className="planet-stats">
                 <span>Era: {era}</span>
                 <span>Turn: {turn}</span>
@@ -261,6 +267,27 @@ const ResourcePanel = () => {
                       {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
                   </button>
                 </div>
+                <button 
+                    onClick={triggerDataWave} 
+                    className="test-effect-btn" // Add a class for potential styling
+                    style={{ marginTop: '10px' }} // Add some space
+                >
+                    Trigger Data Wave (Test)
+                </button>
+                <button 
+                    onClick={incrementResolvedEventCount} 
+                    className="test-effect-btn" // Add a class for potential styling
+                    style={{ marginTop: '10px' }} // Add some space
+                >
+                    Trigger Emoji Effect (Test)
+                </button>
+                <button 
+                    onClick={() => triggerVfx('Aliens')} 
+                    className="test-effect-btn" // Use the same class for consistency
+                    style={{ marginTop: '10px' }} // Add some space
+                >
+                    Trigger Alien VFX (Test)
+                </button>
             </div>
             {/* --- Display Publish Status --- */}
             {publishStatus && <p className="publish-status">{publishStatus}</p>}

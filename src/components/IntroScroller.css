@@ -4,19 +4,22 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); /* Slightly transparent black */
-    color: #0f0; /* Green text */
-    font-family: 'Courier New', Courier, monospace; /* Monospace font */
+    /* background-color: rgba(0, 0, 0, 0.9); */ /* Original dark theme */
+    /* color: #0f0; */ /* Original green text */
+    font-family: 'Courier New', Courier, monospace;
     display: flex;
-    flex-direction: column; /* Stack output and button */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Prevent scrollbars */
+    overflow: hidden;
     padding: 20px;
     box-sizing: border-box;
     z-index: 1500;
     opacity: 1;
-    transition: opacity 0.5s ease-out; /* For fade-out */
+    transition: opacity 0.5s ease-out;
+    /* New light theme background */
+    background-color: #1E3A8A    ;
+    color: #FFFFFF    ; /* Dark text for light background */
 }
 
 .intro-container.finished {
@@ -29,56 +32,56 @@
 /* .intro-text { ... } */
 /* @keyframes scrollIntro { ... } */
 
-/* New console styles */
+/* New console styles (adjusting for new base light theme) */
 .intro-container.console-style {
-    background-color: #000;
-    color: #0f0; /* Classic green terminal text */
+    /* background-color: #000; */ /* Overridden by .intro-container base style now */
+    /* color: #0f0; */ /* Overridden by .intro-container base style now */
     font-family: 'Courier New', Courier, monospace;
 }
 
 .intro-output {
-    width: 80%; /* Limit width */
+    width: 80%;
     max-width: 700px;
-    height: 70%; /* Let it take up significant height */
-    max-height: 70vh; /* Ensure it doesn't exceed viewport too much */
-    overflow-y: auto; /* Enable vertical scroll if needed */
-    border: 1px solid #0f0; /* Green border */
-    padding: 20px; /* Keep internal padding */
-    margin-bottom: 20px; /* Space before skip button */
-    /* Add padding to push initial content towards center */
-    padding-top: 25vh; /* Adjust as needed */
+    height: 70%;
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 1px solid #FFFFFF    ; /* Dark border for light background */
+    padding: 20px;
+    margin-bottom: 20px;
+    padding-top: 25vh;
     padding-bottom: 20px;
     box-sizing: border-box;
-    /* Hide scrollbar */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 .intro-output::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
 }
 
 .intro-output p {
-    margin: 5px 0; /* Adjust spacing between lines */
-    white-space: pre-wrap; /* Preserve whitespace and wrap */
-    word-break: break-word; /* Break long words if needed */
+    margin: 5px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #FFFFFF    ; /* Ensure paragraph text is dark */
 }
 
+/* Adjusting title and sound effect for light theme */
 .planetarian-title {
-    font-size: 1.5em; /* Make title bigger */
+    font-size: 1.5em;
     font-weight: bold;
     text-align: center;
     margin-top: 20px;
     margin-bottom: 1em;
-    color: #fff; /* White title */
+    color: #111; /* Darker title for light background */
 }
 
 .sound-effect {
-    color: #aaa; /* Dimmer color for sound effects */
+    color: #555; /* Adjusted for light background */
     font-style: italic;
 }
 
 .sound-effect em {
-    color: #888; /* Different color for sound cues */
+    color: #444; /* Adjusted for light background */
     font-style: italic;
 }
 
@@ -97,33 +100,57 @@
     /* animation: blink 1s step-end infinite; */ /* Temporarily disable animation */
 }
 
-.cursor { /* Simplified selector */
+.cursor { 
     display: inline-block;
-    background-color: #0f0; /* Cursor color */
+    background-color: #333; /* Dark cursor for light background */
     width: 10px;            
     height: 1.2em;          
     margin-left: 2px;
-    vertical-align: bottom; /* Align with text baseline */
-    animation: blink 1s step-end infinite; /* Restore animation */
+    vertical-align: bottom;
+    animation: blink 1s step-end infinite;
 }
 
-@keyframes blink { /* Restore animation */
+@keyframes blink {
     from, to { background-color: transparent }
-    50% { background-color: #0f0; } /* Cursor color */
+    50% { background-color: #333; } /* Dark cursor for light background */
 }
 
 /* @keyframes blink { ... } */ /* Temporarily disable animation */
 
 .skip-intro-btn {
-    /* Reuse pixel button style from VideoStartScreen.css */
-    /* Make sure .pixel-button styles are available or copy them */
+    background-color: #3B82F6; /* New button background color */
+    color: #FFFFFF; /* White text for contrast */
+    padding: 10px 20px;
+    border: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    cursor: pointer;
+    /* Add other pixel-button styles if needed, or ensure they are globally available */
 }
 
-/* Style for finished state if needed */
 .intro-container.finished .intro-output {
-    border-color: #555; /* Dim border when finished */
+    border-color: #ccc; /* Lighter border when finished on light theme */
 }
 
 .intro-container.finished .cursor {
-    display: none; /* Hide cursor when finished */
+    display: none;
+}
+
+/* Classes for primary and secondary language lines */
+.intro-zh {
+    /* Styles for Chinese text lines, if primary */
+    /* Example: font-weight: bold; */
+}
+
+.intro-en {
+    /* Styles for English text lines */
+    /* Example: font-size: 0.9em; color: #555; */
+    color: #555; /* Slightly dimmer for secondary language */
+    font-size: 0.95em;
+    margin-top: -3px; /* Adjust spacing if needed */
+}
+
+.intro-spacer {
+    /* Spacers might not need language-specific styling, but good to have */
+    line-height: 0.5em; /* Reduce space for spacer lines */
 } 

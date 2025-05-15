@@ -1,0 +1,64 @@
+/* src/components/CollapsibleResourcePanel.css */
+
+.collapsible-resource-panel-container {
+    position: fixed; /* Or absolute, depending on desired layout */
+    top: 15px; /* Position from top */
+    left: 15px; /* Position from left */
+    z-index: 1000; /* Ensure it's above other content */
+    display: flex;
+    flex-direction: row; /* Arrange button and panel side-by-side */
+    align-items: flex-start; /* Align button and panel to the left */
+}
+
+.resource-panel-toggle-button {
+    /* Basic button styling */
+    background: none; /* No background for just icon */
+    border: none;
+    cursor: pointer;
+    padding: 0; /* Remove padding */
+    margin-right: 5px; /* Space between button/arrow and panel - Adjusted to 5px */
+    display: flex;
+    flex-direction: column; /* Stack icon and arrow vertically */
+    align-items: center;
+    z-index: 1001; /* Ensure button is above the panel content */
+}
+
+.resource-panel-toggle-button:hover {
+    opacity: 0.8; /* Simple hover effect */
+}
+
+.resource-panel-toggle-button img {
+    width: 50px; /* Adjust icon size */
+    height: auto;
+    /* Add more styling for icon if needed */
+    display: block; /* Prevent extra space below image */
+}
+
+.resource-panel-arrow {
+    font-size: 20px; /* Size of the arrow */
+    color: white; /* Color of the arrow */
+    margin-top: 5px; /* Space between icon and arrow */
+}
+
+.resource-panel-content {
+    /* Styling for the container holding ResourcePanel */
+    background-color: rgba(0, 0, 0, 0); /* Semi-transparent background */
+    /* padding: 15px; */
+    /* border-radius: 8px; */
+    max-width: auto; /* Adjust as needed */
+    /* Add transition for smooth open/close effect */
+    width: 0; /* Start with 0 width when collapsed */
+    opacity: 0; /* Start with 0 opacity when collapsed */
+    transition: width 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    overflow: hidden; /* Hide overflowing content when collapsed */
+    white-space: nowrap; /* Prevent content from wrapping during collapse */
+}
+
+.collapsible-resource-panel-container.open .resource-panel-content {
+    width: 300px; /* Set to desired width when open */
+    opacity: 1; /* Make visible when open */
+    /* padding: 15px; */ /* Restore padding when open */
+}
+
+/* ResourcePanel component itself will need responsive adjustments if needed,
+   but this container handles the collapsing */ 

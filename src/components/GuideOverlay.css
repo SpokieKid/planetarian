@@ -47,6 +47,10 @@
   flex-grow: 1;
   color: #e0e0e0; /* Light text color */
   font-family: 'Courier New', Courier, monospace;
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Stack children vertically */
+  align-items: stretch; /* Stretch items to fill width (default) */
+  gap: 18px;
 }
 
 .guide-text {
@@ -82,8 +86,8 @@
 /* Ensure pixel button styles are available (copy if not globally defined) */
 /* If not already present in a global CSS file */
 .pixel-button {
-  background-color: #9d4edd; /* A purple color */
-  border: 2px solid #000;
+  background-color: #3B82F6; /* A purple color */
+  border: 2px solid #60A5FA  ;
   color: white;
   padding: 10px 20px; /* Adjusted padding */
   text-align: center;
@@ -100,11 +104,25 @@
 }
 
 .pixel-button:hover {
-  background-color: #c77dff;
+  background-color: #60A5FA  ;
 }
 
 .pixel-button:active {
   background-color: #7b2cbf;
   box-shadow: 1px 1px 0px #000;
   transform: translate(2px, 2px); /* Adjusted transform */
+}
+
+.language-buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+    /* Add some spacing if needed */
+    gap: 18px; 
+}
+
+.language-select-btn { /* Style for the buttons */
+  flex-grow: 1; /* Make buttons share width equally */
+  width: 150px; /* Optional: Prevent buttons from getting too wide */
+  text-align: center; /* Ensure text is centered */
 } 

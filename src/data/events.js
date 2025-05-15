@@ -1,89 +1,198 @@
+import { baseEvents } from './baseEvents'; // Import baseEvents
+import { PLANET_MODES } from '../utils/resourceMapping'; // Import PLANET_MODES
+
 export const events = {
   Era1_Discovery_Prosperity01: {
     eventKey: "Era1_Discovery_Prosperity01",
-    title: "星空的低语",
-    era: 1,
-    karmaLevel: [1, 200], // Representing the range (71, 90)
-    turns: [1, 49], // Representing the range 1-49
-    narrative: [
-      "在星球文明繁荣的光辉下，探索引擎全速运转。",
-      "低维度生命的目光投向更遥远的未知。通过改进的早期天文设备或长距离通讯技术，探测到来自地表之外、甚至可能来自其他星球的重复性、非自然信号。",
-      "这些信号极其微弱，难以捕捉，但在持续的监测中显现出某种规律。"
-    ],
+    title: "event_Era1_Discovery_Prosperity01_title",
+    era: 2,
+    karmaLevel: [71, 90],
+    turns: [1], // Assuming 'turns' should be an array/range based on filtering logic below, changed from single value 1
+    narrative: "event_Era1_Discovery_Prosperity01_narrative",
     conflict:
-      `这"星空的低语"是宇宙中偶然的能量波动，还是来自未知智能文明的刻意尝试？低维度文明内部，一些人急切地想投入庞大资源进行深入研究和回应，希望建立联系。另一些人则保持警惕，认为任何未知接触都蕴含巨大的风险，主张谨慎分析，甚至隔离信息。你作为星球史学家，感知到这股"接触未知"的集体意识正在两极分化。`,
+      "event_Era1_Discovery_Prosperity01_conflict",
     image: '/assets/events/Prosperity01.png',
     options: [
       {
         id: "A",
-        mainText: "推动低维文明中对未知信号积极回应倾向",
-        subText: "引导其集体意识聚焦于\"机遇\"、\"宇宙中的潜在盟友\"、\"知识的飞跃\"等概念。",
-        hashtag: "#宇宙 #接触 #科技 #高风险 #观念转变", // Combined hashtags for the option branch
+        description_zh: "event_Era1_Discovery_Prosperity01_option_A_description_zh",
+        description_en: "event_Era1_Discovery_Prosperity01_option_A_description_en",
+        hashtag_zh: "#宇宙 #接触 #科技 #高风险 #观念转变",
+        hashtag_en: "#Cosmos #Contact #Technology #HighRisk #MindsetShift",
         success: {
-          probability: 60, // Percentage
-          narrative: "研究取得突破，解锁宇宙沟通的初步技术，星球文明的观点出现了巨大冲击。",
+          probability: 60,
+          result_zh: "event_Era1_Discovery_Prosperity01_option_A_success_result_zh",
+          result_en: "event_Era1_Discovery_Prosperity01_option_A_success_result_en",
           stateChanges: {
             // Define specific state changes later if needed
             // e.g., technology: +10
           },
           karmaChange: 15,
-          hashtag: "#突破 #宇宙沟通 #观念冲击", // Specific result hashtag
+          hashtag_zh: "#突破 #宇宙沟通 #观念冲击",
+          hashtag_en: "#突破 #宇宙沟通 #观念冲击",
+          vfx: "Aliens",
         },
         failed: {
-          probability: 40, // Percentage
-          narrative: "研究引发灾难性误解，大量民众纷纷质疑如此高的资金投入大量挤占其他重要领域资源，在舆论压力下星际探索陷入了长期的停滞。",
+          probability: 40,
+          result_zh: "event_Era1_Discovery_Prosperity01_option_A_failed_result_zh",
+          result_en: "event_Era1_Discovery_Prosperity01_option_A_failed_result_en",
           stateChanges: {
             // Define specific state changes later if needed
             // e.g., stability: -5
           },
           karmaChange: -15,
-          hashtag: "#误解 #资源浪费 #探索停滞", // Specific result hashtag
+          hashtag_zh: "#误解 #资源浪费 #探索停滞",
+          hashtag_en: "#误解 #资源浪费 #探索停滞",
+          vfx: "Discussion",
         },
       },
       {
         id: "B",
-        mainText: "强化低维文明中对潜在风险的警惕意识",
-        subText: "引导其集体意识关注\"未知威胁\"、\"盲目投入的愚蠢\"、\"保持隔离的安全\"等概念。",
-        hashtag: "#谨慎 #隔离 #保守 #规避风险 #错过机遇", // Combined hashtags for the option branch
+        description_zh: "event_Era1_Discovery_Prosperity01_option_B_description_zh",
+        description_en: "event_Era1_Discovery_Prosperity01_option_B_description_en",
+        hashtag_zh: "#谨慎 #隔离 #保守 #规避风险 #错过机遇",
+        hashtag_en: "#Caution #Isolation #Conservative #RiskAversion #MissedOpportunity",
         success: {
-          probability: 60, // Percentage
-          narrative: "保守的选择规避了未知风险，保持了现有秩序和发展轨迹。",
+          probability: 60,
+          result_zh: "event_Era1_Discovery_Prosperity01_option_B_success_result_zh",
+          result_en: "event_Era1_Discovery_Prosperity01_option_B_success_result_en",
           stateChanges: {
              // Define specific state changes later if needed
           },
           karmaChange: 0,
-          hashtag: "#风险规避 #维持现状", // Specific result hashtag
+          hashtag_zh: "#风险规避 #维持现状",
+          hashtag_en: "#风险规避 #维持现状",
+          vfx: "n.a",
         },
         failed: {
-          probability: 40, // Percentage
-          narrative: `对星空信号的研究被限制在极小范围内，信息遭到压制。低维度文明将注意力重新投向地表内部的发展和竞争。星球上的各文明错失了与更广阔宇宙连接的潜在机遇。`,
-          stateChanges: {
-             // Define specific state changes later if needed
-          },
-          karmaChange: -3,
-          hashtag: "#信息压制 #机遇错失 #内部竞争", // Specific result hashtag
+           probability: 40,
+           result_zh: "event_Era1_Discovery_Prosperity01_option_B_failed_result_zh",
+           result_en: "event_Era1_Discovery_Prosperity01_option_B_failed_result_en",
+           stateChanges: {
+              // Define specific state changes later if needed
+           },
+           karmaChange: 0,
+           hashtag_zh: "#信息压制 #机遇错失 #内部竞争",
+           hashtag_en: "#信息压制 #机遇错失 #内部竞争",
+           vfx: "n.a",
         },
       },
     ],
     // Note: The 'Result' section from your prompt is incorporated into the Success/Failed outcomes within each option.
   },
+  // Add new event Era1_Empire_Transcendence01 here
+  Era1_Empire_Transcendence01: {
+    eventKey: "Era1_Empire_Transcendence01",
+    title: "event_Era1_Empire_Transcendence01_title", // Assuming title is handled via i18n
+    era: 1,
+    karmaLevel: [91, 100], // Range (91, 100)
+    turns: [2], // Assuming 'turns' should be an array/range, changed from single value 2
+    narrative: [
+      "event_Era1_Empire_Transcendence01_narrative_1",
+      // If the narrative has multiple paragraphs in i18n, add more keys here
+    ],
+    conflict: "event_Era1_Empire_Transcendence01_conflict",
+    image: '/assets/events/UnstableFortress.png', // Placeholder image name, confirm actual file path
+    options: [
+      {
+        id: "A",
+        mainText: "event_Era1_Empire_Transcendence01_option_A_mainText",
+        subText: "", // HTML did not provide subText
+        hashtag: "#真实 #暴露 #反抗 #高风险 #代价 #牺牲", // Using zh hashtags
+        success: {
+          probability: 60,
+          narrative: "event_Era1_Empire_Transcendence01_option_A_success_narrative",
+          stateChanges: {},
+          karmaChange: 10,
+          hashtag: "#突破 #宇宙沟通 #观念冲击", // Using zh hashtags
+          vfx: "Aliens",
+        },
+        failed: null, // Option A in HTML only listed a Success outcome
+      },
+      {
+        id: "B",
+        mainText: "event_Era1_Empire_Transcendence01_option_B_mainText",
+        subText: "", // HTML did not provide subText
+        hashtag: "#压制 #稳定 #僵化 #隐患 #表面和平 #未来风险", // Using zh hashtags
+        success: {
+          probability: 60, // HTML says 60% success for B, but also lists a Failed outcome. Assuming 60% success, 40% failed is implied.
+          narrative: "event_Era1_Empire_Transcendence01_option_B_success_narrative",
+          stateChanges: {},
+          karmaChange: 0,
+          hashtag: "#风险规避 #维持现状", // Using zh hashtags
+          vfx: "Discussion",
+        },
+        failed: {
+           probability: 40, // Assuming 40% failed based on 60% success
+           narrative: "event_Era1_Empire_Transcendence01_option_B_failed_narrative",
+           stateChanges: {},
+           karmaChange: -7,
+           hashtag: "", // HTML did not list hashtags for failed outcome
+           vfx: "Aliens", // HTML listed Discussion VFX for failed
+        },
+      },
+    ],
+  },
   // ... add more events here following the same structure
 };
 
-// Function to potentially get an event based on game state (Era, Karma, Turn)
-// This is a placeholder for now, the actual logic will be more complex
-export const getEligibleEvent = (era, karma, turn) => {
-    // Simple example: return the first event if conditions match (partially)
-    const event = events.Era1_Discovery_Prosperity01;
-    if (
-        event.era === era &&
-        karma >= event.karmaLevel[0] && karma <= event.karmaLevel[1] &&
-        turn >= event.turns[0] && turn <= event.turns[1]
-    ) {
-        return event;
+// Function to potentially get an event based on game state (Era, Karma, Turn, GameMode)
+export const getEligibleEvent = (era, karma, turn, game_mode) => {
+    console.log("[getEligibleEvent] Checking for eligible event with state:", { era, karma, turn, game_mode });
+
+    let eventSource = events; // Default to main planet events
+    let isBaseMode = game_mode === PLANET_MODES.BASE;
+
+    if (isBaseMode) {
+        eventSource = baseEvents; // Use baseEvents for BASE mode
+        console.log("[getEligibleEvent] Using baseEvents source.");
+    } else {
+        console.log("[getEligibleEvent] Using main planet events source.");
     }
-    // In a real scenario, you would filter through all events in the `events` object
-    // and potentially select one randomly from the eligible ones.
-    console.warn("No eligible event found for current state:", { era, karma, turn });
-    return null; // Or return a default/fallback event
+
+
+    const eligibleEvents = Object.values(eventSource).filter(event => {
+        // Skip the manually triggered first BASE event if in BASE mode
+        if (isBaseMode && event.eventKey === 'BASESTONE_01') {
+            return false;
+        }
+
+        // Basic check for turn eligibility.
+        // For main events, assuming event.turns is a range [start, end].
+        // For base events, assuming event.turns is a single number indicating the turn it becomes eligible.
+        // This is a simplified logic and might need refinement based on the actual game design.
+        if (isBaseMode) {
+             // For BASE mode, check if the current turn matches the event's turns value
+             if (event.turns !== turn) {
+                 return false;
+             }
+              // In BASE mode, rely more on the nextEventKey chain in a real implementation
+              // The turn check here is just a basic eligibility check
+        } else {
+            // For main planet mode, check if the current turn is within the event's turns range
+            // Assuming main events 'turns' is an array [start_turn, end_turn]
+             if (!event.turns || turn < event.turns[0] || turn > event.turns[event.turns.length - 1]) {
+                 return false;
+             }
+             // Also check era and karma for main planet events if needed (currently commented out)
+            // if (event.era !== era) { return false; }
+            // if (event.karmaLevel && (karma < event.karmaLevel[0] || karma > event.karmaLevel[1])) { return false; }
+
+        }
+
+
+        // Add other eligibility checks here if necessary (e.g., based on completed events, specific game state flags)
+
+        console.log("[getEligibleEvent] Found eligible event candidate:", event.eventKey, "for turn", turn, "in mode", game_mode);
+        return true;
+    });
+
+    // For now, if multiple events are eligible (which shouldn't happen with turn-based triggers ideally), just return the first one found.
+    if (eligibleEvents.length > 0) {
+        console.log("[getEligibleEvent] Returning eligible event:", eligibleEvents[0].eventKey);
+        return eligibleEvents[0];
+    } else {
+        console.log("[getEligibleEvent] No eligible events found for turn", turn, "in mode", game_mode);
+        return null; // Or return a default/fallback event
+    }
 }; 
