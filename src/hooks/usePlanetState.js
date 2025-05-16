@@ -106,21 +106,23 @@ const usePlanetStore = create(
                 if (view === 'base_planet') {
                     newMode = PLANET_MODES.BASE;
                 } else if (view === 'main_planet') {
-                    // When returning to main_planet, set its mode. 
-                    // Assuming GLOBAL is the primary mode for main_planet view.
-                    // If main_planet can have multiple modes (e.g. GLOBAL, INTERNATIONAL) and you want to remember the last one,
-                    // you'd need another state variable like 'lastMainPlanetMode'.
-                    newMode = PLANET_MODES.GLOBAL; 
+                    newMode = PLANET_MODES.GLOBAL;
                 }
-                // Other views like 'base_intro' don't necessarily change the underlying planet mode directly.
 
-                return {
+                // Update state first
+                const newState = {
                     currentView: view,
                     activeEvent: null, // Clear events on any view change
                     isEventPopupOpen: false,
                     hasPendingEvent: false,
                     game_mode: newMode, // Set the correct mode for the view
                 };
+
+                // Call savePlanetState after state update
+                // Using setTimeout to avoid blocking the state update, though direct call might also work
+                setTimeout(() => get().savePlanetState(), 0);
+
+                return newState;
             }), 
 
             setBaseIntroCompleted: (completed) => set({ hasBaseIntroBeenCompleted: completed }), // <-- Action to set completion
@@ -166,14 +168,14 @@ const usePlanetStore = create(
                 if (!walletAddress) {
                     console.warn("Cannot load state: No wallet address provided.");
                     // Reset to initial state if no address (or handle as needed)
-                    get().resetPlanetState(); // This will also set isPlanetDataLoaded to false via initialGameState
+                    get().resetPlanetState(); // This will also set isPlanetDataLoaded to false
                     return;
                 }
                 console.log(`Loading state from Supabase for ${walletAddress}...`);
                 try {
                     const { data, error } = await supabase
                         .from('planets')
-                        .select('karma, narrative_log, resolved_event_count, is_game_finished, game_mode, era, turn, growth_points, planet_name, triggered_event_keys, earned_base_badge') // Load more complete state including badge
+                        .select('karma, narrative_log, resolved_event_count, is_game_finished, game_mode, era, turn, growth_points, planet_name, triggered_event_keys, earned_base_badge, current_view') // Load more complete state including badge and current_view
                         .eq('wallet_address', walletAddress)
                         .maybeSingle(); // Returns single object or null
 
@@ -202,14 +204,17 @@ const usePlanetStore = create(
                             triggeredEventKeys: data.triggered_event_keys ?? initialGameState.triggeredEventKeys,
                             hasEarnedBaseCompletionBadge: data.earned_base_badge ?? initialGameState.hasEarnedBaseCompletionBadge, // Load badge state
                             isPlanetDataLoaded: true, // Data loaded successfully
-                            // currentView will be reset or handled by navigation logic, not loaded from DB for now
+                            // --- Load currentView from DB ---
+                            currentView: data.current_view ?? initialGameState.currentView,
+                            // ---------------------------------
                         });
-                        console.log("Supabase state loaded and Zustand state updated:", { game_mode: get().game_mode, isPlanetDataLoaded: true }); // Add confirmation log
+                        console.log("Supabase state loaded and Zustand state updated:", { game_mode: get().game_mode, isPlanetDataLoaded: true, currentView: get().currentView }); // Add confirmation log
 
                         // --- IMPORTANT: Add this line ---
                         // Only switch view after data is loaded and state is set
-                        set({ currentView: 'main_planet' });
-                        console.log("Setting currentView to 'main_planet' after state load.");
+                        // Removed the hardcoded switch to 'main_planet' - let the loaded state determine the view.
+                        // set({ currentView: 'main_planet' }); // REMOVE this line
+                        console.log("Setting currentView based on loaded state.");
                         // ---------------------------------
 
                     } else {
@@ -231,8 +236,9 @@ const usePlanetStore = create(
                         get().savePlanetState();
 
                         // --- IMPORTANT: Add this line ---
-                        set({ currentView: 'main_planet' });
-                        console.log("Setting currentView to 'main_planet' after new state initialization.");
+                        // Removed the hardcoded switch to 'main_planet' - let the initial state determine the view.
+                        // set({ currentView: 'main_planet' }); // REMOVE this line
+                        console.log("Setting currentView based on initial state.");
                         // ---------------------------------
                     }
                 } catch (error) {
@@ -246,7 +252,7 @@ const usePlanetStore = create(
             // --- Rewritten savePlanetState using Supabase --- 
             savePlanetState: async () => {
                  // Include is_game_finished and resolved_event_count in save
-                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, game_mode, era, turn, growthPoints, planetName, triggeredEventKeys, hasEarnedBaseCompletionBadge } = get(); 
+                 const { walletAddress, karma, narrativeLog, isGameFinished, resolvedEventCount, game_mode, era, turn, growthPoints, planetName, triggeredEventKeys, hasEarnedBaseCompletionBadge, currentView } = get(); 
                  if (!walletAddress) {
                      console.warn("Cannot save state: No wallet address set.");
                      return;
@@ -255,24 +261,29 @@ const usePlanetStore = create(
                  console.log(`Saving state to Supabase for ${walletAddress}...`);
 
                  try {
-                     // Use upsert to insert or update based on the primary key (walletAddress)
+                     // Prepare data for upsert, explicitly including all fields
+                     const stateToSave = {
+                         wallet_address: walletAddress,
+                         karma: karma,
+                         narrative_log: narrativeLog,
+                         is_game_finished: isGameFinished,
+                         resolved_event_count: resolvedEventCount,
+                         game_mode: game_mode,
+                         era: era,
+                         turn: turn,
+                         growth_points: growthPoints,
+                         planet_name: planetName,
+                         triggered_event_keys: triggeredEventKeys,
+                         earned_base_badge: hasEarnedBaseCompletionBadge,
+                         // --- Add current_view to data to save ---
+                         current_view: currentView,
+                         // -------------------------------------
+                     };
+
+                     // Use upsert to either insert a new row or update an existing one based on wallet_address
                      const { data, error } = await supabase
                          .from('planets')
-                         .upsert({
-                             wallet_address: walletAddress,
-                             karma: karma,
-                             narrative_log: narrativeLog,
-                             is_game_finished: isGameFinished, // Save game finished status
-                             resolved_event_count: resolvedEventCount, // Save resolved count
-                             game_mode: game_mode,
-                             era: era,
-                             turn: turn,
-                             growth_points: growthPoints,
-                             planet_name: planetName,
-                             triggered_event_keys: triggeredEventKeys,
-                             earned_base_badge: hasEarnedBaseCompletionBadge, // Save badge state
-                             // last_updated_at is handled by DB trigger/default
-                         })
+                         .upsert(stateToSave)
                          .select(); // Optionally select the result
 
                      if (error) {
