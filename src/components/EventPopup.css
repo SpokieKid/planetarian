@@ -135,10 +135,9 @@
 
 .story-event-options button {
     display: flex; /* Use flex for emoji + text alignment */
-    align-items: flex-start; /* Align items to the top */
-    width: 220px; /* Fixed width for buttons */
+    align-items: center; /* Align items to the center */
+    width: 300px; /* Fixed width for buttons */
     justify-content: center; /* Center content (emoji+text) within button */
-    height: 120px; /* Fixed height for buttons - adjust as needed */
     padding: 10px 15px;
     margin-bottom: 8px;
     background-color: #3B82F6;
@@ -147,6 +146,7 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em; /* Adjusted base font size */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Added a more readable font stack */
     text-align: left;
     transition: background-color 0.2s ease;
 }

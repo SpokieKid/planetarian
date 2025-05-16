@@ -535,7 +535,7 @@ const usePlanetStore = create(
                                 narrativeLog: [...prevState.narrativeLog, { type: 'event_triggered', eventKey: nextEventKeyFromCurrent }], // Add structured log for triggered event
                                 lastResolvedEventVfx: null, // Clear any pending VFX before triggering next event
                             }));
-                        }, 500); // 0.5 second delay
+                        }, 3000); // 0.5 second delay
                     } else {
                         console.warn(`Next event key "${nextEventKeyFromCurrent}" not found in baseEvents.`);
                     }
