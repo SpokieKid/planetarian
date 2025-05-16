@@ -269,35 +269,14 @@ const ResourcePanel = () => {
                   {hasEarnedBaseCompletionBadge && (
                     <img src="/assets/images/badge.gif" alt="Completion Badge" className="mini-badge-cyberpunk" />
                   )}
-                  <button 
-                      onClick={handlePublish} 
+                  <button
+                      onClick={handlePublish}
                       disabled={isPublishing || !walletAddress} // Disable if publishing or wallet not connected
                       className="publish-zora-btn"
                   >
-                      {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
+                      {isPublishing ? 'Publishing...' : 'Coin on Zora'}
                   </button>
                 </div>
-                <button 
-                    onClick={triggerDataWave} 
-                    className="test-effect-btn" // Add a class for potential styling
-                    style={{ marginTop: '10px' }} // Add some space
-                >
-                    Trigger Data Wave (Test)
-                </button>
-                <button 
-                    onClick={incrementResolvedEventCount} 
-                    className="test-effect-btn" // Add a class for potential styling
-                    style={{ marginTop: '10px' }} // Add some space
-                >
-                    Trigger Emoji Effect (Test)
-                </button>
-                <button 
-                    onClick={() => triggerVfx('Aliens')} 
-                    className="test-effect-btn" // Use the same class for consistency
-                    style={{ marginTop: '10px' }} // Add some space
-                >
-                    Trigger Alien VFX (Test)
-                </button>
             </div>
             {/* --- Display Publish Status --- */}
             {publishStatus && <p className="publish-status">{publishStatus}</p>}

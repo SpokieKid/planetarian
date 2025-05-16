@@ -118,5 +118,12 @@ p {
 }
 
 .publish-zora-btn {
-    /* 保持原有样式，可根据需要微调 */
+    background-color: #4A90E2; /* Blue background */
+    color: white; /* White text */
+    /* Add other styles like padding, border, border-radius, cursor as needed */
+    padding: 8px 15px; /* Example padding */
+    border: none; /* Example: remove border */
+    border-radius: 5px; /* Example: rounded corners */
+    cursor: pointer; /* Example: pointer cursor */
+    font-weight: bold; /* Example: bold text */
 } 
