@@ -1,18 +1,17 @@
 import React from 'react';
 import './WormholeIcon.css';
 import usePlanetStore from '../hooks/usePlanetState';
+import { PLANET_MODES } from '../utils/resourceMapping';
 
 const WormholeIcon = () => {
     const setCurrentView = usePlanetStore(state => state.setCurrentView);
+    const initializePlanet = usePlanetStore(state => state.initializePlanet);
     const hasBaseIntroBeenCompleted = usePlanetStore(state => state.hasBaseIntroBeenCompleted);
-    const setMode = usePlanetStore(state => state.setMode); // Assuming a setMode action exists or will be added
 
     const handleClick = () => {
         if (hasBaseIntroBeenCompleted) {
-            console.log('Wormhole clicked! Base intro already completed. Navigating directly to Base planet view...');
-            // If setCurrentView also handles setting the mode based on view, this might be enough.
-            // Otherwise, explicitly set mode if necessary:
-            // usePlanetStore.setState({ mode: PLANET_MODES.BASE }); 
+            console.log('Wormhole clicked! Base intro already completed. Initializing Base planet and navigating directly to Base planet view...');
+            initializePlanet(PLANET_MODES.BASE);
             setCurrentView('base_planet');
         } else {
             console.log('Wormhole clicked! Attempting to navigate to Base planet intro...');
