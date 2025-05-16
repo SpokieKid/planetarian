@@ -98,6 +98,7 @@ p {
 .publish-badge-btn-row {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     margin-bottom: 0;
     margin-top: 0;
@@ -126,4 +127,7 @@ p {
     border-radius: 5px; /* Example: rounded corners */
     cursor: pointer; /* Example: pointer cursor */
     font-weight: bold; /* Example: bold text */
+    display: flex; /* Added to layout icon and text */
+    align-items: center; /* Added to vertically center icon and text */
+    gap: 8px; /* Added to create space between icon and text */
 } 

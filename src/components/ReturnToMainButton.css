@@ -3,7 +3,7 @@
     bottom: 20px; /* Or any other position you prefer */
     right: 20px;  /* Or any other position you prefer */
     z-index: 1000; /* Ensure it's on top */
-    padding: 8px 12px;
+    padding: 8px 8px;
     background-color: #4a4e69; /* Muted grey-blue, adjust as needed */
     /* Uses .pixel-button for base styling, can override here */
 }
