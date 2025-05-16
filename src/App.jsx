@@ -181,6 +181,13 @@ function App() {
         if (showIntro) setShowIntro(false);
         if (showGuide) setShowGuide(false); // Ensure guide is also closed
 
+        // If currentView is 'base_intro' and the base intro hasn't been completed,
+        // let the BaseIntroScroller handle the flow. Don't redirect from here.
+        if (currentView === 'base_intro' && !hasBaseIntroBeenCompleted) {
+          console.log('[App Effect - Skip Intro] In base_intro and not yet completed. Allowing BaseIntroScroller to manage flow.');
+          return; // Exit early
+        }
+
         // Determine the target view based on game_mode
         let targetView = '';
         if (game_mode === PLANET_MODES.BASE) {
@@ -208,6 +215,7 @@ function App() {
     setShowVideoScreen,
     setShowIntro,
     setShowGuide,
+    hasBaseIntroBeenCompleted,
     // PLANET_MODES.BASE is a constant and doesn't need to be in dependencies
   ]);
 
