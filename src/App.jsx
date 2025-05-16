@@ -72,6 +72,20 @@ const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的�
 function App() {
   const { t } = useTranslation();
 
+  // Local UI State
+  const [showIntro, setShowIntro] = useState(true);
+  const [showVideoScreen, setShowVideoScreen] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
+  const [isZoomEnabled, setIsZoomEnabled] = useState(true);
+
+  // Log showVideoScreen state at the beginning of each render
+  console.log('[App Render Start] showVideoScreen:', showVideoScreen, 'showIntro:', showIntro, 'currentView:', usePlanetStore.getState().currentView);
+
+  const [isEffectDelayActive, setIsEffectDelayActive] = useState(false);
+  const prevActiveEventRef = useRef();
+
   // Zustand State and Actions (Modified for Wagmi)
   const {
     initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
@@ -138,19 +152,6 @@ function App() {
   const { data: connectorClient } = useConnectorClient();
   // --- End wagmi hooks ---
 
-  // Local UI State
-  const [showIntro, setShowIntro] = useState(true);
-  const [showVideoScreen, setShowVideoScreen] = useState(true);
-  const [showGuide, setShowGuide] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
-  const [isZoomEnabled, setIsZoomEnabled] = useState(true);
-
-  const [isEffectDelayActive, setIsEffectDelayActive] = useState(false);
-  const prevActiveEventRef = useRef();
-
-  // The isSdkInitialized and setIsSdkInitialized state variables previously here should be removed as they are unused.
-
   // --- Sentry Context Logging ---
   useEffect(() => {
     Sentry.setContext("appState", {
@@ -166,6 +167,49 @@ function App() {
     });
   }, [isConnected, walletAddressWagmi, chain, game_mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
   // --- End Sentry Context Logging ---
+
+  // Effect to skip intros if user data is loaded
+  useEffect(() => {
+    // Only proceed if wallet is connected, planet data is loaded, and a game mode is established
+    if (isConnected && isPlanetDataLoaded && game_mode) {
+      const currentlyInIntroPhase = showVideoScreen || showIntro || currentView === 'base_intro' || showGuide;
+
+      if (currentlyInIntroPhase) {
+        console.log('[App Effect - Skip Intro] User data loaded, attempting to skip intros.', { game_mode, currentView, showVideoScreen, showIntro, showGuide });
+
+        if (showVideoScreen) setShowVideoScreen(false);
+        if (showIntro) setShowIntro(false);
+        if (showGuide) setShowGuide(false); // Ensure guide is also closed
+
+        // Determine the target view based on game_mode
+        let targetView = '';
+        if (game_mode === PLANET_MODES.BASE) {
+          targetView = 'base_planet';
+        } else if (game_mode) { // Any other loaded game mode
+          targetView = 'main_planet';
+        }
+
+        // Update currentView if it's not already the target game view
+        if (targetView && currentView !== targetView) {
+          setCurrentView(targetView);
+          console.log('[App Effect - Skip Intro] Set currentView to:', targetView);
+        }
+      }
+    }
+  }, [
+    isConnected,
+    isPlanetDataLoaded,
+    game_mode,
+    showVideoScreen,
+    showIntro,
+    showGuide,
+    currentView,
+    setCurrentView,
+    setShowVideoScreen,
+    setShowIntro,
+    setShowGuide,
+    // PLANET_MODES.BASE is a constant and doesn't need to be in dependencies
+  ]);
 
   // Effect to detect mobile devices and control zoom
   useEffect(() => {
