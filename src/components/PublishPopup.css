@@ -1,0 +1,118 @@
+.publish-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* background-color: rgba(0, 0, 0, 0.6); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2005; /* Higher z-index than EventPopup */
+    backdrop-filter: blur(4px);
+    padding: 15px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.publish-popup-card {
+    position: relative;
+    background-color: #2a2a3e; /* Slightly different background from EventPopup */
+    color: #e0e0f0;
+    padding: 25px 30px;
+    border-radius: 10px;
+    max-width: 550px;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: auto;
+    text-align: center; /* Center text by default */
+}
+
+.publish-popup-card h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #fca311; /* Similar to EventPopup title */
+    font-size: 1.3em;
+}
+
+.publish-popup-card p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: #d0d0e0; /* Slightly lighter paragraph text */
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+.publish-popup-card a {
+    color: #61dafb; /* Link color */
+    text-decoration: underline;
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+.publish-popup-card a:hover {
+    color: #fca311;
+}
+
+.close-publish-popup-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #e0e0f0;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 5px 10px;
+    cursor: pointer;
+    line-height: 1;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.close-publish-popup-btn:hover {
+    background-color: rgba(255, 0, 0, 0.6);
+    color: white;
+}
+
+.publish-popup-actions {
+    margin-top: 25px;
+}
+
+.publish-popup-actions button {
+    padding: 10px 20px;
+    background-color: #4f4f81;
+    color: white;
+    border: 1px solid #6a6aaf;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+
+.publish-popup-actions button:hover {
+    background-color: #6a6aaf;
+}
+
+/* Spinner for loading state */
+.publish-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid #fca311;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} 

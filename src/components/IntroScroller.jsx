@@ -13,28 +13,21 @@ const introParagraphKeys = [
     'intro_6',
     'intro_7',
     'intro_8',
-    'intro_9', // TRANSITION_INDEX (index 9)
+    'intro_9',
     'intro_10',
     'intro_11',
-    'intro_12', // Spacer
-    'intro_13', // Spacer
-    'intro_14', // Spacer
-    'intro_15',
-    'intro_16', // Spacer
-    'intro_17',
-    'intro_18', // Spacer
-    'intro_19'
+    'intro_12'
 ];
 
 // Constants for timing
 const TYPING_SPEED_MS = 80;
 const PARAGRAPH_DELAY_MS = 700;
 const FINISH_DELAY_MS = 2000;
-const TRANSITION_INDEX = 9; // Index of 'intro_9'
+const TRANSITION_INDEX = 3; // Index of new 'intro_3' for transition after it
 const TRANSITION_DELAY_MS = 500;
 
-// Helper to check if a key corresponds to a spacer
-const isSpacerKey = (key) => key === 'intro_12' || key === 'intro_13' || key === 'intro_14' || key === 'intro_16' || key === 'intro_18';
+// Helper to check if a key corresponds to a spacer - REMOVED as no specific spacer keys are used now
+// const isSpacerKey = (key) => key === 'intro_12' || key === 'intro_13' || key === 'intro_14' || key === 'intro_16' || key === 'intro_18';
 
 const IntroScroller = ({ onFinished, onTypingFinished }) => {
     const { t, i18n } = useTranslation();
@@ -71,12 +64,12 @@ const IntroScroller = ({ onFinished, onTypingFinished }) => {
         let charIndex = 0;
         let lineAdded = false;
 
-        // Handle spacer lines immediately
-        if (isSpacerKey(currentKey)) {
-            setDisplayedLines(prev => [...prev, { key: currentKey, zh: ' ', en: ' ', type: 'spacer' }]);
-            setTimeout(() => setCurrentParaIndex(prev => prev + 1), PARAGRAPH_DELAY_MS / 2);
-            return;
-        }
+        // Handle spacer lines immediately - REMOVED
+        // if (isSpacerKey(currentKey)) {
+        //     setDisplayedLines(prev => [...prev, { key: currentKey, zh: ' ', en: ' ', type: 'spacer' }]);
+        //     setTimeout(() => setCurrentParaIndex(prev => prev + 1), PARAGRAPH_DELAY_MS / 2);
+        //     return;
+        // }
 
         // Get full texts for both languages
         const fullZhText = i18n.getFixedT('zh')(currentKey);
@@ -157,14 +150,12 @@ const IntroScroller = ({ onFinished, onTypingFinished }) => {
         clearTypingInterval();
         setIsFinished(true);
         const allLines = introParagraphKeys.map(key => {
-            if (isSpacerKey(key)) {
-                return { key, zh: ' ', en: ' ', type: 'spacer' };
-            }
+            // Removed isSpacerKey check, assuming all keys map to normal text
             return {
                 key,
                 zh: i18n.getFixedT('zh')(key),
                 en: i18n.getFixedT('en')(key),
-                type: 'normal'
+                type: 'normal' // All lines are normal now
             };
         });
         // Skip the transition logic if skipping
@@ -196,9 +187,10 @@ const IntroScroller = ({ onFinished, onTypingFinished }) => {
                      const fullTextPrimary = i18n.getFixedT(PrimaryLang)(line.key);
                      const isTyping = !isFinished && !isTransitioning && currentParaIndex < introParagraphKeys.length && isLastLine && line[PrimaryLang]?.length < fullTextPrimary.length;
 
-                     if (line.type === 'spacer') {
-                         return <p key={line.key} className="intro-spacer">{line[PrimaryLang]}</p>; // Render spacer once
-                     }
+                     // Removed spacer type check, all lines rendered similarly now
+                     // if (line.type === 'spacer') {
+                     //     return <p key={line.key} className="intro-spacer">{line[PrimaryLang]}</p>; 
+                     // }
 
                      // Render both languages, primary first
                      return (

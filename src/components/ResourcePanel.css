@@ -98,6 +98,7 @@ p {
 .publish-badge-btn-row {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     margin-bottom: 0;
     margin-top: 0;
@@ -118,5 +119,15 @@ p {
 }
 
 .publish-zora-btn {
-    /* 保持原有样式，可根据需要微调 */
+    background-color: #4A90E2; /* Blue background */
+    color: white; /* White text */
+    /* Add other styles like padding, border, border-radius, cursor as needed */
+    padding: 8px 15px; /* Example padding */
+    border: none; /* Example: remove border */
+    border-radius: 5px; /* Example: rounded corners */
+    cursor: pointer; /* Example: pointer cursor */
+    font-weight: bold; /* Example: bold text */
+    display: flex; /* Added to layout icon and text */
+    align-items: center; /* Added to vertically center icon and text */
+    gap: 8px; /* Added to create space between icon and text */
 } 

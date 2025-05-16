@@ -3,10 +3,11 @@ import { useShallow } from 'zustand/react/shallow'; // Import useShallow
 import usePlanetStore from '../hooks/usePlanetState';
 import { PinataSDK } from 'pinata'; // Import from new package
 import { createPublicClient, http } from 'viem'; // Only need public client utils now
-import { base } from 'viem/chains'; // Import target chain (e.g., base)
+import { baseSepolia } from 'viem/chains'; // Import target chain (e.g., baseSepolia)
 import { createCoinCall } from '@zoralabs/coins-sdk'; // Import createCoinCall
 // import { getResourceModifiers } from '../utils/resourceMapping'; // REMOVED unused import
 import './ResourcePanel.css'; // Add basic styling
+import PublishPopup from './PublishPopup'; // Import the new popup component
 
 const ResourcePanel = () => {
     // Use useShallow for state selection involving objects or multiple primitives
@@ -23,9 +24,9 @@ const ResourcePanel = () => {
         coinbaseProvider, // Get Coinbase provider
         // addResource, // REMOVED
         hasEarnedBaseCompletionBadge,
-        incrementResolvedEventCount,
-        triggerDataWave, // Select the new action
-        triggerVfx, // Import the new triggerVfx action
+        // incrementResolvedEventCount, // REMOVED
+        // triggerDataWave, // REMOVED
+        // triggerVfx, // REMOVED
     } = usePlanetStore(
         useShallow(state => ({
             // resources: state.resources, // REMOVED
@@ -40,15 +41,25 @@ const ResourcePanel = () => {
             coinbaseProvider: state.coinbaseProvider, // Add provider
             // addResource: state.addResource, // REMOVED
             hasEarnedBaseCompletionBadge: state.hasEarnedBaseCompletionBadge,
-            incrementResolvedEventCount: state.incrementResolvedEventCount,
-            triggerDataWave: state.triggerDataWave, // Add to selector
-            triggerVfx: state.triggerVfx, // Add to selector
+            // incrementResolvedEventCount: state.incrementResolvedEventCount, // REMOVED
+            // triggerDataWave: state.triggerDataWave, // REMOVED
+            // triggerVfx: state.triggerVfx, // REMOVED
         }))
     );
 
     // --- Log the entire useWallets return object --- 
     console.log("Zustand walletAddress:", walletAddress);
     // ---
+
+    // Add this useEffect for debugging Coinbase Provider status
+    useEffect(() => {
+        console.log("[ResourcePanel Debug] Coinbase Provider from store:", coinbaseProvider);
+        if (coinbaseProvider) {
+            console.log("[ResourcePanel Debug] Coinbase Provider is available.");
+        } else {
+            console.log("[ResourcePanel Debug] Coinbase Provider is currently NOT available from store. Ensure wallet is connected and SDK initialized.");
+        }
+    }, [coinbaseProvider]);
 
     // --- Component State for Publishing --- 
     const [isPublishing, setIsPublishing] = useState(false);
@@ -57,6 +68,7 @@ const ResourcePanel = () => {
     const [zoraTxHash, setZoraTxHash] = useState(null); // State for Zora transaction hash
     // --- Add State for Viem Clients --- 
     const [publicClient, setPublicClient] = useState(null);
+    const [showPublishPopup, setShowPublishPopup] = useState(false); // State for popup visibility
     // const [walletClient, setWalletClient] = useState(null); // REMOVE walletClient state
     // --- End State for Viem Clients --- 
 
@@ -77,7 +89,7 @@ const ResourcePanel = () => {
     // --- End Pinata Configuration ---
 
     // --- Viem/Zora Config --- 
-    const TARGET_CHAIN = base; // Or your desired chain
+    const TARGET_CHAIN = baseSepolia; // Use baseSepolia
     const RPC_URL = import.meta.env.VITE_BASE_SEPOLIA_RPC_URL; // Get RPC URL from .env
 
     // --- Effect to Initialize ONLY Public Client --- 
@@ -116,9 +128,11 @@ const ResourcePanel = () => {
 
     // --- Publish Function --- 
     const handlePublish = async () => {
-        setPublishStatus(''); // Reset status
+        setShowPublishPopup(true); // Open the popup
+        setPublishStatus(''); 
         setIpfsUri(null);
         setZoraTxHash(null);
+        setIsPublishing(true); // Set initial publishing state for the popup
 
         // --- Log connectedWallet right before the check --- 
         console.log("[handlePublish] Checking connectedWallet:", walletAddress);
@@ -128,27 +142,28 @@ const ResourcePanel = () => {
         // Initial Checks
         if (!walletAddress) { 
             setPublishStatus('Error: Wallet not connected.');
+            setIsPublishing(false);
             return;
         }
         if (!pinata) {
              setPublishStatus('Error: Pinata client not configured.');
+             setIsPublishing(false);
              return;
         }
          if (!publicClient) { // Only check publicClient from state
              setPublishStatus('Error: Public blockchain client not ready. Check RPC URL.');
              console.error("PublicClient not available in state.", { publicClient });
+             setIsPublishing(false);
              return;
          }
          // Check if Coinbase Provider is available
          if (!coinbaseProvider) {
              setPublishStatus('Error: Coinbase Wallet provider not available.');
              console.error("Coinbase Provider not available in state.");
+             setIsPublishing(false);
              return;
          }
 
-        setIsPublishing(true);
-        
-        // --- IPFS Upload --- 
         setPublishStatus('Generating metadata...');
         const metadata = {
             name: `Planet ${planetName} Log (${walletAddress.substring(0, 6)})`,
@@ -235,6 +250,15 @@ const ResourcePanel = () => {
     };
     // --- End Publish Function --- 
 
+    const handleClosePublishPopup = () => {
+        setShowPublishPopup(false);
+        // Optionally reset status when closing if not fully completed, or let it persist
+        // if (isPublishing) { // If closed mid-process
+        //     setIsPublishing(false);
+        //     setPublishStatus('Publishing cancelled by user.');
+        // }
+    };
+
     return (
         <div className="resource-panel">
             <h2>{planetName} <span className={`mode-badge mode-${game_mode.toLowerCase()}`}>{game_mode}</span></h2>
@@ -259,55 +283,27 @@ const ResourcePanel = () => {
                   {hasEarnedBaseCompletionBadge && (
                     <img src="/assets/images/badge.gif" alt="Completion Badge" className="mini-badge-cyberpunk" />
                   )}
-                  <button 
-                      onClick={handlePublish} 
-                      disabled={isPublishing || !walletAddress} // Disable if publishing or wallet not connected
+                  <button
+                      onClick={handlePublish}
+                      disabled={isPublishing && showPublishPopup} // Disable if already publishing (popup is open)
                       className="publish-zora-btn"
                   >
-                      {isPublishing ? 'Publishing...' : 'Publish Planet Log'}
+                      <img src="/assets/icons/zora-icon.png" alt="Zora Icon" style={{ width: '20px', height: 'auto' }} />
+                      { (isPublishing && showPublishPopup) ? 'Publishing...' : 'Coin on Zora'}
                   </button>
                 </div>
-                <button 
-                    onClick={triggerDataWave} 
-                    className="test-effect-btn" // Add a class for potential styling
-                    style={{ marginTop: '10px' }} // Add some space
-                >
-                    Trigger Data Wave (Test)
-                </button>
-                <button 
-                    onClick={incrementResolvedEventCount} 
-                    className="test-effect-btn" // Add a class for potential styling
-                    style={{ marginTop: '10px' }} // Add some space
-                >
-                    Trigger Emoji Effect (Test)
-                </button>
-                <button 
-                    onClick={() => triggerVfx('Aliens')} 
-                    className="test-effect-btn" // Use the same class for consistency
-                    style={{ marginTop: '10px' }} // Add some space
-                >
-                    Trigger Alien VFX (Test)
-                </button>
             </div>
-            {/* --- Display Publish Status --- */}
-            {publishStatus && <p className="publish-status">{publishStatus}</p>}
-            {/* Show IPFS link specifically when IPFS URI is available and status indicates success */}
-            {ipfsUri && publishStatus.startsWith('IPFS Uploaded') && (
-                <p className="ipfs-result">IPFS Link: 
-                    <a href={`https://${PINATA_GATEWAY}/ipfs/${ipfsUri.split('//')[1]}`} target="_blank" rel="noopener noreferrer">
-                        Check it out here
-                    </a>
-                </p>
-            )}
-            {zoraTxHash && (
-                <div className="zora-result">
-                    <p>Zora Coin Creation Transaction:</p>
-                     <a href={`${TARGET_CHAIN.blockExplorers.default.url}/tx/${zoraTxHash}`} target="_blank" rel="noopener noreferrer">
-                         {zoraTxHash}
-                     </a>
-                     <p>(Coin address will be available after transaction confirmation)</p>
-                </div>
-            )}
+
+            <PublishPopup 
+                isOpen={showPublishPopup}
+                onClose={handleClosePublishPopup}
+                publishStatus={publishStatus}
+                ipfsUri={ipfsUri}
+                zoraTxHash={zoraTxHash}
+                isPublishing={isPublishing}
+                pinataGatewayUrl={PINATA_GATEWAY} // Pass gateway URL
+                targetChainBlockExplorerUrl={TARGET_CHAIN.blockExplorers.default.url} // Pass explorer URL
+            />
         </div>
     );
 };

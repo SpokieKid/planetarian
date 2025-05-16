@@ -25,7 +25,7 @@ import './App.css';
 import { useTranslation } from 'react-i18next';
 import CollapsibleResourcePanel from './components/CollapsibleResourcePanel';
 import HamburgerMenu from './components/HamburgerMenu';
-import { useAccount, useDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useDisconnect, useSwitchChain, useConnectorClient } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Sentry from "@sentry/react";
 import { getEligibleEvent } from './data/events';
@@ -72,6 +72,20 @@ const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的�
 function App() {
   const { t } = useTranslation();
 
+  // Local UI State
+  const [showIntro, setShowIntro] = useState(true);
+  const [showVideoScreen, setShowVideoScreen] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
+  const [isZoomEnabled, setIsZoomEnabled] = useState(true);
+
+  // Log showVideoScreen state at the beginning of each render
+  console.log('[App Render Start] showVideoScreen:', showVideoScreen, 'showIntro:', showIntro, 'currentView:', usePlanetStore.getState().currentView);
+
+  const [isEffectDelayActive, setIsEffectDelayActive] = useState(false);
+  const prevActiveEventRef = useRef();
+
   // Zustand State and Actions (Modified for Wagmi)
   const {
     initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
@@ -81,6 +95,7 @@ function App() {
     hasSeenBaseEventTriggerDialogEver, setHasSeenBaseEventTriggerDialogEver,
     showBaseCompletionPopup,
     setWalletAddress,
+    setCoinbaseProvider,
     game_mode,
     isPlanetDataLoaded,
     turn,
@@ -118,6 +133,7 @@ function App() {
       setHasSeenBaseEventTriggerDialogEver: state.setHasSeenBaseEventTriggerDialogEver,
       showBaseCompletionPopup: state.showBaseCompletionPopup,
       setWalletAddress: state.setWalletAddress,
+      setCoinbaseProvider: state.setCoinbaseProvider,
       game_mode: state.game_mode,
       isPlanetDataLoaded: state.isPlanetDataLoaded,
       turn: state.turn,
@@ -132,20 +148,9 @@ function App() {
   const { address: walletAddressWagmi, isConnected, isConnecting, chain } = useAccount();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
+  // --- Get the connector client from wagmi ---
+  const { data: connectorClient } = useConnectorClient();
   // --- End wagmi hooks ---
-
-  // Local UI State
-  const [showIntro, setShowIntro] = useState(true);
-  const [showVideoScreen, setShowVideoScreen] = useState(true);
-  const [showGuide, setShowGuide] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [showBaseEventTriggerDialog, setShowBaseEventTriggerDialog] = useState(false);
-  const [isZoomEnabled, setIsZoomEnabled] = useState(true);
-
-  const [isEffectDelayActive, setIsEffectDelayActive] = useState(false);
-  const prevActiveEventRef = useRef();
-
-  // The isSdkInitialized and setIsSdkInitialized state variables previously here should be removed as they are unused.
 
   // --- Sentry Context Logging ---
   useEffect(() => {
@@ -162,6 +167,49 @@ function App() {
     });
   }, [isConnected, walletAddressWagmi, chain, game_mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
   // --- End Sentry Context Logging ---
+
+  // Effect to skip intros if user data is loaded
+  useEffect(() => {
+    // Only proceed if wallet is connected, planet data is loaded, and a game mode is established
+    if (isConnected && isPlanetDataLoaded && game_mode) {
+      const currentlyInIntroPhase = showVideoScreen || showIntro || currentView === 'base_intro' || showGuide;
+
+      if (currentlyInIntroPhase) {
+        console.log('[App Effect - Skip Intro] User data loaded, attempting to skip intros.', { game_mode, currentView, showVideoScreen, showIntro, showGuide });
+
+        if (showVideoScreen) setShowVideoScreen(false);
+        if (showIntro) setShowIntro(false);
+        if (showGuide) setShowGuide(false); // Ensure guide is also closed
+
+        // Determine the target view based on game_mode
+        let targetView = '';
+        if (game_mode === PLANET_MODES.BASE) {
+          targetView = 'base_planet';
+        } else if (game_mode) { // Any other loaded game mode
+          targetView = 'main_planet';
+        }
+
+        // Update currentView if it's not already the target game view
+        if (targetView && currentView !== targetView) {
+          setCurrentView(targetView);
+          console.log('[App Effect - Skip Intro] Set currentView to:', targetView);
+        }
+      }
+    }
+  }, [
+    isConnected,
+    isPlanetDataLoaded,
+    game_mode,
+    showVideoScreen,
+    showIntro,
+    showGuide,
+    currentView,
+    setCurrentView,
+    setShowVideoScreen,
+    setShowIntro,
+    setShowGuide,
+    // PLANET_MODES.BASE is a constant and doesn't need to be in dependencies
+  ]);
 
   // Effect to detect mobile devices and control zoom
   useEffect(() => {
@@ -195,22 +243,23 @@ function App() {
 
   // --- Effect to Load User State using wagmi Account ---
   useEffect(() => {
-      console.log("[wagmi Effect] isConnected:", isConnected, "Address:", walletAddressWagmi, "Chain:", chain);
-      if (isConnected && walletAddressWagmi) {
+      console.log("[wagmi Effect] isConnected:", isConnected, "Address:", walletAddressWagmi, "Chain:", chain, "ConnectorClient:", connectorClient);
+      if (isConnected && walletAddressWagmi && connectorClient) { // Also check for connectorClient
           console.log("Wallet connected via wagmi, calling loadPlanetState for:", walletAddressWagmi);
 
           // Check if the current chain is Base Sepolia, if not, prompt to switch
           if (chain?.id !== baseSepolia.id) {
             console.log(`Connected to chain ID ${chain?.id}, switching to Base Sepolia (${baseSepolia.id})`);
-            // Use the switchChain function provided by useSwitchChain
             switchChain({ chainId: baseSepolia.id });
-            // The rest of the logic will run AFTER the chain is switched and the effect re-runs
-            return; // Exit this run of the effect, it will re-run after switch
+            return; 
           }
 
-          // If already on the correct chain, proceed with loading state and UI
-          console.log("Wallet connected and on correct chain. Loading state.");
+          console.log("Wallet connected and on correct chain. Loading state and setting provider.");
           setWalletAddress(walletAddressWagmi);
+          // --- Set the coinbaseProvider in Zustand store ---
+          // The connectorClient itself can often act as an EIP-1193 provider.
+          // If it's a Viem client, it should have a 'request' method.
+          setCoinbaseProvider(connectorClient); 
           loadPlanetState(walletAddressWagmi);
 
           if (showGuide) {
@@ -221,9 +270,12 @@ function App() {
       } else if (!isConnected) {
           console.log("Wallet not connected via wagmi.");
           setWalletAddress(null);
+          // --- Clear the coinbaseProvider in Zustand store when disconnected ---
+          setCoinbaseProvider(null);
           resetPlanetState();
       }
-  }, [isConnected, walletAddressWagmi, loadPlanetState, setWalletAddress, resetPlanetState, chain, switchChain]); // Removed showGuide from dependencies
+  // Add connectorClient to dependencies
+  }, [isConnected, walletAddressWagmi, loadPlanetState, setWalletAddress, resetPlanetState, chain, switchChain, connectorClient, setCoinbaseProvider]);
 
   // Game loop
   useEffect(() => {

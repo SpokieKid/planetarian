@@ -65,7 +65,7 @@ const BaseIntroScroller = ({ onFinished }) => {
                 <div className="base-intro-navigation">
                     {/* Show UP button only if not on the first page AND not on the last page where FINISH is shown */}
                     {currentIndex > 0 && currentIndex < BASE_INTRO_TEXT.length - 1 && (
-                        <button onClick={handlePrev} className="pixel-button prev-button">UP</button>
+                        <button onClick={handlePrev} className="pixel-button prev-button">BACK</button>
                     )}
                     {currentIndex < BASE_INTRO_TEXT.length - 1 ? (
                         <button onClick={handleNext} className="pixel-button next-button">NEXT</button>
