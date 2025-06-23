@@ -17,7 +17,7 @@ const guideStepKeys = [
 ];
 
 // Modify props to use isConnected and disconnect from wagmi, remove authenticated and login
-const GuideOverlay = ({ isConnected, disconnect, onClose }) => {
+const GuideOverlay = ({ isConnected, onClose }) => {
     const { t, i18n } = useTranslation();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [planetNumber, setPlanetNumber] = useState('xxx'); // Default to xxx
@@ -27,6 +27,19 @@ const GuideOverlay = ({ isConnected, disconnect, onClose }) => {
     useEffect(() => {
         setIsVisible(true); // For fade-in effect
     }, []);
+
+    // Effect to auto-proceed on the final step if already connected
+    useEffect(() => {
+        // If we are on the final step and the user is connected, automatically close the guide.
+        if (isConnected && currentStepIndex === guideStepKeys.length - 1) {
+            // Adding a small delay to allow the user to read the last message.
+            const timer = setTimeout(() => {
+                onClose();
+            }, 1500); // 1.5 second delay
+
+            return () => clearTimeout(timer); // Cleanup timer on unmount
+        }
+    }, [isConnected, currentStepIndex, onClose]);
 
     const handleLanguageSelect = (lang) => {
         i18n.changeLanguage(lang);

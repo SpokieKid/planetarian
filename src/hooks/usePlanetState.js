@@ -89,17 +89,12 @@ const usePlanetStore = create(
             // --- Core State --- Spread initial state here for defaults ---
             ...initialGameState, 
             // --- Overwrite specific initial values if needed ---
-            coinbaseProvider: null, // New state for Coinbase Provider
-            coinbaseAccount: null, // New state for Coinbase Account
             walletAddress: null, 
             createdAt: Date.now(),
             lastTickTime: Date.now(),
 
             // --- Actions ---
             setWalletAddress: (address) => set({ walletAddress: address }),
-            setCoinbaseProvider: (provider) => set({ coinbaseProvider: provider }),
-            setCoinbaseAccount: (account) => set({ coinbaseAccount: account, walletAddress: account }), // Update walletAddress here
-            clearCoinbaseConnection: () => set({ coinbaseProvider: null, coinbaseAccount: null, walletAddress: null }), // Action to clear connection
             setCurrentView: (view) => set(state => {
                 console.log(`Setting current view from ${state.currentView} to ${view}`);
                 let newMode = state.game_mode;
@@ -163,7 +158,13 @@ const usePlanetStore = create(
             },
 
             // --- Rewritten loadPlanetState using Supabase --- 
-            loadPlanetState: async (walletAddress) => {
+            loadPlanetState: async (walletAddress, provider) => { // Accept provider
+                if (provider) {
+                  // If a provider is passed, you can instantiate ethers or other libraries here
+                  // For now, we'll just log that we received it.
+                  console.log("[usePlanetState] Ethers provider could be created with:", provider);
+                }
+
                 set({ isPlanetDataLoaded: false }); // Set loading to false at the start
                 if (!walletAddress) {
                     console.warn("Cannot load state: No wallet address provided.");

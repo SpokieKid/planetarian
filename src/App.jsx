@@ -15,7 +15,6 @@ import BaseIntroScroller from './components/BaseIntroScroller';
 import VideoStartScreen from './components/VideoStartScreen';
 import GuideOverlay from './components/GuideOverlay';
 import usePlanetStore from './hooks/usePlanetState';
-import { useShallow } from 'zustand/react/shallow';
 import { PLANET_MODES } from './utils/resourceMapping';
 import { EVENTS_TO_FINISH } from './constants/events';
 import ReturnToMainButton from './components/ReturnToMainButton';
@@ -29,6 +28,7 @@ import { useAccount, useDisconnect, useSwitchChain, useConnectorClient } from 'w
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Sentry from "@sentry/react";
 import { getEligibleEvent } from './data/events';
+import { sdk } from '@farcaster/frame-sdk';
 
 // --- Wagmi Configuration ---
 // The wagmiConfig constant previously here should be removed as it was moved to main.jsx
@@ -72,6 +72,98 @@ const NOUNII_SYSTEM_PROMPT = `你是 Nounii，一位跨越叙事维度而生的�
 function App() {
   const { t } = useTranslation();
 
+  // --- Zustand State and Actions (Granular Selectors) ---
+  const initializePlanet = usePlanetStore(state => state.initializePlanet);
+  const tick = usePlanetStore(state => state.tick);
+  const resolvedEventCount = usePlanetStore(state => state.resolvedEventCount);
+  const isGameFinished = usePlanetStore(state => state.isGameFinished);
+  const finishGame = usePlanetStore(state => state.finishGame);
+  const resetPlanetState = usePlanetStore(state => state.resetPlanetState);
+  const activeEvent = usePlanetStore(state => state.activeEvent);
+  const isEventPopupOpen = usePlanetStore(state => state.isEventPopupOpen);
+  const loadPlanetState = usePlanetStore(state => state.loadPlanetState);
+  const currentView = usePlanetStore(state => state.currentView);
+  const setCurrentView = usePlanetStore(state => state.setCurrentView);
+  const isFlowEffectActive = usePlanetStore(state => state.isFlowEffectActive);
+  const triggerSpecificEvent = usePlanetStore(state => state.triggerSpecificEvent);
+  const narrativeLog = usePlanetStore(state => state.narrativeLog);
+  const hasBaseIntroBeenCompleted = usePlanetStore(state => state.hasBaseIntroBeenCompleted);
+  const setBaseIntroCompleted = usePlanetStore(state => state.setBaseIntroCompleted);
+  const hasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.hasSeenBaseEventTriggerDialogEver);
+  const setHasSeenBaseEventTriggerDialogEver = usePlanetStore(state => state.setHasSeenBaseEventTriggerDialogEver);
+  const showBaseCompletionPopup = usePlanetStore(state => state.showBaseCompletionPopup);
+  const setWalletAddress = usePlanetStore(state => state.setWalletAddress);
+  const game_mode = usePlanetStore(state => state.game_mode);
+  const isPlanetDataLoaded = usePlanetStore(state => state.isPlanetDataLoaded);
+  const turn = usePlanetStore(state => state.turn);
+  const era = usePlanetStore(state => state.era);
+  const karma = usePlanetStore(state => state.karma);
+  const isEventPopupMinimized = usePlanetStore(state => state.isEventPopupMinimized);
+  const restoreEventPopup = usePlanetStore(state => state.restoreEventPopup);
+  // --- End Zustand State ---
+
+  // --- Use wagmi hooks for connection status ---
+  const { address: walletAddressWagmi, isConnected, isConnecting, chain } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
+  const { data: connectorClient } = useConnectorClient();
+  // --- End wagmi hooks ---
+
+  // --- Farcaster State ---
+  const [isFarcasterConnected, setIsFarcasterConnected] = useState(false);
+  const [farcasterUser, setFarcasterUser] = useState(null); // Optional: store user data
+  // --- End Farcaster State ---
+
+  // --- Farcaster Context Logging & User Detection ---
+  useEffect(() => {
+    // Polling for Farcaster user data
+    const maxRetries = 15; // 15 * 200ms = 3 seconds
+    let attempts = 0;
+
+    const intervalId = setInterval(() => {
+      const user = sdk.user;
+      console.log(`[Farcaster Polling Attempt ${attempts + 1}] sdk.user:`, user);
+
+      if (user?.fid && user?.custodyAddress) {
+        console.log('[Farcaster] Farcaster user detected:', user);
+        setIsFarcasterConnected(true);
+        setFarcasterUser(user);
+        // This is crucial for other parts of the app to recognize the user.
+        setWalletAddress(user.custodyAddress);
+        
+        // Load planet state for Farcaster user
+        console.log('[Farcaster] Loading planet state for Farcaster user:', user.custodyAddress);
+        loadPlanetState(user.custodyAddress, null); // Pass null for connectorClient as Farcaster doesn't use wagmi
+        
+        // Log context once user is confirmed
+        const context = sdk.context;
+        console.log('[Farcaster] App context:', context);
+        if (context?.location?.type === 'cast_embed') {
+            console.log('[Farcaster] Launched from a cast embed. Cast details:', context.location.cast);
+        }
+
+        clearInterval(intervalId); // Stop polling once found
+      } else {
+        attempts++;
+        if (attempts >= maxRetries) {
+          console.log('[Farcaster Polling] Stopped after 3 seconds, no user found.');
+          clearInterval(intervalId); // Stop polling after timeout
+        }
+      }
+    }, 200); // Poll every 200ms
+
+    // Cleanup function to clear interval if component unmounts
+    return () => clearInterval(intervalId);
+  }, [setWalletAddress, loadPlanetState]); // Add loadPlanetState to dependencies
+
+  // --- Ensure Farcaster SDK is ready ---
+  useEffect(() => {
+    // Call sdk.actions.ready() to hide Farcaster splash screen
+    // This needs to be called regardless of whether VideoStartScreen is shown
+    console.log('[Farcaster] Calling sdk.actions.ready() to hide splash screen');
+    sdk.actions.ready();
+  }, []); // Run only once on mount
+
   // Local UI State
   const [showIntro, setShowIntro] = useState(true);
   const [showVideoScreen, setShowVideoScreen] = useState(true);
@@ -86,77 +178,15 @@ function App() {
   const [isEffectDelayActive, setIsEffectDelayActive] = useState(false);
   const prevActiveEventRef = useRef();
 
-  // Zustand State and Actions (Modified for Wagmi)
-  const {
-    initializePlanet, tick, resolvedEventCount, isGameFinished, finishGame,
-    resetPlanetState, activeEvent, isEventPopupOpen,
-    loadPlanetState, currentView, setCurrentView, isFlowEffectActive,
-    triggerSpecificEvent, narrativeLog, hasBaseIntroBeenCompleted, setBaseIntroCompleted,
-    hasSeenBaseEventTriggerDialogEver, setHasSeenBaseEventTriggerDialogEver,
-    showBaseCompletionPopup,
-    setWalletAddress,
-    setCoinbaseProvider,
-    game_mode,
-    isPlanetDataLoaded,
-    turn,
-    era,
-    karma,
-    isEventPopupMinimized,
-    restoreEventPopup,
-  } = usePlanetStore(
-    useShallow(state => ({
-      // Log when these key states change as seen by App component
-      // console.log("[App] Zustand state selector observed change:", {
-      //   mode: state.mode,
-      //   isPlanetDataLoaded: state.isPlanetDataLoaded,
-      //   activeEvent: !!state.activeEvent, // Use boolean to avoid logging large object
-      //   isEventPopupOpen: state.isEventPopupOpen,
-      //   hasPendingEvent: state.hasPendingEvent,
-      // });
-      initializePlanet: state.initializePlanet,
-      tick: state.tick,
-      resolvedEventCount: state.resolvedEventCount,
-      isGameFinished: state.isGameFinished,
-      finishGame: state.finishGame,
-      resetPlanetState: state.resetPlanetState,
-      activeEvent: state.activeEvent,
-      isEventPopupOpen: state.isEventPopupOpen,
-      loadPlanetState: state.loadPlanetState,
-      currentView: state.currentView,
-      setCurrentView: state.setCurrentView,
-      isFlowEffectActive: state.isFlowEffectActive,
-      triggerSpecificEvent: state.triggerSpecificEvent,
-      narrativeLog: state.narrativeLog,
-      hasBaseIntroBeenCompleted: state.hasBaseIntroBeenCompleted,
-      setBaseIntroCompleted: state.setBaseIntroCompleted,
-      hasSeenBaseEventTriggerDialogEver: state.hasSeenBaseEventTriggerDialogEver,
-      setHasSeenBaseEventTriggerDialogEver: state.setHasSeenBaseEventTriggerDialogEver,
-      showBaseCompletionPopup: state.showBaseCompletionPopup,
-      setWalletAddress: state.setWalletAddress,
-      setCoinbaseProvider: state.setCoinbaseProvider,
-      game_mode: state.game_mode,
-      isPlanetDataLoaded: state.isPlanetDataLoaded,
-      turn: state.turn,
-      era: state.era,
-      karma: state.karma,
-      isEventPopupMinimized: state.isEventPopupMinimized,
-      restoreEventPopup: state.restoreEventPopup,
-    }))
-  );
-
-  // --- Use wagmi hooks for connection status ---
-  const { address: walletAddressWagmi, isConnected, isConnecting, chain } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
-  // --- Get the connector client from wagmi ---
-  const { data: connectorClient } = useConnectorClient();
-  // --- End wagmi hooks ---
+  // --- Combined Connection Status ---
+  const isEffectivelyConnected = isConnected || isFarcasterConnected;
+  // --- End Combined Connection Status ---
 
   // --- Sentry Context Logging ---
   useEffect(() => {
     Sentry.setContext("appState", {
-      isConnected,
-      walletAddress: walletAddressWagmi,
+      isConnected: isEffectivelyConnected, // Use combined status
+      walletAddress: walletAddressWagmi || farcasterUser?.custodyAddress,
       currentChainId: chain?.id,
       game_mode: game_mode,
       currentView,
@@ -165,46 +195,49 @@ function App() {
       showGuide,
       showVideoScreen,
     });
-  }, [isConnected, walletAddressWagmi, chain, game_mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
+  }, [isEffectivelyConnected, walletAddressWagmi, farcasterUser, chain, game_mode, currentView, isPlanetDataLoaded, showIntro, showGuide, showVideoScreen]);
   // --- End Sentry Context Logging ---
 
   // Effect to skip intros if user data is loaded
   useEffect(() => {
     // Only proceed if wallet is connected, planet data is loaded, and a game mode is established
-    if (isConnected && isPlanetDataLoaded && game_mode) {
+    if (isEffectivelyConnected && isPlanetDataLoaded && game_mode) {
       const currentlyInIntroPhase = showVideoScreen || showIntro || currentView === 'base_intro' || showGuide;
 
       if (currentlyInIntroPhase) {
         console.log('[App Effect - Skip Intro] User data loaded, attempting to skip intros.', { game_mode, currentView, showVideoScreen, showIntro, showGuide });
 
-        if (showVideoScreen) setShowVideoScreen(false);
-        if (showIntro) setShowIntro(false);
-        if (showGuide) setShowGuide(false); // Ensure guide is also closed
+        // Add a small delay to ensure Farcaster state is properly set
+        setTimeout(() => {
+          if (showVideoScreen) setShowVideoScreen(false);
+          if (showIntro) setShowIntro(false);
+          if (showGuide) setShowGuide(false); // Ensure guide is also closed
 
-        // If currentView is 'base_intro' and the base intro hasn't been completed,
-        // let the BaseIntroScroller handle the flow. Don't redirect from here.
-        if (currentView === 'base_intro' && !hasBaseIntroBeenCompleted) {
-          console.log('[App Effect - Skip Intro] In base_intro and not yet completed. Allowing BaseIntroScroller to manage flow.');
-          return; // Exit early
-        }
+          // If currentView is 'base_intro' and the base intro hasn't been completed,
+          // let the BaseIntroScroller handle the flow. Don't redirect from here.
+          if (currentView === 'base_intro' && !hasBaseIntroBeenCompleted) {
+            console.log('[App Effect - Skip Intro] In base_intro and not yet completed. Allowing BaseIntroScroller to manage flow.');
+            return; // Exit early
+          }
 
-        // Determine the target view based on game_mode
-        let targetView = '';
-        if (game_mode === PLANET_MODES.BASE) {
-          targetView = 'base_planet';
-        } else if (game_mode) { // Any other loaded game mode
-          targetView = 'main_planet';
-        }
+          // Determine the target view based on game_mode
+          let targetView = '';
+          if (game_mode === PLANET_MODES.BASE) {
+            targetView = 'base_planet';
+          } else if (game_mode) { // Any other loaded game mode
+            targetView = 'main_planet';
+          }
 
-        // Update currentView if it's not already the target game view
-        if (targetView && currentView !== targetView) {
-          setCurrentView(targetView);
-          console.log('[App Effect - Skip Intro] Set currentView to:', targetView);
-        }
+          // Update currentView if it's not already the target game view
+          if (targetView && currentView !== targetView) {
+            setCurrentView(targetView);
+            console.log('[App Effect - Skip Intro] Set currentView to:', targetView);
+          }
+        }, 300); // Small delay to ensure states are properly set
       }
     }
   }, [
-    isConnected,
+    isEffectivelyConnected,
     isPlanetDataLoaded,
     game_mode,
     showVideoScreen,
@@ -267,8 +300,8 @@ function App() {
           // --- Set the coinbaseProvider in Zustand store ---
           // The connectorClient itself can often act as an EIP-1193 provider.
           // If it's a Viem client, it should have a 'request' method.
-          setCoinbaseProvider(connectorClient); 
-          loadPlanetState(walletAddressWagmi);
+          // setCoinbaseProvider(connectorClient);  // REVERT: Avoid storing complex client object in zustand
+          loadPlanetState(walletAddressWagmi, connectorClient); // Pass client directly to the action
 
           if (showGuide) {
               console.log('[Auth Effect] Wallet connected AND guide showing. Closing guide...');
@@ -279,15 +312,15 @@ function App() {
           console.log("Wallet not connected via wagmi.");
           setWalletAddress(null);
           // --- Clear the coinbaseProvider in Zustand store when disconnected ---
-          setCoinbaseProvider(null);
+          // setCoinbaseProvider(null); // REVERT: No longer storing provider
           resetPlanetState();
       }
   // Add connectorClient to dependencies
-  }, [isConnected, walletAddressWagmi, loadPlanetState, setWalletAddress, resetPlanetState, chain, switchChain, connectorClient, setCoinbaseProvider]);
+  }, [isConnected, walletAddressWagmi, loadPlanetState, setWalletAddress, resetPlanetState, chain, switchChain, connectorClient]);
 
   // Game loop
   useEffect(() => {
-    const canStartLoop = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && isConnected;
+    const canStartLoop = currentView === 'main_planet' && !showVideoScreen && !showIntro && !showGuide && !isGameFinished && isEffectivelyConnected;
 
     if (canStartLoop) {
       console.log('[Game Loop Effect] Starting game tick interval.');
@@ -297,9 +330,9 @@ function App() {
         clearInterval(intervalId);
       }
     } else {
-       console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { currentView, showVideoScreen, showIntro, showGuide, isGameFinished, isConnected });
+       console.log('[Game Loop Effect] Conditions not met, tick interval not started.', { currentView, showVideoScreen, showIntro, showGuide, isGameFinished, isConnected: isEffectivelyConnected });
     }
-  }, [currentView, tick, showVideoScreen, showIntro, showGuide, isGameFinished, isConnected]);
+  }, [currentView, tick, showVideoScreen, showIntro, showGuide, isGameFinished, isEffectivelyConnected]);
 
   // Check for game end condition
   useEffect(() => {
@@ -321,12 +354,11 @@ function App() {
 
   // UI Handlers
   const handleVideoScreenFinish = () => {
-    console.log('[App] handleVideoScreenFinish called.');
+    console.log('Video screen finished.');
     setShowVideoScreen(false);
   };
   const handleIntroTypingFinished = () => {
-    console.log('[App] handleIntroTypingFinished called.');
-    setShowGuide(true);
+    // This function might be used to trigger something after the intro text animation
   };
   const handleIntroFinished = () => {
     console.log("Intro finished or skipped, attempting to transition to guide.");
@@ -346,7 +378,7 @@ function App() {
     setShowGuide(false);
     console.log("Guide closed.");
     // After closing guide, if wallet is connected, go to main_planet view
-    if (!isConnected) {
+    if (!isEffectivelyConnected) {
         // If not connected after guide, stay on a state that prompts connection (handled by mainContent logic)
     }
   };
@@ -474,26 +506,29 @@ function App() {
   console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded, isZoomEnabled });
   if (currentView === 'base_intro') {
     console.log('[App] Rendering BaseIntroScroller.');
-    mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
+    mainContent = <BaseIntroScroller onFinish={handleBaseIntroFinish} />;
   } else if (showVideoScreen) {
     console.log('[App] Rendering VideoStartScreen.');
-    mainContent = <VideoStartScreen onStartClick={handleVideoScreenFinish} />;
+    mainContent = <VideoStartScreen onFinish={handleVideoScreenFinish} />;
   } else if (showIntro) {
     console.log('[App] Rendering IntroScroller.');
     mainContent = <IntroScroller onFinished={handleIntroFinished} onTypingFinished={handleIntroTypingFinished} />;
   } else if (showGuide) {
      console.log('[App] Rendering GuideOverlay.', { isConnected, game_mode });
-    mainContent = <GuideOverlay isConnected={isConnected} disconnect={disconnect} onClose={handleGuideClose} />;
-  } else if (!isConnected && currentView !== 'base_intro' && currentView !== 'base_planet') {
+    mainContent = <GuideOverlay isConnected={isEffectivelyConnected} disconnect={disconnect} onClose={handleGuideClose} />;
+  } else if (!isEffectivelyConnected && currentView !== 'base_intro' && currentView !== 'base_planet') {
       console.log('[App] Rendering Please Connect message.');
       mainContent = <div className="please-connect" style={{textAlign: 'center', marginTop: '50px'}}>{t('pleaseConnectWallet')}</div>;
-  } else if (isConnected && walletAddressWagmi && game_mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet')) {
+  } else if (isEffectivelyConnected && (walletAddressWagmi || farcasterUser?.custodyAddress) && game_mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet')) {
      console.log('[App] Rendering Main/Base Planet view.', { game_mode: game_mode, isPlanetDataLoaded });
     mainContent = (
       <>
         {/* Log right before rendering PlanetCanvas */}
         {console.log("[App] About to render PlanetCanvas and CollapsibleResourcePanel", { isZoomEnabled: isZoomEnabled })}
-        <PlanetCanvas isZoomEnabled={isZoomEnabled} />
+        <PlanetCanvas isZoomEnabled={isZoomEnabled}>
+          <ActionIcon onOpenDialog={handleOpenDialog} />
+          <WormholeIcon />
+        </PlanetCanvas>
         <CollapsibleResourcePanel />
         {(currentView === 'main_planet' || currentView === 'base_planet') && activeEvent && <EventPopup />}
         {currentView === 'main_planet' && isFlowEffectActive && <div className="flow-effect active"></div>}
@@ -525,7 +560,7 @@ function App() {
       {/* The following auth controls are for when NOT in intro/video/guide */}
       {!showIntro && !showVideoScreen && !showGuide && (currentView === 'main_planet' || currentView === 'base_planet') && (
            <div className="auth-controls">
-               {!isConnected ? (
+               {!isEffectivelyConnected ? (
                   <Wallet>
                       <ConnectWallet label={t('connectWallet')} />
                   </Wallet>
@@ -552,7 +587,7 @@ function App() {
 
       {mainContent}
 
-      <HamburgerMenu isConnected={isConnected} walletAddress={walletAddressWagmi} t={t} disconnectWallet={disconnect} />
+      <HamburgerMenu isConnected={isEffectivelyConnected} walletAddress={walletAddressWagmi} t={t} disconnectWallet={disconnect} />
 
       {showBaseEventTriggerDialog && currentView === 'base_planet' && (
         <BaseEventTriggerDialog
@@ -565,12 +600,10 @@ function App() {
         <BaseCompletionPopup />
       )}
 
-      {isConnected && walletAddressWagmi && game_mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && !showGuide && (
+      {isEffectivelyConnected && (walletAddressWagmi || farcasterUser?.custodyAddress) && game_mode && isPlanetDataLoaded && (currentView === 'main_planet' || currentView === 'base_planet') && !showIntro && !showVideoScreen && !showGuide && (
          <div className="action-icon-area">
             <ActionIcon onClick={handleOpenDialog} />
-            <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title={t('planetInfoTitle')}>
-              <p>{t('planetInfoDescription')}</p>
-            </DialogBox>
+            <DialogBox isOpen={isDialogOpen} onClose={handleCloseDialog} title={t('planetInfoTitle')} systemPrompt={NOUNII_SYSTEM_PROMPT} />
          </div>
       )}
     </div>
