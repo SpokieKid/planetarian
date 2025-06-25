@@ -16,8 +16,29 @@ const PlanetCanvas = ({ isZoomEnabled }) => {
     // const mode = usePlanetStore(state => state.mode); // Removed as it's unused
     // const visualStyle = getVisualStyle(mode); // Remove or uncomment this line
 
+    // Enhanced touch event handlers to prevent Farcaster frame closing
+    const handleTouchStart = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    };
+
+    const handleTouchMove = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    };
+
+    const handleTouchEnd = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    };
+
     return (
-        <div className="planet-canvas-container">
+        <div 
+            className="planet-canvas-container"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+        >
             <Canvas
                 camera={{ position: [0, 0, 5], fov: 50 }} // Adjust camera position and field of view
                 gl={{ preserveDrawingBuffer: true }} // Needed for potential screenshots
@@ -49,6 +70,14 @@ const PlanetCanvas = ({ isZoomEnabled }) => {
             <style>{`
                 .planet-canvas-container { /* Add a temporary background to see if the div is there */
                     background-color: transparent; /* Allow underlying CSS background to show */
+                    touch-action: none; /* Prevent default touch behaviors like scrolling */
+                    user-select: none; /* Prevent text selection */
+                    -webkit-user-select: none; /* Safari */
+                    -moz-user-select: none; /* Firefox */
+                    -ms-user-select: none; /* IE/Edge */
+                    overscroll-behavior: none; /* Prevent overscroll effects */
+                    -webkit-touch-callout: none; /* Disable callout on iOS */
+                    -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
                 }
             `}</style>
         </div>

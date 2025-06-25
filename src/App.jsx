@@ -160,8 +160,9 @@ function App() {
   useEffect(() => {
     // Call sdk.actions.ready() to hide Farcaster splash screen
     // This needs to be called regardless of whether VideoStartScreen is shown
-    console.log('[Farcaster] Calling sdk.actions.ready() to hide splash screen');
-    sdk.actions.ready();
+    // Set disableNativeGestures to true to prevent swipe-to-dismiss conflicts
+    console.log('[Farcaster] Calling sdk.actions.ready() with disableNativeGestures=true to hide splash screen and disable native gestures');
+    sdk.actions.ready({ disableNativeGestures: true });
   }, []); // Run only once on mount
 
   // Local UI State
@@ -506,7 +507,7 @@ function App() {
   console.log('[App] Determining main content view:', { currentView, showVideoScreen, showIntro, showGuide, isConnected, walletAddress: walletAddressWagmi, game_mode: game_mode, isPlanetDataLoaded, isZoomEnabled });
   if (currentView === 'base_intro') {
     console.log('[App] Rendering BaseIntroScroller.');
-    mainContent = <BaseIntroScroller onFinish={handleBaseIntroFinish} />;
+    mainContent = <BaseIntroScroller onFinished={handleBaseIntroFinish} />;
   } else if (showVideoScreen) {
     console.log('[App] Rendering VideoStartScreen.');
     mainContent = <VideoStartScreen onFinish={handleVideoScreenFinish} />;
