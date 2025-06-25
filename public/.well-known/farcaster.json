@@ -1,0 +1,27 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjMxNzg5NSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDJmNzNkNzk2OGU3QjQ3MGI1OTY0YTQzMDYzOUY1OWZjNzBENTI3NDAifQ",
+    "payload": "eyJkb21haW4iOiJ3d3cucGxhbmV0YXJpYW4uc3BhY2UifQ",
+    "signature": "MHgxZThlYjViYWFlMGVkZDhlOTk1ZTcxMTZkMTczMDBiOWY0NWYyMGE5NzA0NDIzOWRmZDNmNmRhMmU1ZTQ5MGVjN2ZkYjg0MWYxNjk2MzZlZTFkZGM5OTE3OThlNDE5ZDZmODg0NTk5MDA4ODNhOGYyODI0YTk3M2ZlMDRiYzc0OTFi"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Planetarian",
+    "iconUrl": "https://www.planetarian.space/planetatian_logo.png",
+    "homeUrl": "https://www.planetarian.space",
+    "splashImageUrl": "https://www.planetarian.space/planetatian_logo.png",
+    "splashBackgroundColor": "#000000",
+    "subtitle": "Build your own planet",
+    "description": "A game about building and exploring planets.",
+    "primaryCategory": "games",
+    "tags": [
+      "game",
+      "planet",
+      "building",
+      "web3"
+    ],
+    "ogTitle": "Planetarian",
+    "ogDescription": "A game about building and exploring planets. Create your own world in the digital cosmos.",
+    "ogImageUrl": "https://www.planetarian.space/planetatian_logo.png"
+  }
+} 
